@@ -23,7 +23,7 @@ public class SetupSessionThread extends Thread {
             sendingThread.start();
             receivingTread.start();
             session.setSendingThread(sendingThread);
-            session.setReceiveingThread(receivingTread);
+            session.setReceivingThread(receivingTread);
             System.out.println("SetupSessionThread: launched communication threads");
         } catch (Exception e) {
             System.out.println("SetupSessionThread: Failed to launch communication threads");

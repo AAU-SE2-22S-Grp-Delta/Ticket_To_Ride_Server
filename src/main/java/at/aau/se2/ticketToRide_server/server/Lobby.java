@@ -32,12 +32,13 @@ public class Lobby {
     /**
      * creates a new Player within the Lobby
      * @param name unique (in this Lobby) name
-     * @return 0 if successful, -1 on fail
+     * @return the Player if successful, null on fail
      */
-    public int createPlayer(String name) {
-        for (Player player : players) if (player.getName().equals(name)) return -1; //if name is already in use
-        players.add(new Player(name));
-        return 0;
+    public Player createPlayer(String name, Session session) {
+        for (Player player : players) if (player.getName().equals(name)) return null; //if name is already in use
+        Player player = new Player(name, session);
+        players.add(player);
+        return player;
     }
 
     public Player getPlayerByName(String name) {

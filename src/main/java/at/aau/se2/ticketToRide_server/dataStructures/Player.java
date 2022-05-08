@@ -1,5 +1,7 @@
 package at.aau.se2.ticketToRide_server.dataStructures;
 
+import at.aau.se2.ticketToRide_server.server.Session;
+
 /**
  * Player-Class represents a person who is playing the Game
  */
@@ -15,11 +17,14 @@ public class Player
     private int numStones;
     private State state;
 
-    public Player(String name)
+    private Session session;
+
+    public Player(String name, Session session)
     {
         this.id = id++;
         setName(name);
         this.state = State.LOBBY;
+        this.session = session;
     }
 
     public int getId()
@@ -32,7 +37,7 @@ public class Player
         return name;
     }
 
-    //TODO change unique name check
+    //TODO unique name check
     public void setName(String name)
     {
         if (name == null) throw new IllegalArgumentException("name is null");

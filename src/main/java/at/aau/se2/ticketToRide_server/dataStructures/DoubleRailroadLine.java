@@ -1,12 +1,14 @@
 package at.aau.se2.ticketToRide_server.dataStructures;
 
 
+import java.rmi.MarshalledObject;
+
 /**
  * RailroadLine-class represents a double connection between two Destination-Objects
  */
 public class DoubleRailroadLine extends RailroadLine{
     Player owner2;
-    int color2;
+    MapColors color2;
 
     /**
      * Creates a double RailroadLine to connect two distinct destinations
@@ -16,7 +18,7 @@ public class DoubleRailroadLine extends RailroadLine{
      * @param distance
      * @param color2 to build the 2nd line train cards of this color will be needed
      */
-    public DoubleRailroadLine(Destination destination1, Destination destination2, int color1, int distance, int color2) {
+    public DoubleRailroadLine(Destination destination1, Destination destination2, MapColors color1, int distance, MapColors color2) {
         super(destination1, destination2, color1, distance);
         this.color2 = color2;
         this.owner2 = null;
