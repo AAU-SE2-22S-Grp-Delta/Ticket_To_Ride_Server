@@ -67,8 +67,15 @@ public class GameModel {
         return cards;
     }
 
+    //region -------------------- GAME INITIALIZATION ------------------------------
 
 
+
+    //endregion
+
+
+
+    //region ------------------- GETTER SETTER TO_STRING -------------------------
 
     public static int getIdCounter() {
         return idCounter;
@@ -104,6 +111,9 @@ public class GameModel {
         for(Player player : players) toString+="\t"+player.toString()+"\n";
         return toString;
     }
+
+    //endregion------------
+
 
     //region ---------------------- STATIC GENERATORS ---------------------------------------
 

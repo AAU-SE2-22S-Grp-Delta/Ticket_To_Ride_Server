@@ -29,6 +29,16 @@ public class Lobby {
         games.add(game);
     }
 
+    public void enterGame(String gameName, Player player) throws Exception{
+        GameModel game = null;
+        for (GameModel g : games) {
+            if (g.getName().equals(gameName)) game = g;
+        }
+        if (game == null) throw new IllegalArgumentException("No game of the name " + gameName);
+        for (Player p: game.getPlayers()) if (player.getName().equals(player.getName())) throw new IllegalArgumentException("Player of name " + player.getName() + "has already joint game of name " + gameName);
+        game.addPlayer(player);
+    }
+
     /**
      * creates a new Player within the Lobby
      * @param name unique (in this Lobby) name
