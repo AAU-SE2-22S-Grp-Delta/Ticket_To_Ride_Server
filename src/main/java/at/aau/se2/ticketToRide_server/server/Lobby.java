@@ -29,7 +29,7 @@ public class Lobby {
         games.add(game);
     }
 
-    public void enterGame(String gameName, Player player) throws Exception{
+    public void joinGame(String gameName, Player player) throws Exception{
         GameModel game = null;
         for (GameModel g : games) {
             if (g.getName().equals(gameName)) game = g;
