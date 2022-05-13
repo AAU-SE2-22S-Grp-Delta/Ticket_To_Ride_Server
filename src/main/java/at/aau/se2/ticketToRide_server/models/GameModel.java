@@ -123,7 +123,7 @@ public class GameModel {
         Destination littlerock = new Destination("Little Rock");
         Destination losangeles = new Destination("Los Angeles");
         Destination miami = new Destination("Miami");
-        Destination montréal = new Destination("Montréal");
+        Destination montreal = new Destination("Montreal");
         Destination nashville = new Destination("Nashville");
         Destination neworleans = new Destination("New Orleans");
         Destination newyork = new Destination("New York");
@@ -165,7 +165,7 @@ public class GameModel {
         map.addDestination(littlerock);
         map.addDestination(losangeles);
         map.addDestination(miami);
-        map.addDestination(montréal);
+        map.addDestination(montreal);
         map.addDestination(nashville);
         map.addDestination(neworleans);
         map.addDestination(newyork);
@@ -185,10 +185,10 @@ public class GameModel {
         map.addRailroadLine(new RailroadLine(vancouver, calgary, MapColors.GRAY, 3));
         map.addRailroadLine(new RailroadLine(calgary,winnipeg, MapColors.WHITE, 6));
         map.addRailroadLine(new RailroadLine(winnipeg, saultstmarie, MapColors.GRAY, 6));
-        map.addRailroadLine(new RailroadLine(saultstmarie, montréal, MapColors.BLACK, 5));
-        map.addRailroadLine(new DoubleRailroadLine(montréal, boston, MapColors.GRAY, 2, MapColors.GRAY));
-        map.addRailroadLine(new RailroadLine(montréal, newyork, MapColors.BLUE, 3));
-        map.addRailroadLine(new RailroadLine(montréal, toronto, MapColors.GRAY, 3));
+        map.addRailroadLine(new RailroadLine(saultstmarie, montreal, MapColors.BLACK, 5));
+        map.addRailroadLine(new DoubleRailroadLine(montreal, boston, MapColors.GRAY, 2, MapColors.GRAY));
+        map.addRailroadLine(new RailroadLine(montreal, newyork, MapColors.BLUE, 3));
+        map.addRailroadLine(new RailroadLine(montreal, toronto, MapColors.GRAY, 3));
         map.addRailroadLine(new DoubleRailroadLine(newyork, boston, MapColors.YELLOW, 2, MapColors.RED));
         map.addRailroadLine(new DoubleRailroadLine(newyork, pittsburgh, MapColors.YELLOW, 2, MapColors.GREEN));
         map.addRailroadLine(new RailroadLine(toronto, pittsburgh, MapColors.GRAY,2));
@@ -283,8 +283,8 @@ public class GameModel {
         missions.add(new Mission(map.getDestinationByName("Los Angeles"),map.getDestinationByName("Chicago"),16));
         missions.add(new Mission(map.getDestinationByName("Los Angeles"),map.getDestinationByName("Miami"),20));
         missions.add(new Mission(map.getDestinationByName("Los Angeles"),map.getDestinationByName("New York"),21));
-        missions.add(new Mission(map.getDestinationByName("Montréal"),map.getDestinationByName("Atlanta"),9));
-        missions.add(new Mission(map.getDestinationByName("Montréal"),map.getDestinationByName("New Orleans"),13));
+        missions.add(new Mission(map.getDestinationByName("Montreal"),map.getDestinationByName("Atlanta"),9));
+        missions.add(new Mission(map.getDestinationByName("Montreal"),map.getDestinationByName("New Orleans"),13));
         missions.add(new Mission(map.getDestinationByName("New York"),map.getDestinationByName("Atlanta"),6));
         missions.add(new Mission(map.getDestinationByName("Portland"),map.getDestinationByName("Nashville"),17));
         missions.add(new Mission(map.getDestinationByName("Portland"),map.getDestinationByName("Phoenix"),11));
@@ -294,7 +294,7 @@ public class GameModel {
         missions.add(new Mission(map.getDestinationByName("Seattle"),map.getDestinationByName("Los Angeles"),9));
         missions.add(new Mission(map.getDestinationByName("Seattle"),map.getDestinationByName("New York"),22));
         missions.add(new Mission(map.getDestinationByName("Toronto"),map.getDestinationByName("Miami"),10));
-        missions.add(new Mission(map.getDestinationByName("Vancouver"),map.getDestinationByName("Montréal"),20));
+        missions.add(new Mission(map.getDestinationByName("Vancouver"),map.getDestinationByName("Montreal"),20));
         missions.add(new Mission(map.getDestinationByName("Vancouver"),map.getDestinationByName("Santa Fe"),13));
         missions.add(new Mission(map.getDestinationByName("Winnipeg"),map.getDestinationByName("Houston"),12));
         missions.add(new Mission(map.getDestinationByName("Winnipeg"),map.getDestinationByName("Little Rock"),11));
