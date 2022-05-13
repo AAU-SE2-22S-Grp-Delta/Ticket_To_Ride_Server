@@ -40,7 +40,7 @@ public class GameModel implements Runnable {
 
         addPlayer(owner);
 
-        this.trainCards = getTraincards();
+        this.trainCards = getTrainCards();
         this.missions = getMissions();
     }
 
@@ -200,6 +200,7 @@ public class GameModel implements Runnable {
         //TODO impl Method
         //check costs
         //build
+        //remove handcards (impl method in Player)
         //check if a mission was completed
         throw new IllegalStateException("(FATAL) GameModel: At this point the move should be processed");
     }
@@ -253,6 +254,8 @@ public class GameModel implements Runnable {
 
 
     //region ---------------------- STATIC GENERATORS ---------------------------------------
+
+
     private static Map getMap() {
         Map map = new Map();
         Destination atlanta = new Destination("Atlanta");
@@ -448,7 +451,8 @@ public class GameModel implements Runnable {
         return missions;
     }
 
-    private static ArrayList<TrainCard> getTraincards() {
+
+    private static ArrayList<TrainCard> getTrainCards() {
         ArrayList<TrainCard> cards = new ArrayList<>();
         for (int i = 0; i < 18; i++) {
             cards.add(new TrainCard(TrainCard.Type.BLACK));
@@ -466,6 +470,7 @@ public class GameModel implements Runnable {
 
         return cards;
     }
+
 
     //endregion
 }
