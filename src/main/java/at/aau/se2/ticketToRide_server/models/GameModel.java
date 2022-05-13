@@ -74,7 +74,8 @@ public class GameModel implements Runnable {
         if (!whoIsPerformingThisAction.equals(owner)) throw new IllegalCallerException(whoIsPerformingThisAction.getName() + " is not the owner, aborting to start game!");
         if (this.state != State.WAITING_FOR_PLAYERS) throw new IllegalStateException("Game is not in state WAITING_FOR_PLAYERS!");
         this.state = State.RUNNING;
-        //TODO launch Game thread
+        Thread gameLoop = new Thread(this);
+        gameLoop.start();
     }
 
     private void exitGameCrashed() {
