@@ -9,6 +9,11 @@ import at.aau.se2.ticketToRide_server.server.Session;
  */
 public class Player implements  Comparable
 {
+    public enum Command {
+        SYNC, //game model has changed -> prompts the client to synchronize
+        DO_MOVE //prompts the client to perform a move
+    }
+
     public enum Color {
         RED(0), BLUE(1), GREEN(2), YELLOW(3), BLACK(4), WHITE(5);
 
@@ -75,7 +80,21 @@ public class Player implements  Comparable
         this.playerColor = playerColor;
     }
 
-    public int sendCommand(String command) {
+    /**
+     * prompts the client to sync
+     */
+    public void sync() {
+        sendCommand("sync");
+    }
+
+    /**
+     * prompts the client to perform a move
+     */
+    public void doMove() {
+        sendCommand("doMove");
+    }
+
+    private int sendCommand(String command) {
         return session.send(command);
     }
 

@@ -25,6 +25,7 @@ public class GameModel implements Runnable {
     private Player owner;
     private ArrayList<TrainCard> trainCards;
     private ArrayList<Mission> missions;
+    private int nextPlayer = 0;  //counts who is next
 
     //visible to all
     private ArrayList<TrainCard> openCards = new ArrayList<>();
@@ -75,6 +76,7 @@ public class GameModel implements Runnable {
         if (this.state != State.WAITING_FOR_PLAYERS) throw new IllegalStateException("Game is not in state WAITING_FOR_PLAYERS!");
         this.state = State.RUNNING;
         Thread gameLoop = new Thread(this);
+        Collections.shuffle(players);
         gameLoop.start();
     }
 
@@ -94,6 +96,8 @@ public class GameModel implements Runnable {
     //region -------------------- GAME INITIALIZATION ------------------------------
 
     //TODO init visible cards
+
+
 
     //endregion
 
@@ -132,6 +136,8 @@ public class GameModel implements Runnable {
      */
     private void move() {
         //wait for move
+
+
         //lock info
         //write
         //unlock
