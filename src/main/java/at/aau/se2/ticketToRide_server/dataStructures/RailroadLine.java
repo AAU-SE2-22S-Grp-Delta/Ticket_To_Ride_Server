@@ -8,7 +8,7 @@ public class RailroadLine {
     //TODO exception-handling
     private Destination destination1;
     private Destination destination2;
-    private MapColors color = 0;
+    private MapColors color;
     private int distance = 0;
     private Player owner;
 
@@ -43,7 +43,7 @@ public class RailroadLine {
         return destination2;
     }
 
-    public int getColor() {
+    public MapColors getColor() {
         return color;
     }
 
