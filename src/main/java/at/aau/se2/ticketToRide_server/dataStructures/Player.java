@@ -11,7 +11,7 @@ public class Player implements  Comparable
 {
     public enum Command {
         SYNC, //game model has changed -> prompts the client to synchronize
-        DO_MOVE //prompts the client to perform a move
+        DO_MOVE //informs this that the game is waiting for the valid player to perform a move
     }
 
     public enum Color {
@@ -88,10 +88,10 @@ public class Player implements  Comparable
     }
 
     /**
-     * prompts the client to perform a move
+     * informs this client that the game is waiting for the valid player to perform a move
      */
-    public void doMove() {
-        sendCommand("doMove");
+    public void doMove(String playerName) {
+        sendCommand("doMove:"+playerName);
     }
 
     private int sendCommand(String command) {
