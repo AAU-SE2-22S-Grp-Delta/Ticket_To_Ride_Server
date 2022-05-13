@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 enum State {
-    WAITING_FOR_PLAYERS, RUNNING, OVER
+    WAITING_FOR_PLAYERS, RUNNING, OVER, CRASHED
 }
 
 public class GameModel implements Runnable {
@@ -53,6 +53,10 @@ public class GameModel implements Runnable {
             return -1;
         }
         players.add(player);
+        if (colorCounter > 5) {
+            System.out.println("(FATAL) GameModel: colorCounter raised over 5, max value when executing addPlayer at this point should be 5. Execution crashed.");
+            exitGameCrashed();
+        }
         switch (colorCounter++) {
             case 0 -> player.setPlayerColor(Player.Color.RED);
             case 1 -> player.setPlayerColor(Player.Color.BLUE);
@@ -71,6 +75,14 @@ public class GameModel implements Runnable {
         if (this.state != State.WAITING_FOR_PLAYERS) throw new IllegalStateException("Game is not in state WAITING_FOR_PLAYERS!");
         this.state = State.RUNNING;
         //TODO launch Game thread
+    }
+
+    private void exitGameCrashed() {
+        this.state = State.CRASHED;
+        //TODO
+        //try to recover?
+        //endGame
+        //notify Players
     }
 
     //endregion
