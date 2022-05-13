@@ -29,7 +29,7 @@ public class Lobby {
         games.add(game);
     }
 
-    public void joinGame(String gameName, Player player) throws Exception{
+    public void joinGame(String gameName, Player player) throws IllegalArgumentException{
         GameModel game = null;
         for (GameModel g : games) {
             if (g.getName().equals(gameName)) game = g;
@@ -69,22 +69,6 @@ public class Lobby {
         return 0;
     }
 
-
-    /**
-     *
-     * @param id
-     * @param player
-     * @return 0 if successful, -1 on fail
-     */
-    public int joinGame(int id, Player player) {
-        for (GameModel game : games) {
-            if (game.getId() == id) {
-                game.addPlayer(player);
-                return 0;
-            }
-        }
-        return -1;
-    }
 
     public ArrayList<Player> getPlayers() {
         return players;

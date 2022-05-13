@@ -62,7 +62,18 @@ public class Session {
                 if (Configuration_Constants.verbose)
                     System.out.println("(VERBOSE)\tCreating game " + words[1] + ", owner=" + this.sessionOwner.getName());
                 lobby.createGame(words[1], sessionOwner);
-            } else if (command.matches("joinGame:" + REGEX_GAME_ID + ":addPlayer:" + REGEX_NAME)) ;
+            } else if (command.matches("joinGame:" +REGEX_NAME)) {
+                String[] words = command.split(":");
+                try {
+                    lobby.joinGame(words[1], this.sessionOwner);
+                    if (Configuration_Constants.verbose) System.out.println("(VERBOSE)\t player of name " + words[1] + "joint game of name " + this.sessionOwner.getName());
+                } catch (IllegalArgumentException e) {
+                    if (Configuration_Constants.debug) {
+                        System.out.println("(debug)\t Error while executing " + command);
+                        e.printStackTrace();
+                    }
+                }
+            }
 
 
             else if (command.equals("startGame")) ;
