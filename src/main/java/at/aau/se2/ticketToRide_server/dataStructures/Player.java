@@ -58,6 +58,10 @@ public class Player
         return playerColor;
     }
 
+    public int sendCommand(String command) {
+        return session.send(command);
+    }
+
     @Override
     public String toString() {
         return "Player{" +

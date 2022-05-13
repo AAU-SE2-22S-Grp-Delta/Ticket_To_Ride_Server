@@ -100,7 +100,7 @@ public class Session {
         return builder.toString();
     }
 
-    private int send(String toClient) {
+    public int send(String toClient) {
         if (sendingThread == null) return -1;
         sendingThread.setCommand(toClient);
         return 0;
