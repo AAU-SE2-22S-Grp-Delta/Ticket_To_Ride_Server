@@ -1,6 +1,7 @@
 package at.aau.se2.ticketToRide_server.models;
 
 import at.aau.se2.ticketToRide_server.dataStructures.*;
+import at.aau.se2.ticketToRide_server.server.Configuration_Constants;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -17,7 +18,8 @@ public class GameModel implements Runnable {
     private int id;
     private String name;
     private State state;
-    private int colorCounter = 0; //to assign colors to players
+    private int colorCounter = 0;   //to assign colors to players
+    private int actionsLeft;        //to manage a move
 
 
     //invisible
@@ -25,7 +27,7 @@ public class GameModel implements Runnable {
     private Player owner;
     private ArrayList<TrainCard> trainCards;
     private ArrayList<Mission> missions;
-    private int nextPlayer = 0;  //counts who is next
+    private int activePlayer = 0;  //counts who is next
 
     //visible to all
     private ArrayList<TrainCard> openCards = new ArrayList<>();
@@ -47,14 +49,14 @@ public class GameModel implements Runnable {
     public int addPlayer(Player player) {
         try {
             if (player == null) throw new IllegalArgumentException("Player is NULL!");
-            if (players.size() > 5) throw new IllegalArgumentException("Board is full!");
+            if (players.size() > 4) throw new IllegalArgumentException("Board is full!");
             if (this.state != State.WAITING_FOR_PLAYERS) throw new IllegalStateException("Game has already started!");
         } catch (IllegalArgumentException e) {
             System.out.println(e);
             return -1;
         }
         players.add(player);
-        if (colorCounter > 5) {
+        if (colorCounter > 4) {
             System.out.println("(FATAL) GameModel: colorCounter raised over 5, max value when executing addPlayer at this point should be 5. Execution crashed.");
             exitGameCrashed();
         }
@@ -63,8 +65,7 @@ public class GameModel implements Runnable {
             case 1 -> player.setPlayerColor(Player.Color.BLUE);
             case 2 -> player.setPlayerColor(Player.Color.GREEN);
             case 3 -> player.setPlayerColor(Player.Color.YELLOW);
-            case 4 -> player.setPlayerColor(Player.Color.WHITE);
-            case 5 -> player.setPlayerColor(Player.Color.BLACK);
+            case 4 -> player.setPlayerColor(Player.Color.BLACK);
         }
         player.setGaming();
         this.owner = player;
@@ -135,21 +136,80 @@ public class GameModel implements Runnable {
      * while actualisation information is locked
      */
     private void move() {
-        //wait for move
+        //wait for move and inform clients
+        this.actionsLeft = 3;
+        for (Player player : players) {
+            player.doMove(players.get(activePlayer).getName(), actionsLeft);
+        }
 
-
-        //lock info
-        //write
-        //unlock
-        //broadcast sync flag
+        while (actionsLeft > 0) {
+            //lock info
+            //write
+            //unlock
+            //broadcast sync flag
+        }
     }
 
     private void calculatePointsAndSendResult() {
+        //TODO impl
     }
 
     //endregion
 
 
+
+
+    //region ---------------------- PLAYER ACTIONS ----------------------------------
+
+
+    public int drawOpenCard(Player player, int openCardId) {
+        if (!players.get(activePlayer).equals(player)) {
+            //TODO return failure or block info?
+            if (Configuration_Constants.verbose) System.out.println("(VERBOSE)\t Player" + player.getName() +" was blocked trying pick open card while players " + players.get(activePlayer) + "turn.");
+            return -1;
+        }
+
+        //TODO: check if the chosen card is a Traincard (costs TrainCard = 3 => then turn is over)
+
+        if (actionsLeft == 3) {
+            //TODO: draw cards and call player.addHandCard(getCardfromStack(OpenCardID) or something
+            return actionsLeft-=2;
+        }
+        if (actionsLeft == 2|| actionsLeft==1) {
+            return --actionsLeft;
+        }
+        throw new IllegalStateException("(FATAL) GameModel: No more moves left when called drawOpenCard");
+    }
+
+    public int drawCardFromStack(Player player) {
+        if (!players.get(activePlayer).equals(player)) {
+            //TODO return failure or block info?
+            if (Configuration_Constants.verbose) System.out.println("(VERBOSE)\t Player" + player.getName() +" was blocked trying pick card from stack while players " + players.get(activePlayer) + "turn.");
+            return -1;
+        }
+        if (actionsLeft > 0 && trainCards.size() > 0) {
+            //TODO this is a temp workaround for testing purposes
+            TrainCard card = trainCards.remove(0);
+            player.addHandCard(card);
+            --actionsLeft;
+        }
+        throw new IllegalStateException("(FATAL) GameModel: At this point the move should be processed");
+    }
+
+    public int buildRailroad(Player player) {
+        //TODO impl Method
+        //check costs
+        //build
+        //check if a mission was completed
+        throw new IllegalStateException("(FATAL) GameModel: At this point the move should be processed");
+    }
+
+    public int drawMission(Player player) {
+        //TODO impl Method
+        throw new IllegalStateException("(FATAL) GameModel: At this point the move should be processed");
+    }
+
+    //endregion
 
 
     //region ------------------- GETTER SETTER TO_STRING ----------------------------
@@ -189,7 +249,7 @@ public class GameModel implements Runnable {
     }
 
 
-    //endregion------------
+    //endregion
 
 
     //region ---------------------- STATIC GENERATORS ---------------------------------------
