@@ -10,7 +10,10 @@ import at.aau.se2.ticketToRide_server.server.Session;
 public class Player implements  Comparable
 {
     public enum Color {
-        RED, BLUE, GREEN, YELLOW, BLACK, WHITE
+        RED(0), BLUE(1), GREEN(2), YELLOW(3), BLACK(4), WHITE(5);
+
+        Color(int i) {
+        }
     }
 
     public enum State {

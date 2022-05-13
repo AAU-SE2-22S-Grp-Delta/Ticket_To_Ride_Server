@@ -53,7 +53,14 @@ public class GameModel implements Runnable {
             return -1;
         }
         players.add(player);
-        //TODO asign Color
+        switch (colorCounter++) {
+            case 0 -> player.setPlayerColor(Player.Color.RED);
+            case 1 -> player.setPlayerColor(Player.Color.BLUE);
+            case 2 -> player.setPlayerColor(Player.Color.GREEN);
+            case 3 -> player.setPlayerColor(Player.Color.YELLOW);
+            case 4 -> player.setPlayerColor(Player.Color.WHITE);
+            case 5 -> player.setPlayerColor(Player.Color.BLACK);
+        }
         player.setGaming();
         this.owner = player;
         return 0;
