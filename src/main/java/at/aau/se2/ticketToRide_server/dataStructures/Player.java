@@ -1,13 +1,17 @@
 package at.aau.se2.ticketToRide_server.dataStructures;
 
+import at.aau.se2.ticketToRide_server.server.Configuration_Constants;
 import at.aau.se2.ticketToRide_server.server.Session;
+
 
 /**
  * Player-Class represents a person who is playing the Game
  */
 public class Player implements  Comparable
 {
-
+    public enum Color {
+        RED, BLUE, GREEN, YELLOW, BLACK, WHITE
+    }
 
     public enum State {
         LOBBY, GAMING
@@ -15,7 +19,7 @@ public class Player implements  Comparable
 
     private String name;
     private int id = 0;
-    private int playerColor;
+    private Color playerColor;
     private int numStones;
     private State state;
 
@@ -55,9 +59,17 @@ public class Player implements  Comparable
         this.numStones = 45;
     }
 
-    public int getPlayerColor()
+    public Color getPlayerColor()
     {
         return playerColor;
+    }
+
+    public void setPlayerColor(Color playerColor) {
+        if (this.state == State.GAMING) {
+            if (Configuration_Constants.debug) System.out.println("(DEBUG)\tCalled Player.getPlayerColor() while Player was in Game!");
+            return;
+        }
+        this.playerColor = playerColor;
     }
 
     public int sendCommand(String command) {

@@ -19,6 +19,7 @@ public class GameModel implements Runnable {
     private State state;
     private int colorCounter = 0; //to assign colors to players
 
+
     //invisible
     private ArrayList<Player> players;
     private Player owner;
@@ -52,6 +53,7 @@ public class GameModel implements Runnable {
             return -1;
         }
         players.add(player);
+        //TODO asign Color
         player.setGaming();
         this.owner = player;
         return 0;
