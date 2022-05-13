@@ -10,13 +10,13 @@ enum State {
 
 public class GameModel {
     private static int idCounter = 0;
+    private static Map map = getMap();
 
     private int id;
     private String name;
     private State state;
     private int colorCounter = 0;
 
-    private Map map;
     private ArrayList<Player> players;
     private Player owner;
     private ArrayList<TrainCard> trainCards;
@@ -30,7 +30,6 @@ public class GameModel {
 
         addPlayer(owner);
 
-        map = getMap();
         this.trainCards = getTraincards();
         this.missions = getMissions();
     }
@@ -48,6 +47,65 @@ public class GameModel {
         this.owner = player;
         return 0;
     }
+
+
+
+    private static ArrayList<TrainCard> getTraincards() {
+        ArrayList<TrainCard> cards = new ArrayList<>();
+        for (int i = 0; i < 18; i++) {
+            cards.add(new TrainCard(TrainCard.Type.BLACK));
+            cards.add(new TrainCard(TrainCard.Type.BLUE));
+            cards.add(new TrainCard(TrainCard.Type.GRAY));
+            cards.add(new TrainCard(TrainCard.Type.GREEN));
+            cards.add(new TrainCard(TrainCard.Type.LOCOMOTIVE));
+            cards.add(new TrainCard(TrainCard.Type.ORANGE));
+            cards.add(new TrainCard(TrainCard.Type.RED));
+            cards.add(new TrainCard(TrainCard.Type.WHITE));
+            cards.add(new TrainCard(TrainCard.Type.YELLOW));
+        }
+
+        return cards;
+    }
+
+
+
+
+    public static int getIdCounter() {
+        return idCounter;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public State getState() {
+        return state;
+    }
+
+    public ArrayList<Player> getPlayers() {
+        return players;
+    }
+
+    public Player getOwner() {
+        return owner;
+    }
+
+    @Override
+    public String toString() {
+        String toString = "GameModelid=" + id +
+                ", name='" + name +
+                ", state=" + state
+                + ", owner=" + owner.getName()+ "\n"
+                + "\tPlayers:";
+        for(Player player : players) toString+="\t"+player.toString()+"\n";
+        return toString;
+    }
+
+    //region ---------------------- STATIC GENERATORS ---------------------------------------
 
     private static Map getMap() {
         Map map = new Map();
@@ -206,62 +264,43 @@ public class GameModel {
         return map;
     }
 
-    private static ArrayList<TrainCard> getTraincards() {
-        ArrayList<TrainCard> cards = new ArrayList<>();
-        for (int i = 0; i < 18; i++) {
-            cards.add(new TrainCard(TrainCard.Type.BLACK));
-            cards.add(new TrainCard(TrainCard.Type.BLUE));
-            cards.add(new TrainCard(TrainCard.Type.GRAY));
-            cards.add(new TrainCard(TrainCard.Type.GREEN));
-            cards.add(new TrainCard(TrainCard.Type.LOCOMOTIVE));
-            cards.add(new TrainCard(TrainCard.Type.ORANGE));
-            cards.add(new TrainCard(TrainCard.Type.RED));
-            cards.add(new TrainCard(TrainCard.Type.WHITE));
-            cards.add(new TrainCard(TrainCard.Type.YELLOW));
-        }
-
-        return cards;
-    }
 
     private static ArrayList<Mission> getMissions() {
         ArrayList<Mission> missions = new ArrayList<>();
-        //TODO generate Missions
+
+        missions.add(new Mission(map.getDestinationByName("Boston"),map.getDestinationByName("Miami"),12));
+        missions.add(new Mission(map.getDestinationByName("Calgary"),map.getDestinationByName("Phoenix"),13));
+        missions.add(new Mission(map.getDestinationByName("Calgary"),map.getDestinationByName("Salt Lake City"),7));
+        missions.add(new Mission(map.getDestinationByName("Chicago"),map.getDestinationByName("New Orleans"),7));
+        missions.add(new Mission(map.getDestinationByName("Chicago"),map.getDestinationByName("Santa Fe"),9));
+        missions.add(new Mission(map.getDestinationByName("Dallas"),map.getDestinationByName("New York"),11));
+        missions.add(new Mission(map.getDestinationByName("Denver"),map.getDestinationByName("El Paso"),4));
+        missions.add(new Mission(map.getDestinationByName("Denver"),map.getDestinationByName("Pittsburgh"),11));
+        missions.add(new Mission(map.getDestinationByName("Duluth"),map.getDestinationByName("El Paso"),10));
+        missions.add(new Mission(map.getDestinationByName("Duluth"),map.getDestinationByName("Houston"),8));
+        missions.add(new Mission(map.getDestinationByName("Helena"),map.getDestinationByName("Los Angeles"),8));
+        missions.add(new Mission(map.getDestinationByName("Kansas City"),map.getDestinationByName("Houston"),5));
+        missions.add(new Mission(map.getDestinationByName("Los Angeles"),map.getDestinationByName("Chicago"),16));
+        missions.add(new Mission(map.getDestinationByName("Los Angeles"),map.getDestinationByName("Miami"),20));
+        missions.add(new Mission(map.getDestinationByName("Los Angeles"),map.getDestinationByName("New York"),21));
+        missions.add(new Mission(map.getDestinationByName("Montréal"),map.getDestinationByName("Atlanta"),9));
+        missions.add(new Mission(map.getDestinationByName("Montréal"),map.getDestinationByName("New Orleans"),13));
+        missions.add(new Mission(map.getDestinationByName("New York"),map.getDestinationByName("Atlanta"),6));
+        missions.add(new Mission(map.getDestinationByName("Portland"),map.getDestinationByName("Nashville"),17));
+        missions.add(new Mission(map.getDestinationByName("Portland"),map.getDestinationByName("Phoenix"),11));
+        missions.add(new Mission(map.getDestinationByName("San Francisco"),map.getDestinationByName("Atlanta"),17));
+        missions.add(new Mission(map.getDestinationByName("Sault St. Marie"),map.getDestinationByName("Nashville"),8));
+        missions.add(new Mission(map.getDestinationByName("Sault St. Marie"),map.getDestinationByName("Oklahoma City"),9));
+        missions.add(new Mission(map.getDestinationByName("Seattle"),map.getDestinationByName("Los Angeles"),9));
+        missions.add(new Mission(map.getDestinationByName("Seattle"),map.getDestinationByName("New York"),22));
+        missions.add(new Mission(map.getDestinationByName("Toronto"),map.getDestinationByName("Miami"),10));
+        missions.add(new Mission(map.getDestinationByName("Vancouver"),map.getDestinationByName("Montréal"),20));
+        missions.add(new Mission(map.getDestinationByName("Vancouver"),map.getDestinationByName("Santa Fe"),13));
+        missions.add(new Mission(map.getDestinationByName("Winnipeg"),map.getDestinationByName("Houston"),12));
+        missions.add(new Mission(map.getDestinationByName("Winnipeg"),map.getDestinationByName("Little Rock"),11));
+
         return missions;
     }
 
-
-    public static int getIdCounter() {
-        return idCounter;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public State getState() {
-        return state;
-    }
-
-    public ArrayList<Player> getPlayers() {
-        return players;
-    }
-
-    public Player getOwner() {
-        return owner;
-    }
-
-    @Override
-    public String toString() {
-        String toString = "GameModelid=" + id +
-                ", name='" + name +
-                ", state=" + state
-                + ", owner=" + owner.getName()+ "\n"
-                + "\tPlayers:";
-        for(Player player : players) toString+="\t"+player.toString()+"\n";
-        return toString;
-    }
+    //endregion
 }

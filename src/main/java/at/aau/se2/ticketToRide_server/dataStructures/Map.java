@@ -40,4 +40,15 @@ public class Map {
     public Set<RailroadLine> getRailroadLines() {
         return railroadLines;
     }
+
+
+    /**
+     * Searches the destinations for a destination of the specified name
+     * @param name of the destination
+     * @return the destination Object on success, null on fail
+     */
+    public Destination getDestinationByName(String name) {
+        for (Destination destination : destinations) if (destination.getName().equals(name)) return destination;
+        return null;
+    }
 }
