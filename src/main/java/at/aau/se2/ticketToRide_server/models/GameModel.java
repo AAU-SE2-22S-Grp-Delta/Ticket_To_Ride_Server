@@ -6,10 +6,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 enum State {
-    WAITING_FOR_PLAYERS, GAMING, ENDED
+    WAITING_FOR_PLAYERS, RUNNING, OVER
 }
 
-public class GameModel {
+public class GameModel implements Runnable {
     private static int idCounter = 0;
     private static Map map = getMap();
 
@@ -60,7 +60,7 @@ public class GameModel {
     public void startGame(Player whoIsPerformingThisAction) {
         if (!whoIsPerformingThisAction.equals(owner)) throw new IllegalCallerException(whoIsPerformingThisAction.getName() + " is not the owner, aborting to start game!");
         if (this.state != State.WAITING_FOR_PLAYERS) throw new IllegalStateException("Game is not in state WAITING_FOR_PLAYERS!");
-        this.state = State.GAMING;
+        this.state = State.RUNNING;
         //TODO launch Game thread
     }
 
@@ -77,7 +77,54 @@ public class GameModel {
 
 
 
-    //region ------------------- GETTER SETTER TO_STRING -------------------------
+
+    //region ----------------------- GAMING -----------------------------------------
+
+    @Override
+    public void run() {
+        while (checkIfOver()) {
+            move();
+        }
+        calculatePointsAndSendResult();
+    }
+
+    /**
+     * checks if the game is over
+     * @return true on over
+     */
+    private boolean checkIfOver() {
+        //check if each player has at least 2 wagons or, if there is a running countdown
+        //if a player has less than 2, each other player has one move left (start count down)
+        //if countdown is over, set state to OVER
+
+        return false;
+    }
+
+    /**
+     * sends a signal to the player whose turn it is
+     * and waits for his move
+     * refreshes the model based on the move
+     * broadcasts a sync to all clients,
+     * while this is waiting, information is still readable
+     * while actualisation information is locked
+     */
+    private void move() {
+        //wait for move
+        //lock info
+        //write
+        //unlock
+        //broadcast sync flag
+    }
+
+    private void calculatePointsAndSendResult() {
+    }
+
+    //endregion
+
+
+
+
+    //region ------------------- GETTER SETTER TO_STRING ----------------------------
     public static int getIdCounter() {
         return idCounter;
     }
