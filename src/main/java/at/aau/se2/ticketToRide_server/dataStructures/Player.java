@@ -5,8 +5,10 @@ import at.aau.se2.ticketToRide_server.server.Session;
 /**
  * Player-Class represents a person who is playing the Game
  */
-public class Player
+public class Player implements  Comparable
 {
+
+
     public enum State {
         LOBBY, GAMING
     }
@@ -71,5 +73,17 @@ public class Player
                 ", numStones=" + numStones +
                 ", state=" + state +
                 '}';
+    }
+
+    /**
+     * compares this player with an object
+     * @param player to be compared with this
+     * @return 1 if no instanceof Player, 0 if the names are equal, -1 if names differ
+     */
+    @Override
+    public int compareTo(Object player) {
+        if  (!(player instanceof Player)) return 1;
+        if (this.name.equals(((Player) player).name)) return 0;
+        else return -1;
     }
 }

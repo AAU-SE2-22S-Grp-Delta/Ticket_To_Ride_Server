@@ -3,6 +3,7 @@ package at.aau.se2.ticketToRide_server.models;
 import at.aau.se2.ticketToRide_server.dataStructures.*;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 enum State {
     WAITING_FOR_PLAYERS, GAMING, ENDED
@@ -12,15 +13,20 @@ public class GameModel {
     private static int idCounter = 0;
     private static Map map = getMap();
 
+    //meta
     private int id;
     private String name;
     private State state;
-    private int colorCounter = 0;
+    private int colorCounter = 0; //to assign colors to players
 
+    //invisible
     private ArrayList<Player> players;
     private Player owner;
     private ArrayList<TrainCard> trainCards;
     private ArrayList<Mission> missions;
+
+    //visible to all
+    private ArrayList<TrainCard> openCards = new ArrayList<>();
 
     public GameModel(String name, Player owner) {
         this.id = idCounter++;
@@ -34,10 +40,13 @@ public class GameModel {
         this.missions = getMissions();
     }
 
+    //region ----------------  WAITING FOR PLAYERS ---------------------------------------
+
     public int addPlayer(Player player) {
         try {
             if (player == null) throw new IllegalArgumentException("Player is NULL!");
             if (players.size() > 5) throw new IllegalArgumentException("Board is full!");
+            if (this.state != State.WAITING_FOR_PLAYERS) throw new IllegalStateException("Game has already started!");
         } catch (IllegalArgumentException e) {
             System.out.println(e);
             return -1;
@@ -48,35 +57,27 @@ public class GameModel {
         return 0;
     }
 
-
-
-    private static ArrayList<TrainCard> getTraincards() {
-        ArrayList<TrainCard> cards = new ArrayList<>();
-        for (int i = 0; i < 18; i++) {
-            cards.add(new TrainCard(TrainCard.Type.BLACK));
-            cards.add(new TrainCard(TrainCard.Type.BLUE));
-            cards.add(new TrainCard(TrainCard.Type.GRAY));
-            cards.add(new TrainCard(TrainCard.Type.GREEN));
-            cards.add(new TrainCard(TrainCard.Type.LOCOMOTIVE));
-            cards.add(new TrainCard(TrainCard.Type.ORANGE));
-            cards.add(new TrainCard(TrainCard.Type.RED));
-            cards.add(new TrainCard(TrainCard.Type.WHITE));
-            cards.add(new TrainCard(TrainCard.Type.YELLOW));
-        }
-
-        return cards;
+    public void startGame(Player whoIsPerformingThisAction) {
+        if (!whoIsPerformingThisAction.equals(owner)) throw new IllegalCallerException(whoIsPerformingThisAction.getName() + " is not the owner, aborting to start game!");
+        if (this.state != State.WAITING_FOR_PLAYERS) throw new IllegalStateException("Game is not in state WAITING_FOR_PLAYERS!");
+        this.state = State.GAMING;
+        //TODO launch Game thread
     }
+
+    //endregion
+
+
+
 
     //region -------------------- GAME INITIALIZATION ------------------------------
 
-
+    //TODO init visible cards
 
     //endregion
 
 
 
     //region ------------------- GETTER SETTER TO_STRING -------------------------
-
     public static int getIdCounter() {
         return idCounter;
     }
@@ -112,11 +113,11 @@ public class GameModel {
         return toString;
     }
 
+
     //endregion------------
 
 
     //region ---------------------- STATIC GENERATORS ---------------------------------------
-
     private static Map getMap() {
         Map map = new Map();
         Destination atlanta = new Destination("Atlanta");
@@ -310,6 +311,25 @@ public class GameModel {
         missions.add(new Mission(map.getDestinationByName("Winnipeg"),map.getDestinationByName("Little Rock"),11));
 
         return missions;
+    }
+
+    private static ArrayList<TrainCard> getTraincards() {
+        ArrayList<TrainCard> cards = new ArrayList<>();
+        for (int i = 0; i < 18; i++) {
+            cards.add(new TrainCard(TrainCard.Type.BLACK));
+            cards.add(new TrainCard(TrainCard.Type.BLUE));
+            cards.add(new TrainCard(TrainCard.Type.GRAY));
+            cards.add(new TrainCard(TrainCard.Type.GREEN));
+            cards.add(new TrainCard(TrainCard.Type.LOCOMOTIVE));
+            cards.add(new TrainCard(TrainCard.Type.ORANGE));
+            cards.add(new TrainCard(TrainCard.Type.RED));
+            cards.add(new TrainCard(TrainCard.Type.WHITE));
+            cards.add(new TrainCard(TrainCard.Type.YELLOW));
+        }
+
+        Collections.shuffle(cards);
+
+        return cards;
     }
 
     //endregion
