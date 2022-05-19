@@ -8,7 +8,7 @@ public class RailroadLine {
     //TODO exception-handling
     private Destination destination1;
     private Destination destination2;
-    private MapColors color;
+    private MapColor color;
     private int distance = 0;
     private Player owner;
 
@@ -19,7 +19,7 @@ public class RailroadLine {
      * @param color to build the line train cards of this color will be needed
      * @param distance to build the line that many train cards will be needed
      */
-    public RailroadLine(Destination destination1, Destination destination2, MapColors color, int distance) {
+    public RailroadLine(Destination destination1, Destination destination2, MapColor color, int distance) {
         configureConnection(destination1, destination2);
         this.color = color;
         this.distance = distance;
@@ -43,7 +43,7 @@ public class RailroadLine {
         return destination2;
     }
 
-    public MapColors getColor() {
+    public MapColor getColor() {
         return color;
     }
 

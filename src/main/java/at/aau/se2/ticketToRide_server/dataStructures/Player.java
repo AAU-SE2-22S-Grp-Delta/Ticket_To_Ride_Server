@@ -48,9 +48,9 @@ public class Player implements Comparable {
         this.session = session;
     }
 
-    public int getId() {
-        return id;
-    }
+
+
+
 
     public String getName() {
         return name;
@@ -121,6 +121,16 @@ public class Player implements Comparable {
         this.handCards.add(card);
     }
 
+
+    public int countHandCardsOfColor(MapColor color) {
+        int counter = 0;
+        for (TrainCard card : this.handCards) {
+            if (card.equals(color)) counter++;
+        }
+        return counter;
+    }
+
+
     public void addMission(Mission mission) {
         if (this.state != State.GAMING) {
             if (Configuration_Constants.debug)
@@ -130,12 +140,22 @@ public class Player implements Comparable {
         this.missions.add(mission);
     }
 
+
+    //endregion
+
+
+
+
+    //region --------------------------- SERVER CLIENT COMMUNICATION ---------------------------------------------------
+
+
     /**
      * prompts the client to sync
      */
     public void sync() {
         sendCommand("sync");
     }
+
 
     /**
      * informs this client that the game is waiting for the valid player to perform a move
@@ -144,9 +164,52 @@ public class Player implements Comparable {
         sendCommand("doMove:" + playerName + ":" + actionsLeft);
     }
 
+
     private int sendCommand(String command) {
         return session.send(command);
     }
+
+
+    //endregion
+
+
+
+
+    // region ------------------------------ SETTER GETTER TO STRING ---------------------------------------------------
+
+
+    public int getId() {
+        return id;
+    }
+
+
+    //unique name check in lobby
+    public void setName(String name) {
+        if (name == null) throw new IllegalArgumentException("name is null");
+        if (name.length() == 0) throw new IllegalArgumentException("name.length is 0");
+        this.name = name;
+    }
+
+
+    public String getName() {
+        return name;
+    }
+
+
+    public Color getPlayerColor() {
+        return playerColor;
+    }
+
+
+    public void setPlayerColor(Color playerColor) {
+        if (this.state == State.GAMING) {
+            if (Configuration_Constants.debug)
+                System.out.println("(DEBUG)\tCalled Player.getPlayerColor() while Player was in Game!");
+            return;
+        }
+        this.playerColor = playerColor;
+    }
+
 
     @Override
     public String toString() {
@@ -158,6 +221,12 @@ public class Player implements Comparable {
                 ", state=" + state +
                 '}';
     }
+
+
+    //endregion
+
+
+
 
     /**
      * compares this player with an object
