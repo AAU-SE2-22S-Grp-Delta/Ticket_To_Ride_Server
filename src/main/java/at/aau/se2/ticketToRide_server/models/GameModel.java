@@ -14,8 +14,7 @@ enum State {
 
 public class GameModel implements Runnable {
     private static int idCounter = 0;
-    public static Map map = getMap();
-    PointsHelper pointsHelper = new PointsHelper();
+    private static Map map = getMap();
 
     //meta
     private int id;
@@ -159,6 +158,8 @@ public class GameModel implements Runnable {
         //check if each player has at least 2 wagons or, if there is a running countdown
         //if a player has less than 2, each other player has one move left (start count down)
         //if countdown is over, set state to OVER
+
+        return false;
     }
 
     /**
@@ -234,29 +235,18 @@ public class GameModel implements Runnable {
         throw new IllegalStateException("(FATAL) GameModel: At this point the move should be processed");
     }
 
-    public int buildRailroad(Player player, RailroadLine railroadLine, ArrayList<TrainCard> cardsToBuild) {
+    public int buildRailroad(Player player, RailroadLine railroadLine, MapColor color) {
+        if (!players.get(activePlayer).equals(player)) {
+            //TODO return failure or block info?
+            if (Configuration_Constants.verbose) System.out.println("(VERBOSE)\t Player" + player.getName() +" was blocked trying to build road while players " + players.get(activePlayer) + "turn.");
+            return -1;
+        }
         //TODO impl Method
         //check costs
-        if(railroadLine.getDistance() == cardsToBuild.size()){
-            Mission currentMission = null;
-            //build
-            railroadLine.setOwner(player);
-
-            player.setPoints(pointsHelper.getPointsForRoutes(cardsToBuild.size()));
-
-            //remove handcards (impl method in Player)
-            for (TrainCard trainCard : cardsToBuild) {
-                player.getHandCards().remove(trainCard);
-            }
-
-            //check if a mission was completed
-            for (Mission mission: player.getMissions()) {
-                if(railroadLine.getDestination1() == mission.getDestination1() && railroadLine.getDestination2() == mission.getDestination2()) currentMission = mission;
-            }
-            if(currentMission!= null) currentMission.setDone();
-        }else {
-            throw new IllegalStateException("Not enough cards");
-        }
+//        if (railroadLine.getColor() == color && railroadLine.getDistance() )
+        //build
+        //remove handcards (impl method in Player)
+        //check if a mission was completed
         throw new IllegalStateException("(FATAL) GameModel: At this point the move should be processed");
     }
 
@@ -285,7 +275,7 @@ public class GameModel implements Runnable {
         return state;
     }
 
-    public static ArrayList<Player> getPlayers() {
+    public ArrayList<Player> getPlayers() {
         return players;
     }
 
@@ -509,19 +499,16 @@ public class GameModel implements Runnable {
 
     private static ArrayList<TrainCard> getTrainCards() {
         ArrayList<TrainCard> cards = new ArrayList<>();
-        for (int i = 0; i < 12; i++) {
+        for (int i = 0; i < 18; i++) {
             cards.add(new TrainCard(TrainCard.Type.BLACK));
             cards.add(new TrainCard(TrainCard.Type.BLUE));
             cards.add(new TrainCard(TrainCard.Type.GRAY));
             cards.add(new TrainCard(TrainCard.Type.GREEN));
+            cards.add(new TrainCard(TrainCard.Type.LOCOMOTIVE));
             cards.add(new TrainCard(TrainCard.Type.ORANGE));
             cards.add(new TrainCard(TrainCard.Type.RED));
             cards.add(new TrainCard(TrainCard.Type.WHITE));
             cards.add(new TrainCard(TrainCard.Type.YELLOW));
-        }
-
-        for(int i=0;i < 14; i++) {
-            cards.add(new TrainCard(TrainCard.Type.LOCOMOTIVE));
         }
 
         Collections.shuffle(cards);
