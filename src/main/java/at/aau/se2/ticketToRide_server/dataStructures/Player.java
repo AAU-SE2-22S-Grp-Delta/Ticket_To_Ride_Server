@@ -10,9 +10,12 @@ import java.util.ArrayList;
  * Player-Class represents a person who is playing the Game
  */
 public class Player implements Comparable {
+
+
     public enum Command {
         SYNC, //game model has changed -> prompts the client to synchronize
         DO_MOVE //informs this that the game is waiting for the valid player to perform a move
+        ;
     }
 
     public enum Color {
@@ -20,7 +23,9 @@ public class Player implements Comparable {
 
         Color(int i) {
         }
+
     }
+
 
     public enum State {
         LOBBY, GAMING
@@ -36,10 +41,13 @@ public class Player implements Comparable {
 
     //game objects
     private int numStones;
-    private int points;
     private ArrayList<TrainCard> handCards;
     private ArrayList<Mission> missions;
-    private int numberOfConnectedRailroads = 0;
+    private ArrayList<RailroadLine> ownsRailroads;
+    //todo completed missions
+
+
+
 
     public Player(String name, Session session) {
         this.id = id++;
@@ -52,16 +60,12 @@ public class Player implements Comparable {
 
 
 
-    public String getName() {
-        return name;
-    }
 
-    //unique name check in lobby
-    public void setName(String name) {
-        if (name == null) throw new IllegalArgumentException("name is null");
-        if (name.length() == 0) throw new IllegalArgumentException("name.length is 0");
-        this.name = name;
-    }
+
+
+
+    //region ----------------------------------- IN GAME METHODS -------------------------------------------------------
+
 
     public void setGaming() {
         //TODO throws illegal state error / process
@@ -143,7 +147,17 @@ public class Player implements Comparable {
             else {
                 //TODO inform player not enough handCards;
             }
+            return false;
         }
+
+        ArrayList<TrainCard> cards = getCardsToBuildRail(railroadLine.getColor(), railroadLine.getDistance());
+        if (cards != null) {
+            //TODO ask player to confirm
+            this.ownsRailroads.add(railroadLine);
+            this.handCards.removeAll(cards);
+            return true;
+        }
+        return false;
     }
 
 
