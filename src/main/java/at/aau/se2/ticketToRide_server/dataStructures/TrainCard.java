@@ -62,8 +62,6 @@ public class TrainCard implements Comparable{
                     if (color == MapColor.YELLOW) return 0;
                     return 1;
                 }
-
-                case LOCOMOTIVE -> {return 0;}
             }
         }
 

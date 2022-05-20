@@ -5,8 +5,8 @@ package at.aau.se2.ticketToRide_server.dataStructures;
  * RailroadLine-class represents a double connection between two Destination-Objects
  */
 public class DoubleRailroadLine extends RailroadLine{
-    Player owner2;
-    MapColor color2;
+    private Player owner2;
+    private MapColor color2;
 
     /**
      * Creates a double RailroadLine to connect two distinct destinations
@@ -34,5 +34,9 @@ public class DoubleRailroadLine extends RailroadLine{
     public void setOwner2(Player owner2) throws IllegalStateException {
         if (this.owner2 != null) throw new IllegalStateException("Line already owned by " + owner2.getName());
         this.owner2 = owner2;
+    }
+
+    public MapColor getColor2() {
+        return color2;
     }
 }

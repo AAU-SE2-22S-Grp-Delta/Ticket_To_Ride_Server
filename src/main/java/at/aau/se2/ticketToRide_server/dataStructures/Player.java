@@ -122,12 +122,42 @@ public class Player implements Comparable {
     }
 
 
-    public int countHandCardsOfColor(MapColor color) {
-        int counter = 0;
-        for (TrainCard card : this.handCards) {
-            if (card.equals(color)) counter++;
+    public void buildRailroadLine(RailroadLine railroadLine) {
+        if (railroadLine instanceof DoubleRailroadLine) {
+            DoubleRailroadLine doubleRailroadLine = (DoubleRailroadLine) railroadLine;
+            MapColor color1 = doubleRailroadLine.getColor();
+            MapColor color2 = doubleRailroadLine.getColor2();
+
+            ArrayList<TrainCard> railOfColor1 = getCardsToBuildRail(color1, railroadLine.getDistance());
+            ArrayList<TrainCard> railOfColor2 = getCardsToBuildRail(color2, railroadLine.getDistance());
+
+            if (railOfColor1 != null && railOfColor2 != null) {
+                //TODO ask player which one and then confirm
+            }
+            else if (railOfColor1 != null) {
+                //TODO ask player to confirm
+            }
+            else if (railOfColor2 != null) {
+                //TODO ask player to confirm
+            }
+            else {
+                //TODO inform player not enough handCards;
+            }
         }
-        return counter;
+    }
+
+
+    private ArrayList<TrainCard> getCardsToBuildRail(MapColor color, int amount) {
+        ArrayList<TrainCard> cards = new ArrayList<>();
+        for (TrainCard card : this.handCards) {
+            if (card.equals(color)) cards.add(card);
+            if (amount <= cards.size()) return cards;
+        }
+        for (TrainCard card: this.handCards) {
+            if (card.getType() == TrainCard.Type.LOCOMOTIVE) cards.add(card);
+            if (amount <= cards.size()) return cards;
+        }
+        return null;
     }
 
 
