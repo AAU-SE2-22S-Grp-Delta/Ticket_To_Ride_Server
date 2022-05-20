@@ -70,6 +70,8 @@ public class Player implements Comparable {
         this.missions = new ArrayList<>();
     }
 
+    public int getNumStones() { return numStones;}
+
     public Color getPlayerColor() {
         return playerColor;
     }
