@@ -97,7 +97,19 @@ public class GameModel implements Runnable {
     //region -------------------- GAME INITIALIZATION ------------------------------
 
     //TODO init visible cards
+    public ArrayList<TrainCard> getOpenCards()
+    {
+        ArrayList<TrainCard> openCards = new ArrayList<>();
+        ArrayList<TrainCard>  allTrainCards = getTrainCards();
+        int length = allTrainCards.size();
 
+        for(int i = 1; i < 5; i++)
+        {
+            openCards.add(allTrainCards.get(length));
+            length--;
+        }
+        return openCards;
+    }
 
 
     //endregion
