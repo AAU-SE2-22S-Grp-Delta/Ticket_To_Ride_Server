@@ -20,6 +20,7 @@ public class GameModel implements Runnable {
     private State state;
     private int colorCounter = 0;   //to assign colors to players
     private int actionsLeft;        //to manage a move
+    private int countdown = -1;          // for the last moves before end
 
 
     //invisible
@@ -133,12 +134,28 @@ public class GameModel implements Runnable {
      * @return true on over
      */
     private boolean checkIfOver() {
+        if(countdown != -1) {
+            countdown--;
+        }
 
+        if(countdown == 0) {
+            state = State.OVER;
+            return true;
+        } else {
+            for (Player player:players) {
+                if(player.getNumStones() <= 2)
+                {
+                    if(countdown != -1)
+                    {
+                        countdown = players.size();
+                    }
+                }
+            }
+            return false;
+        }
         //check if each player has at least 2 wagons or, if there is a running countdown
         //if a player has less than 2, each other player has one move left (start count down)
         //if countdown is over, set state to OVER
-
-        return false;
     }
 
     /**
