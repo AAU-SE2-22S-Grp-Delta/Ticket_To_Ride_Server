@@ -28,6 +28,7 @@ public class GameModel implements Runnable {
     private ArrayList<TrainCard> trainCards;
     private ArrayList<Mission> missions;
     private int activePlayer = 0;  //counts who is next
+    private int pointerTrainCards = 96;
 
     //visible to all
     private ArrayList<TrainCard> openCards = new ArrayList<>();
@@ -101,13 +102,13 @@ public class GameModel implements Runnable {
     {
         ArrayList<TrainCard> openCards = new ArrayList<>();
         ArrayList<TrainCard>  allTrainCards = getTrainCards();
-        int length = allTrainCards.size();
 
         for(int i = 1; i < 5; i++)
         {
-            openCards.add(allTrainCards.get(length));
-            length--;
+            openCards.add(allTrainCards.get(pointerTrainCards));
+            pointerTrainCards--;
         }
+
         return openCards;
     }
 
