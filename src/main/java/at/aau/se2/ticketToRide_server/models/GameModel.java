@@ -28,7 +28,7 @@ public class GameModel implements Runnable {
     private ArrayList<TrainCard> trainCards;
     private ArrayList<Mission> missions;
     private int activePlayer = 0;  //counts who is next
-    private int pointerTrainCards = 96;
+    private int pointerTrainCards = 110;
 
     //visible to all
     private ArrayList<TrainCard> openCards = new ArrayList<>();
@@ -467,16 +467,19 @@ public class GameModel implements Runnable {
 
     private static ArrayList<TrainCard> getTrainCards() {
         ArrayList<TrainCard> cards = new ArrayList<>();
-        for (int i = 0; i < 18; i++) {
+        for (int i = 0; i < 12; i++) {
             cards.add(new TrainCard(TrainCard.Type.BLACK));
             cards.add(new TrainCard(TrainCard.Type.BLUE));
             cards.add(new TrainCard(TrainCard.Type.GRAY));
             cards.add(new TrainCard(TrainCard.Type.GREEN));
-            cards.add(new TrainCard(TrainCard.Type.LOCOMOTIVE));
             cards.add(new TrainCard(TrainCard.Type.ORANGE));
             cards.add(new TrainCard(TrainCard.Type.RED));
             cards.add(new TrainCard(TrainCard.Type.WHITE));
             cards.add(new TrainCard(TrainCard.Type.YELLOW));
+        }
+
+        for(int i=0;i < 14; i++) {
+            cards.add(new TrainCard(TrainCard.Type.LOCOMOTIVE));
         }
 
         Collections.shuffle(cards);
