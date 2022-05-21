@@ -113,10 +113,16 @@ public class GameModel implements Runnable {
         return openCards;
     }
 
+    public TrainCard getNewOpenCard()
+    {
+        // returns a new trainCard
+        ArrayList<TrainCard>  allTrainCards = getTrainCards();
+        TrainCard newCard = allTrainCards.get(pointerTrainCards);
+        pointerTrainCards--;
+        return newCard;
+    }
 
     //endregion
-
-
 
 
     //region ----------------------- GAMING -----------------------------------------
