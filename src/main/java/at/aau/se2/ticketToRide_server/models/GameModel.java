@@ -1,10 +1,12 @@
 package at.aau.se2.ticketToRide_server.models;
 
 import at.aau.se2.ticketToRide_server.dataStructures.*;
+import at.aau.se2.ticketToRide_server.helpers.PointsHelper;
 import at.aau.se2.ticketToRide_server.server.Configuration_Constants;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Objects;
 
 enum State {
     WAITING_FOR_PLAYERS, RUNNING, OVER, CRASHED
@@ -12,7 +14,8 @@ enum State {
 
 public class GameModel implements Runnable {
     private static int idCounter = 0;
-    private static Map map = getMap();
+    public static Map map = getMap();
+    PointsHelper pointsHelper = new PointsHelper();
 
     //meta
     private int id;
@@ -24,7 +27,7 @@ public class GameModel implements Runnable {
 
 
     //invisible
-    private ArrayList<Player> players;
+    private static ArrayList<Player> players;
     private Player owner;
     private ArrayList<TrainCard> trainCards;
     private ArrayList<Mission> missions;
@@ -183,6 +186,10 @@ public class GameModel implements Runnable {
 
     private void calculatePointsAndSendResult() {
         //TODO impl
+        for (Player player: players) {
+            pointsHelper.numberOfConnectedRailroads(player);
+            pointsHelper.calculateSum(player);
+        }
     }
 
     //endregion
@@ -227,12 +234,29 @@ public class GameModel implements Runnable {
         throw new IllegalStateException("(FATAL) GameModel: At this point the move should be processed");
     }
 
-    public int buildRailroad(Player player) {
+    public int buildRailroad(Player player, RailroadLine railroadLine, ArrayList<TrainCard> cardsToBuild) {
         //TODO impl Method
         //check costs
-        //build
-        //remove handcards (impl method in Player)
-        //check if a mission was completed
+        if(railroadLine.getDistance() == cardsToBuild.size()){
+            Mission currentMission = null;
+            //build
+            railroadLine.setOwner(player);
+
+            player.setPoints(pointsHelper.getPointsForRoutes(cardsToBuild.size()));
+
+            //remove handcards (impl method in Player)
+            for (TrainCard trainCard : cardsToBuild) {
+                player.getHandCards().remove(trainCard);
+            }
+
+            //check if a mission was completed
+            for (Mission mission: player.getMissions()) {
+                if(railroadLine.getDestination1() == mission.getDestination1() && railroadLine.getDestination2() == mission.getDestination2()) currentMission = mission;
+            }
+            if(currentMission!= null) currentMission.setDone();
+        }else {
+            throw new IllegalStateException("Not enough cards");
+        }
         throw new IllegalStateException("(FATAL) GameModel: At this point the move should be processed");
     }
 
@@ -261,7 +285,7 @@ public class GameModel implements Runnable {
         return state;
     }
 
-    public ArrayList<Player> getPlayers() {
+    public static ArrayList<Player> getPlayers() {
         return players;
     }
 
