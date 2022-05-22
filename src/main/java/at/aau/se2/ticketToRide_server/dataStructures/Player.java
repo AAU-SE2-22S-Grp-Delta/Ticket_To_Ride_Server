@@ -36,8 +36,10 @@ public class Player implements Comparable {
 
     //game objects
     private int numStones;
+    private int points;
     private ArrayList<TrainCard> handCards;
     private ArrayList<Mission> missions;
+    private int numberOfConnectedRailroads = 0;
 
     public Player(String name, Session session) {
         this.id = id++;
@@ -72,6 +74,14 @@ public class Player implements Comparable {
 
     public int getNumStones() { return numStones;}
 
+    public void setPoints(int points){
+        this.points = points;
+    }
+
+    public int getPoints() {
+        return points;
+    }
+
     public Color getPlayerColor() {
         return playerColor;
     }
@@ -83,6 +93,22 @@ public class Player implements Comparable {
             return;
         }
         this.playerColor = playerColor;
+    }
+
+    public ArrayList<TrainCard> getHandCards() {
+        return handCards;
+    }
+
+    public ArrayList<Mission> getMissions() {
+        return missions;
+    }
+
+    public void setNumberOfConnectedRailroads(int numberOfConnectedRailroads) {
+        this.numberOfConnectedRailroads = numberOfConnectedRailroads;
+    }
+
+    public int getNumberOfConnectedRailroads() {
+        return numberOfConnectedRailroads;
     }
 
     public void addHandCard(TrainCard card) {
