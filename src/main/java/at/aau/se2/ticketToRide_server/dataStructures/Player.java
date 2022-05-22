@@ -45,6 +45,7 @@ public class Player implements Comparable {
     private ArrayList<Mission> missions;
     private ArrayList<RailroadLine> ownsRailroads;
     //todo completed missions
+    int points=0;
 
 
 
@@ -86,19 +87,6 @@ public class Player implements Comparable {
         return points;
     }
 
-    public Color getPlayerColor() {
-        return playerColor;
-    }
-
-    public void setPlayerColor(Color playerColor) {
-        if (this.state == State.GAMING) {
-            if (Configuration_Constants.debug)
-                System.out.println("(DEBUG)\tCalled Player.getPlayerColor() while Player was in Game!");
-            return;
-        }
-        this.playerColor = playerColor;
-    }
-
     public ArrayList<TrainCard> getHandCards() {
         return handCards;
     }
@@ -107,13 +95,13 @@ public class Player implements Comparable {
         return missions;
     }
 
-    public void setNumberOfConnectedRailroads(int numberOfConnectedRailroads) {
-        this.numberOfConnectedRailroads = numberOfConnectedRailroads;
-    }
-
-    public int getNumberOfConnectedRailroads() {
-        return numberOfConnectedRailroads;
-    }
+//    public void setNumberOfConnectedRailroads(int numberOfConnectedRailroads) {
+//        this.numberOfConnectedRailroads = numberOfConnectedRailroads;
+//    }
+//
+//    public int getNumberOfConnectedRailroads() {
+//        return numberOfConnectedRailroads;
+//    }
 
     public void addHandCard(TrainCard card) {
         if (this.state != State.GAMING) {
@@ -126,7 +114,7 @@ public class Player implements Comparable {
     }
 
 
-    public void buildRailroadLine(RailroadLine railroadLine) {
+    public boolean buildRailroadLine(RailroadLine railroadLine) {
         if (railroadLine instanceof DoubleRailroadLine) {
             DoubleRailroadLine doubleRailroadLine = (DoubleRailroadLine) railroadLine;
             MapColor color1 = doubleRailroadLine.getColor();

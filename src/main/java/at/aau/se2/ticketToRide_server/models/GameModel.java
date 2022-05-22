@@ -159,7 +159,7 @@ public class GameModel implements Runnable {
         //if a player has less than 2, each other player has one move left (start count down)
         //if countdown is over, set state to OVER
 
-        return false;
+//        return false;
     }
 
     /**
