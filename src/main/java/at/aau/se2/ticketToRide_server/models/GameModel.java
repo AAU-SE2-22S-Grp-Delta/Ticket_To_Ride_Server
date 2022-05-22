@@ -39,8 +39,8 @@ public class GameModel implements Runnable {
         this.name = name;
         this.state = State.WAITING_FOR_PLAYERS;
         players = new ArrayList<>();
-
         addPlayer(owner);
+        this.initOpenCards();
 
         this.trainCards = getTrainCards();
         this.missions = getMissions();
@@ -99,27 +99,12 @@ public class GameModel implements Runnable {
     //region -------------------- GAME INITIALIZATION ------------------------------
 
     //TODO init visible cards
-    public ArrayList<TrainCard> getOpenCards()
+    private void initOpenCards()
     {
-        ArrayList<TrainCard> openCards = new ArrayList<>();
-        ArrayList<TrainCard>  allTrainCards = getTrainCards();
-
-        for(int i = 1; i < 5; i++)
-        {
-            openCards.add(allTrainCards.get(pointerTrainCards));
-            pointerTrainCards--;
+        this.openCards = new ArrayList<>();
+        for (int i = 0; i < 5; i++) {
+            this.openCards.add(this.trainCards.remove(0));
         }
-
-        return openCards;
-    }
-
-    public TrainCard getNewOpenCard()
-    {
-        // returns a new trainCard
-        ArrayList<TrainCard>  allTrainCards = getTrainCards();
-        TrainCard newCard = allTrainCards.get(pointerTrainCards);
-        pointerTrainCards--;
-        return newCard;
     }
 
     //endregion
@@ -174,7 +159,7 @@ public class GameModel implements Runnable {
      */
     private void move() {
         //wait for move and inform clients
-        this.actionsLeft = 3;
+        this.actionsLeft = 2;
         for (Player player : players) {
             player.doMove(players.get(activePlayer).getName(), actionsLeft);
         }
@@ -208,7 +193,7 @@ public class GameModel implements Runnable {
 
         //TODO: check if the chosen card is a Traincard (costs TrainCard = 3 => then turn is over)
 
-        if (actionsLeft == 3) {
+        if (actionsLeft == 2) {
             //TODO: draw cards and call player.addHandCard(getCardfromStack(OpenCardID) or something
             return actionsLeft-=2;
         }
