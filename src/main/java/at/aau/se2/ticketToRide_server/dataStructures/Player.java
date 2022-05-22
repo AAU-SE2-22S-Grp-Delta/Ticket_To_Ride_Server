@@ -1,10 +1,10 @@
 package at.aau.se2.ticketToRide_server.dataStructures;
 
+import at.aau.se2.ticketToRide_server.models.GameModel;
 import at.aau.se2.ticketToRide_server.server.Configuration_Constants;
 import at.aau.se2.ticketToRide_server.server.Session;
 
 import java.util.ArrayList;
-
 
 /**
  * Player-Class represents a person who is playing the Game
@@ -36,6 +36,7 @@ public class Player implements Comparable {
     private int id = 0;
     private Color playerColor;
     private State state;
+    private GameModel game;
 
     private Session session;
 
@@ -68,7 +69,7 @@ public class Player implements Comparable {
     //region ----------------------------------- IN GAME METHODS -------------------------------------------------------
 
 
-    public void setGaming() {
+    public void setGaming(GameModel game) {
         //TODO throws illegal state error / process
         if (state.equals(State.GAMING)) throw new IllegalStateException("Player is already gaming");
         state = State.GAMING;
@@ -135,6 +136,8 @@ public class Player implements Comparable {
             else {
                 //TODO inform player not enough handCards;
             }
+            //TODO add to this.ownsRailroads
+
             return false;
         }
 
@@ -143,9 +146,31 @@ public class Player implements Comparable {
             //TODO ask player to confirm
             this.ownsRailroads.add(railroadLine);
             this.handCards.removeAll(cards);
+            this.points += getPointsForRoutes(railroadLine.getDistance());
             return true;
         }
         return false;
+    }
+
+
+    //Punkte für vollständige Strecken
+    private int getPointsForRoutes(int lengthOfRoute) {
+        switch (lengthOfRoute) {
+            case 1:
+                return 1;
+            case 2:
+                return 2;
+            case 3:
+                return 4;
+            case 4:
+                return 7;
+            case 5:
+                return 10;
+            case 6:
+                return 15;
+            default:
+                throw new IllegalStateException("Unexpected value: " + lengthOfRoute);
+        }
     }
 
 
@@ -170,6 +195,62 @@ public class Player implements Comparable {
             throw new IllegalStateException("Player is not in Game!");
         }
         this.missions.add(mission);
+    }
+
+
+    //endregion
+
+
+
+    //region ---------------------------- ENDING GAME METHODS ----------------------------------------------------------
+
+
+
+
+
+    public int calculateSumPoints(){
+        int sum = this.points;
+
+        //Punkte von Zielkarten dazuzählen und abziehen
+        for (Mission mission: this.missions) {
+            if (mission.isDone()) sum+=mission.getPoints();
+            else sum-=mission.getPoints();
+        }
+
+        //Zusatzpunkte für längste Strecke
+        if(game.hasLongestRailroad(this)) sum+=10;
+
+        return sum;
+    }
+
+    public int findLongestConnection() {
+//    public void numberOfConnectedRailroads(Player player){
+//        ArrayList<RailroadLine> railroadLines = new ArrayList<>();
+//        int counter = 0;
+//
+//        for (RailroadLine railroadLine: map.getRailroadLines()) {
+//            if(railroadLine.getOwner()==player) railroadLines.add(railroadLine);
+//        }
+//        //First destination
+//        Destination destination = railroadLines.get(0).getDestination2();
+//        for (int i = 0; i < railroadLines.size(); i++) {
+//            RailroadLine railroadLine = findRailroadLine(destination, railroadLines);
+//            if(railroadLine!= null){
+//                counter++;
+//                destination = railroadLine.getDestination2();
+//            }
+//        }
+//        player.setNumberOfConnectedRailroads(counter);
+//    }
+//
+//    private RailroadLine findRailroadLine(Destination destination, ArrayList<RailroadLine> railroadLines){
+//        for (RailroadLine railroadLine: railroadLines){
+//            if (destination == railroadLine.getDestination1()) return railroadLine;
+//        }
+//        return null;
+//    }
+
+        return -1;
     }
 
 

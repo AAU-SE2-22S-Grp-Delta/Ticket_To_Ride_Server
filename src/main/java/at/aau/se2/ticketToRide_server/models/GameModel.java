@@ -1,12 +1,10 @@
 package at.aau.se2.ticketToRide_server.models;
 
 import at.aau.se2.ticketToRide_server.dataStructures.*;
-import at.aau.se2.ticketToRide_server.helpers.PointsHelper;
 import at.aau.se2.ticketToRide_server.server.Configuration_Constants;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Objects;
 
 enum State {
     WAITING_FOR_PLAYERS, RUNNING, OVER, CRASHED
@@ -14,7 +12,6 @@ enum State {
 
 public class GameModel implements Runnable {
     private static int idCounter = 0;
-    private static Map map = getMap();
 
     //meta
     private int id;
@@ -35,6 +32,7 @@ public class GameModel implements Runnable {
     private int pointerTrainCards = 110;
 
     //visible to all
+    private Map map = getMapInstance();
     private ArrayList<TrainCard> openCards = new ArrayList<>();
 
     public GameModel(String name, Player owner) {
@@ -72,7 +70,7 @@ public class GameModel implements Runnable {
             case 3 -> player.setPlayerColor(Player.Color.YELLOW);
             case 4 -> player.setPlayerColor(Player.Color.BLACK);
         }
-        player.setGaming();
+        player.setGaming(this);
         this.owner = player;
         return 0;
     }
@@ -186,7 +184,25 @@ public class GameModel implements Runnable {
 
 
 
-    //region ---------------------- PLAYER ACTIONS ----------------------------------
+
+    //region -------------------------------- END GAME METHODS ---------------------------------------------------------
+
+
+    public boolean hasLongestRailroad(Player player) {
+        //TODO
+        return false;
+    }
+
+
+
+
+
+    //endregion
+
+
+
+
+    //region ---------------------- PLAYER ACTIONS ---------------------------------------------------------------------
 
 
     //TODO LOCKS WHILE CHANGING GAME STATE!!!
@@ -298,7 +314,7 @@ public class GameModel implements Runnable {
     //region ---------------------- STATIC GENERATORS ---------------------------------------
 
 
-    private static Map getMap() {
+    private static Map getMapInstance() {
         Map map = new Map();
         Destination atlanta = new Destination("Atlanta");
         Destination boston = new Destination("Boston");
@@ -456,7 +472,7 @@ public class GameModel implements Runnable {
     }
 
 
-    private static ArrayList<Mission> getMissions() {
+    private ArrayList<Mission> getMissions() {
         ArrayList<Mission> missions = new ArrayList<>();
 
         missions.add(new Mission(map.getDestinationByName("Boston"),map.getDestinationByName("Miami"),12));
@@ -511,6 +527,8 @@ public class GameModel implements Runnable {
 
         return cards;
     }
+
+
 
 
     //endregion
