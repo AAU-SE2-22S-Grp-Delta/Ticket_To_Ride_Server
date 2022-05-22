@@ -61,11 +61,6 @@ public class Player implements Comparable {
 
 
 
-
-
-
-
-
     //region ----------------------------------- IN GAME METHODS -------------------------------------------------------
 
 
@@ -96,13 +91,6 @@ public class Player implements Comparable {
         return missions;
     }
 
-//    public void setNumberOfConnectedRailroads(int numberOfConnectedRailroads) {
-//        this.numberOfConnectedRailroads = numberOfConnectedRailroads;
-//    }
-//
-//    public int getNumberOfConnectedRailroads() {
-//        return numberOfConnectedRailroads;
-//    }
 
     public void addHandCard(TrainCard card) {
         if (this.state != State.GAMING) {
@@ -208,22 +196,23 @@ public class Player implements Comparable {
 
 
 
-    public int calculateSumPoints(){
-        int sum = this.points;
+    public void calculatePointsAtGameEnd(){
+        //TODO call this method at the end of the game
 
         //Punkte von Zielkarten dazuzählen und abziehen
         for (Mission mission: this.missions) {
-            if (mission.isDone()) sum+=mission.getPoints();
-            else sum-=mission.getPoints();
+            if (mission.isDone()) points=mission.getPoints();
+            else points-=mission.getPoints();
         }
 
         //Zusatzpunkte für längste Strecke
-        if(game.hasLongestRailroad(this)) sum+=10;
+        if(game.hasLongestRailroad(this)) points+=10;
 
-        return sum;
+//        return sum;
     }
 
     public int findLongestConnection() {
+        //TODO fix algorithm
 //    public void numberOfConnectedRailroads(Player player){
 //        ArrayList<RailroadLine> railroadLines = new ArrayList<>();
 //        int counter = 0;

@@ -5,6 +5,7 @@ import at.aau.se2.ticketToRide_server.server.Configuration_Constants;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 
 enum State {
     WAITING_FOR_PLAYERS, RUNNING, OVER, CRASHED
@@ -34,6 +35,7 @@ public class GameModel implements Runnable {
     //visible to all
     private Map map = getMapInstance();
     private ArrayList<TrainCard> openCards = new ArrayList<>();
+    private HashMap<Player, Integer> longestConnectionsForEachPlayer = new HashMap<>();
 
     public GameModel(String name, Player owner) {
         this.id = idCounter++;
@@ -176,6 +178,9 @@ public class GameModel implements Runnable {
     }
 
     private void calculatePoints() {
+        for (Player player : this.players) {
+            player.calculatePointsAtGameEnd();
+        }
         //TODO impl
     }
 
@@ -189,8 +194,20 @@ public class GameModel implements Runnable {
 
 
     public boolean hasLongestRailroad(Player player) {
-        //TODO
-        return false;
+        for (Player p : this.players) {
+            if (p.equals(player)) continue;
+            if (this.longestConnectionsForEachPlayer.get(player) <= this.longestConnectionsForEachPlayer.get(p)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private void getLongestConnectionFromEachPlayer() {
+        //TODO call this metho
+        for (Player p : this.players) {
+            this.longestConnectionsForEachPlayer.put(p, p.findLongestConnection());
+        }
     }
 
 
