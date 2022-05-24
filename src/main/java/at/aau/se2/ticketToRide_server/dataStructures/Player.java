@@ -207,42 +207,36 @@ public class Player implements Comparable {
 
         //Zusatzpunkte für längste Strecke
         if(game.hasLongestRailroad(this)) points+=10;
-
-//        return sum;
     }
 
     public int findLongestConnection() {
-        //TODO fix algorithm
-//    public void numberOfConnectedRailroads(Player player){
-//        ArrayList<RailroadLine> railroadLines = new ArrayList<>();
-//        int counter = 0;
-//
-//        for (RailroadLine railroadLine: map.getRailroadLines()) {
-//            if(railroadLine.getOwner()==player) railroadLines.add(railroadLine);
-//        }
-//        //First destination
-//        Destination destination = railroadLines.get(0).getDestination2();
-//        for (int i = 0; i < railroadLines.size(); i++) {
-//            RailroadLine railroadLine = findRailroadLine(destination, railroadLines);
-//            if(railroadLine!= null){
-//                counter++;
-//                destination = railroadLine.getDestination2();
-//            }
-//        }
-//        player.setNumberOfConnectedRailroads(counter);
-//    }
-//
-//    private RailroadLine findRailroadLine(Destination destination, ArrayList<RailroadLine> railroadLines){
-//        for (RailroadLine railroadLine: railroadLines){
-//            if (destination == railroadLine.getDestination1()) return railroadLine;
-//        }
-//        return null;
-//    }
+        ArrayList<Integer> connectedRailroadLength = new ArrayList<>();
+        for (RailroadLine railroadLine: this.ownsRailroads) {
+            //Add length of connection from railroad
+            connectedRailroadLength.add(findRailroadLine(railroadLine));
+        }
 
-        return -1;
+        //Find longest connection
+        int longestConnection = 0;
+        for(Integer counter: connectedRailroadLength){
+            if(counter > longestConnection) longestConnection = counter;
+        }
+
+        return longestConnection;
     }
-
-
+    
+    //Count length of connection
+    private int findRailroadLine(RailroadLine railroadLine){
+        Destination startDestination = railroadLine.getDestination2();
+        int counter = 0;
+        for (RailroadLine otherRailroadLine: this.ownsRailroads){
+            if (startDestination == otherRailroadLine.getDestination1()) {
+                counter++;
+                startDestination = otherRailroadLine.getDestination2();
+            }
+        }
+        return counter;
+    }
     //endregion
 
 
