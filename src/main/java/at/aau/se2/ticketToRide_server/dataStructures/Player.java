@@ -5,6 +5,7 @@ import at.aau.se2.ticketToRide_server.server.Configuration_Constants;
 import at.aau.se2.ticketToRide_server.server.Session;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 
 /**
  * Player-Class represents a person who is playing the Game
@@ -183,6 +184,32 @@ public class Player implements Comparable {
             throw new IllegalStateException("Player is not in Game!");
         }
         this.missions.add(mission);
+    }
+
+
+    private boolean checkIfCompleted(Mission mission) {
+        LinkedList<Destination> visited = new LinkedList<>();
+        LinkedList<Destination> toProcess = new LinkedList<>();
+
+        toProcess.add(mission.getDestination1());
+        while (toProcess.size() > 0) {
+            Destination currentDest = toProcess.remove(0);
+            for (RailroadLine line : this.ownsRailroads) {
+                if (line.getDestination1().equals(currentDest) && !visited.contains(line.getDestination2())) {
+                    if (line.getDestination2().equals(mission.destination2)) return true;
+                    toProcess.add(line.getDestination2());
+                }
+
+                else if (line.getDestination2().equals(currentDest) && !visited.contains(line.getDestination1())) {
+                    if (line.getDestination1().equals(mission.destination2)) return true;
+                    toProcess.add(line.getDestination1());
+                }
+            }
+
+            visited.add(currentDest);
+        }
+
+        return false;
     }
 
 
