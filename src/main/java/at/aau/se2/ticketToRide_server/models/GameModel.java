@@ -169,7 +169,8 @@ public class GameModel implements Runnable {
         }
 
         while (actionsLeft > 0) {
-            //lock info
+            //broadcast whose turn e.g. "actionCall:[Player1]"
+            //lock
             //write
             //unlock
             //check if over
@@ -204,7 +205,7 @@ public class GameModel implements Runnable {
     }
 
     private void getLongestConnectionFromEachPlayer() {
-        //TODO call this metho
+        //TODO call this method
         for (Player p : this.players) {
             this.longestConnectionsForEachPlayer.put(p, p.findLongestConnection());
         }
