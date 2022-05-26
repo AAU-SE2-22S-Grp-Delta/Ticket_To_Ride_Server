@@ -12,8 +12,8 @@ import java.util.LinkedList;
  */
 public class Player implements Comparable {
 
-
-    public void joinGame(String word) {
+    public int startGame() {
+        return -1;
     }
 
     public enum Command {
@@ -63,19 +63,38 @@ public class Player implements Comparable {
     }
 
 
+    //region ----------------------------------- GENERAL ACTIONS -------------------------------------------------------
 
-
-    //region ----------------------------------- IN GAME METHODS -------------------------------------------------------
-
-
-    public void setGaming(GameModel game) {
-        //TODO throws illegal state error / process
-        if (state.equals(State.GAMING)) throw new IllegalStateException("Player is already gaming");
+    /**
+     * Player joins the specified game if in state waiting for players
+     * @param game
+     * @return 0 on success, -1 on fail
+     */
+    public int joinGame(GameModel game) {
+        if (state.equals(State.GAMING)) {
+            if (Configuration_Constants.debug) System.out.println("(DEBUG)\t Player.joinGame() called while Player " + name + " was in game " + this.game.getName());
+            return -1;
+        }
         state = State.GAMING;
         this.numStones = 45;
         this.handCards = new ArrayList<>();
         this.missions = new ArrayList<>();
+        if (game.addPlayer(this)<0) {
+            if (Configuration_Constants.debug) System.out.println("(DEBUG)\t Game is full");
+            return -2;
+        }
+        this.game = game;
+        if (Configuration_Constants.verbose) System.out.println("(VERBOSE)\tPlayer joint game " + this.game.getName());
+        return 0;
     }
+
+    //endregion
+
+
+
+
+    //region ----------------------------------- IN GAME METHODS -------------------------------------------------------
+
 
     public int getNumStones() { return numStones;}
 
