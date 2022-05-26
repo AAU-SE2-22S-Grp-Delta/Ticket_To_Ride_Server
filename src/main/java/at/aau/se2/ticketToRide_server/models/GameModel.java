@@ -42,7 +42,6 @@ public class GameModel implements Runnable {
         this.name = name;
         this.state = State.WAITING_FOR_PLAYERS;
         players = new ArrayList<>();
-        addPlayer(owner);
         this.initOpenCards();
 
         this.trainCards = getTrainCards();
@@ -54,7 +53,7 @@ public class GameModel implements Runnable {
     public int addPlayer(Player player) {
         try {
             if (player == null) throw new IllegalArgumentException("Player is NULL!");
-            if (players.size() > 4) throw new IllegalArgumentException("Board is full!");
+            if (players.size() > 4) throw new IllegalStateException("Board is full!");
             if (this.state != State.WAITING_FOR_PLAYERS) throw new IllegalStateException("Game has already started!");
         } catch (IllegalArgumentException e) {
             System.out.println(e);
@@ -72,7 +71,6 @@ public class GameModel implements Runnable {
             case 3 -> player.setPlayerColor(Player.Color.YELLOW);
             case 4 -> player.setPlayerColor(Player.Color.BLACK);
         }
-        player.setGaming(this);
         this.owner = player;
         return 0;
     }
@@ -182,7 +180,6 @@ public class GameModel implements Runnable {
         for (Player player : this.players) {
             player.calculatePointsAtGameEnd();
         }
-        //TODO impl
     }
 
     //endregion
