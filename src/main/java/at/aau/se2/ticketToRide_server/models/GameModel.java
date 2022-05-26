@@ -204,14 +204,13 @@ public class GameModel implements Runnable {
         return true;
     }
 
+
     private void getLongestConnectionFromEachPlayer() {
         //TODO call this method
         for (Player p : this.players) {
             this.longestConnectionsForEachPlayer.put(p, p.findLongestConnection());
         }
     }
-
-
 
 
 
