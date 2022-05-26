@@ -36,8 +36,8 @@ public class Session {
 
     private static final String COMMAND_GET_CARD_STACK = "cardStack";
     private static final String COMMAND_GET_CARD_OPEN = "cardOpen:" + REGEX_OPEN_CARD_ID;
-    private static final String COMMAND_PREPARE_RAILROAD = "buildRailRoad:" + REGEX_NAME + "+" + REGEX_NAME;
-    private static final String COMMAND_CONFIRM_RAILROAD = "aknRailRoad:" + REGEX_NAME + "+" + REGEX_NAME +":" + REGEX_COLOR;
+    private static final String COMMAND_PREPARE_RAILROAD = "buildRailRoad:" + REGEX_NAME + ":" + REGEX_NAME;
+    private static final String COMMAND_CONFIRM_RAILROAD = "aknRailRoad:" + REGEX_NAME + ":" + REGEX_NAME +":" + REGEX_COLOR;
     private static final String COMMAND_GET_MISSION = "getMission";
     private static final String COMMAND_CHOOSE_MISSION = "chooseMission:" + REGEX_MISSION_ID;
     //----------------------------------------------
