@@ -7,12 +7,14 @@ import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.LinkedList;
 
 public class Session {
     //---------- REGEX FOR PARSER ------------------
     private static final String REGEX_NAME = "[^:;]*?";
     private static final String REGEX_OPEN_CARD_ID = "[01234]";
     private static final String REGEX_MISSION_ID = "[//d][//d]?";
+    private static final String REGEX_COLOR = "(blue)|(green)|(yellow)|(red)|(white)|(orange)|(gray)|(black)|(pink)";
 
     private static final String COMMAND_ENTER_LOBBY = "enterLobby:" + REGEX_NAME;
     private static final String COMMAND_CREATE_GAME = "createGame";
@@ -34,7 +36,8 @@ public class Session {
 
     private static final String COMMAND_GET_CARD_STACK = "cardStack";
     private static final String COMMAND_GET_CARD_OPEN = "cardOpen:" + REGEX_OPEN_CARD_ID;
-    private static final String COMMAND_BUILD_RAILROAD = "buildRailRoad:" + REGEX_NAME + "+" + REGEX_NAME;
+    private static final String COMMAND_PREPARE_RAILROAD = "buildRailRoad:" + REGEX_NAME + "+" + REGEX_NAME;
+    private static final String COMMAND_CONFIRM_RAILROAD = "aknRailRoad:" + REGEX_NAME + "+" + REGEX_NAME +":" + REGEX_COLOR;
     private static final String COMMAND_GET_MISSION = "getMission";
     private static final String COMMAND_CHOOSE_MISSION = "chooseMission:" + REGEX_MISSION_ID;
     //----------------------------------------------
@@ -43,12 +46,12 @@ public class Session {
 
     private final int id;
     Socket session;
-    private ReceiveingThread receiveingThread;
+    private ReceivingThread receivingThread;
     private SendingThread sendingThread;
     BufferedReader inFromClient;
     DataOutputStream sendToClient;
 
-    Player sessionOwner;
+    Player player;
 
     public Session(Socket session) throws Exception {
         this.id = sessionCounter++;
@@ -68,7 +71,7 @@ public class Session {
 
             //----------- At this point in control flow the session leader must have called enterLobby to assign session Owner ----------
             //----------- when adding commands which don't necessarily need a session owner, put them above the following check ---------
-            if (this.sessionOwner == null) {
+            if (this.player == null) {
                 sendingThread.setCommand("ERROR: Not in Lobby");
                 if (Configuration_Constants.debug) {
                     System.out.printf("(DEBUG)\t Session %d received command '%s' while sessionOwner=null\n", this.id, command);
@@ -78,31 +81,32 @@ public class Session {
             }
 
             //---- GENERAL REQUESTS ---------------------------------------------------------
-            if (command.equals(REQUEST_LIST_GAMES)) this.listGames();
-            else if (command.equals(REQUEST_LIST_PLAYERS_LOBBY)) this.listPlayersLobby();
-            else if (command.equals(REQUEST_LIST_PLAYERS_GAME)) this.listPlayersGame();
-            else if (command.equals(REQUEST_GAME_STATE)) this.getGameState(command);
+            if (command.matches(REQUEST_LIST_GAMES)) this.listGames();
+            else if (command.matches(REQUEST_LIST_PLAYERS_LOBBY)) this.listPlayersLobby();
+            else if (command.matches(REQUEST_LIST_PLAYERS_GAME)) this.listPlayersGame();
+            else if (command.matches(REQUEST_GAME_STATE)) this.getGameState(command);
 
                 //---- GENERAL COMMANDS ---------------------------------------------------------
             else if (command.matches(COMMAND_CREATE_GAME)) this.createGame(command);
             else if (command.matches(COMMAND_JOIN_GAME)) this.joinGame(command);
-            else if (command.equals(COMMAND_START_GAME)) this.startGame();
-            else if (command.equals(COMMAND_EXIT_GAME)) this.exitGame();
-            else if (command.equals(COMMAND_LEAVE)) this.leave();
+            else if (command.matches(COMMAND_START_GAME)) this.startGame();
+            else if (command.matches(COMMAND_EXIT_GAME)) this.exitGame();
+            else if (command.matches(COMMAND_LEAVE)) this.leave();
 
                 //----- IN GAME REQUESTS --------------------------------------------------------
-            else if (command.equals(REQUEST_GET_HAND_CARDS)) this.getHandCards();
-            else if (command.equals(REQUEST_GET_OPEN_CARDS)) this.getOpenCards();
-            else if (command.equals(REQUEST_GET_MAP)) this.getMap();
-            else if (command.equals(REQUEST_GET_POINTS)) this.getPoints();
-            else if (command.equals(REQUEST_GET_COLORS)) this.getColors();
+            else if (command.matches(REQUEST_GET_HAND_CARDS)) this.getHandCards();
+            else if (command.matches(REQUEST_GET_OPEN_CARDS)) this.getOpenCards();
+            else if (command.matches(REQUEST_GET_MAP)) this.getMap();
+            else if (command.matches(REQUEST_GET_POINTS)) this.getPoints();
+            else if (command.matches(REQUEST_GET_COLORS)) this.getColors();
 
                 //----- IN GAME COMMANDS --------------------------------------------------------
-            else if (command.equals(COMMAND_GET_CARD_STACK)) this.getCardStack();
-            else if (command.equals(COMMAND_GET_CARD_OPEN)) this.getCardOpen(command);
-            else if (command.equals(COMMAND_BUILD_RAILROAD)) this.buildRailRoad(command);
-            else if (command.equals(COMMAND_GET_MISSION)) this.getMission();
-            else if (command.equals(COMMAND_CHOOSE_MISSION)) this.chooseMission(command);
+            else if (command.matches(COMMAND_GET_CARD_STACK)) this.getCardStack();
+            else if (command.matches(COMMAND_GET_CARD_OPEN)) this.getCardOpen(command);
+            else if (command.matches(COMMAND_PREPARE_RAILROAD)) this.prepareRailroad(command);
+            else if (command.matches(COMMAND_CONFIRM_RAILROAD)) this.confirmRailroad(command);
+            else if (command.matches(COMMAND_GET_MISSION)) this.getMission();
+            else if (command.matches(COMMAND_CHOOSE_MISSION)) this.chooseMission(command);
         }
     }
 
@@ -134,31 +138,34 @@ public class Session {
 
     private void enterLobby(String command) {
         if (Configuration_Constants.verbose) System.out.println("(VERBOSE)\tSession.enterLobby() called");
-        if (this.sessionOwner != null) {
+        if (this.player != null) {
             this.send("enterLobby:null");
             if (Configuration_Constants.debug)
-                System.out.println("(DEBUG)\tSession.enterLobby() failed: session already belongs to player " + sessionOwner.getName());
+                System.out.println("(DEBUG)\tSession.enterLobby() failed: session already belongs to player " + player.getName());
             return;
         }
 
         String[] words = command.split(":");
-        this.sessionOwner = Lobby.getInstance().createPlayer(words[1], this);
+        this.player = Lobby.getInstance().createPlayer(words[1], this);
         if (Configuration_Constants.verbose) System.out.println("(VERBOSE)\tCreated Player " + words[1]);
     }
 
     private void createGame(String command) {
         String[] words = command.split(":");
-        if (Lobby.getInstance().createGame(words[1], this.sessionOwner) < 0) {
+        GameModel game = Lobby.getInstance().createGame(words[1], this.player);
+        if (game == null) {
             if (Configuration_Constants.debug) System.out.println("(DEBUG)\tCreating game " + words[1] + " failed");
             send("createGame:null");
             return;
         }
+        player.joinGame(game);
         if (Configuration_Constants.verbose) System.out.println("(VERBOSE)\tCreated game " + words[1]);
     }
 
     private void joinGame(String command) {
         String[] words = command.split(":");
-        sessionOwner.joinGame(words[1]);
+        GameModel game = Lobby.getInstance().getGameByName(words[1]);
+        player.joinGame(game);
     }
 
     private void leave() {
@@ -190,24 +197,39 @@ public class Session {
     //----- IN GAME COMMANDS -------------------------------------------------------
 
     private void startGame() {
+        player.startGame();
     }
 
     private void getCardStack() {
+        player.getCardStack();
     }
 
     private void getCardOpen(String command) {
+
+        player.getCardOpen(id);
     }
 
-    private void buildRailRoad(String command) {
+    private void prepareRailroad(String command) {
+        String[] words = command.split(":");
+        player.prepareRailroadLine(words[1], words[2]);
+    }
+
+    private void confirmRailroad(String command) {
+        String[] words = command.split(":");
+        player.confirmBuild(words[1], words[2], words[3]);
     }
 
     private void getMission() {
+        player.getMissions();
     }
 
     private void chooseMission(String command) {
+        LinkedList<Integer> chosen = new LinkedList<>();
+        player.chooseMissoions(chosen);
     }
 
     private void exitGame() {
+        player.exitGame();
     }
 
 
@@ -220,8 +242,8 @@ public class Session {
         return 0;
     }
 
-    void setReceivingThread(ReceiveingThread receiveingThread) {
-        this.receiveingThread = receiveingThread;
+    void setReceivingThread(ReceivingThread receivingThread) {
+        this.receivingThread = receivingThread;
     }
 
     void setSendingThread(SendingThread sendingThread) {

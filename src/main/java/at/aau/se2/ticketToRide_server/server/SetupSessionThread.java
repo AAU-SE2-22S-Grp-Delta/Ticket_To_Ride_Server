@@ -7,7 +7,7 @@ public class SetupSessionThread extends Thread {
 
     protected Socket socket;
     private SendingThread sendingThread;
-    private ReceiveingThread receivingTread;
+    private ReceivingThread receivingTread;
 
     public SetupSessionThread(Session session, Socket socket) {
         this.session = session;
@@ -19,7 +19,7 @@ public class SetupSessionThread extends Thread {
         try {
             System.out.println("SetupSessionThread: setting up communication threads ... ");
             sendingThread = new SendingThread(socket);
-            receivingTread = new ReceiveingThread(socket, session);
+            receivingTread = new ReceivingThread(socket, session);
             sendingThread.start();
             receivingTread.start();
             session.setSendingThread(sendingThread);

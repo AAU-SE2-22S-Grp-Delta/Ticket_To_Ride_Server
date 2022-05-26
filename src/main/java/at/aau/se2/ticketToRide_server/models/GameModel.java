@@ -20,7 +20,8 @@ public class GameModel implements Runnable {
     private State state;
     private int colorCounter = 0;   //to assign colors to players
     private int actionsLeft;        //to manage a move
-    private int countdown = -1;          // for the last moves before end
+    private int countdown = -1;     // for the last moves before end
+//    private Object lock;            //synchronization
 
 
     //invisible
@@ -76,8 +77,10 @@ public class GameModel implements Runnable {
     }
 
     public void startGame(Player whoIsPerformingThisAction) {
-        if (!whoIsPerformingThisAction.equals(owner)) throw new IllegalCallerException(whoIsPerformingThisAction.getName() + " is not the owner, aborting to start game!");
-        if (this.state != State.WAITING_FOR_PLAYERS) throw new IllegalStateException("Game is not in state WAITING_FOR_PLAYERS!");
+        if (!whoIsPerformingThisAction.equals(owner))
+            throw new IllegalCallerException(whoIsPerformingThisAction.getName() + " is not the owner, aborting to start game!");
+        if (this.state != State.WAITING_FOR_PLAYERS)
+            throw new IllegalStateException("Game is not in state WAITING_FOR_PLAYERS!");
         this.state = State.RUNNING;
         Thread gameLoop = new Thread(this);
         Collections.shuffle(players);
@@ -95,13 +98,10 @@ public class GameModel implements Runnable {
     //endregion
 
 
-
-
     //region -------------------- GAME INITIALIZATION ------------------------------
 
     //TODO init visible cards
-    private void initOpenCards()
-    {
+    private void initOpenCards() {
         this.openCards = new ArrayList<>();
         for (int i = 0; i < 5; i++) {
             this.openCards.add(this.trainCards.remove(0));
@@ -122,22 +122,21 @@ public class GameModel implements Runnable {
 
     /**
      * checks if the game is over
+     *
      * @return true on over
      */
     private boolean checkIfOver() {
-        if(countdown != -1) {
+        if (countdown != -1) {
             countdown--;
         }
 
-        if(countdown == 0) {
+        if (countdown == 0) {
             state = State.OVER;
             return true;
         } else {
-            for (Player player:players) {
-                if(player.getNumStones() <= 2)
-                {
-                    if(countdown != -1)
-                    {
+            for (Player player : players) {
+                if (player.getNumStones() <= 2) {
+                    if (countdown != -1) {
                         countdown = players.size();
                     }
                 }
@@ -176,20 +175,36 @@ public class GameModel implements Runnable {
         }
     }
 
+    /**
+     * searches for a railroadLine which names are equal to dest1 and dest2
+     *
+     * @param destination1 the name of one destination of the line
+     * @param destination2 the name of one destination of the line
+     * @return the RailroadLine on success, null on fail
+     */
+    public RailroadLine getRailroadLineByName(String destination1, String destination2) {
+        for (RailroadLine r : map.getRailroadLines()) {
+            String d1 = r.getDestination1().getName();
+            String d2 = r.getDestination2().getName();
+            if (destination1.equals(d1) && destination2.equals(d1) || destination1.equals(d2) && destination2.equals(d1)) {
+                return r;
+            }
+        }
+        return null;
+    }
+
+
+    //endregion
+
+
+    //region -------------------------------- END GAME METHODS ---------------------------------------------------------
+
+
     private void calculatePoints() {
         for (Player player : this.players) {
             player.calculatePointsAtGameEnd();
         }
     }
-
-    //endregion
-
-
-
-
-
-    //region -------------------------------- END GAME METHODS ---------------------------------------------------------
-
 
     public boolean hasLongestRailroad(Player player) {
         for (Player p : this.players) {
@@ -210,10 +225,7 @@ public class GameModel implements Runnable {
     }
 
 
-
     //endregion
-
-
 
 
     //region ---------------------- PLAYER ACTIONS ---------------------------------------------------------------------
@@ -224,17 +236,18 @@ public class GameModel implements Runnable {
     public int drawOpenCard(Player player, int openCardId) {
         if (!players.get(activePlayer).equals(player)) {
             //TODO return failure or block info?
-            if (Configuration_Constants.verbose) System.out.println("(VERBOSE)\t Player" + player.getName() +" was blocked trying pick open card while players " + players.get(activePlayer) + "turn.");
+            if (Configuration_Constants.verbose)
+                System.out.println("(VERBOSE)\t Player" + player.getName() + " was blocked trying pick open card while players " + players.get(activePlayer) + "turn.");
             return -1;
         }
 
-        //TODO: check if the chosen card is a Traincard (costs TrainCard = 3 => then turn is over)
+        //TODO: check if the chosen card is a TrainCard (costs TrainCard = 3 => then turn is over)
 
         if (actionsLeft == 2) {
             //TODO: draw cards and call player.addHandCard(getCardfromStack(OpenCardID) or something
-            return actionsLeft-=2;
+            return actionsLeft -= 2;
         }
-        if (actionsLeft == 2|| actionsLeft==1) {
+        if (actionsLeft == 2 || actionsLeft == 1) {
             return --actionsLeft;
         }
         throw new IllegalStateException("(FATAL) GameModel: No more moves left when called drawOpenCard");
@@ -244,7 +257,8 @@ public class GameModel implements Runnable {
     public int drawCardFromStack(Player player) {
         if (!players.get(activePlayer).equals(player)) {
             //TODO return failure or block info?
-            if (Configuration_Constants.verbose) System.out.println("(VERBOSE)\t Player" + player.getName() +" was blocked trying pick card from stack while players " + players.get(activePlayer) + "turn.");
+            if (Configuration_Constants.verbose)
+                System.out.println("(VERBOSE)\t Player" + player.getName() + " was blocked trying pick card from stack while players " + players.get(activePlayer) + "turn.");
             return -1;
         }
         if (actionsLeft > 0 && trainCards.size() > 0) {
@@ -257,21 +271,28 @@ public class GameModel implements Runnable {
     }
 
 
-    public int buildRailroad(Player player, String destination1, String destination2) {
+    public int setRailRoadLineOwner(Player player, RailroadLine railroadLine, MapColor color) {
         if (!players.get(activePlayer).equals(player)) {
-            //TODO return failure or block info?
-            if (Configuration_Constants.verbose) System.out.println("(VERBOSE)\t Player" + player.getName() +" was blocked trying to build road while players " + players.get(activePlayer) + "turn.");
+            if (Configuration_Constants.debug)
+                System.out.println("(DEBUG)\t Player" + player.getName() + " was blocked trying to build road while players " + players.get(activePlayer) + "turn.");
             return -1;
         }
-        for (RailroadLine railroadLine : map.getRailroadLines()) {
-            String d1 = railroadLine.getDestination1().getName();
-            String d2 = railroadLine.getDestination2().getName();
-            if (destination1.equals(d1) && destination2.equals(d1) || destination1.equals(d2) && destination2.equals(d1)) {
-                player.buildRailroadLine(railroadLine);
-            }
+
+        if (railroadLine.getOwner() == null) {
+            if (Configuration_Constants.debug)
+                System.out.println("(DEBUG)\t GameModel.setRailRoadLineOwner() Rail has owner named " + railroadLine.getOwner().getName() + ". Can't set owner to " + player.getName());
+            return -1;
         }
-        //check if a mission was completed
-        throw new IllegalStateException("(FATAL) GameModel: At this point the move should be processed");
+
+        if (railroadLine instanceof DoubleRailroadLine) {
+            DoubleRailroadLine doubleRailroadLine = (DoubleRailroadLine) railroadLine;
+            if (doubleRailroadLine.getColor2().equals(color) && doubleRailroadLine.getOwner2() == null) doubleRailroadLine.setOwner2(player);
+            else if (doubleRailroadLine.getColor().equals(color)) doubleRailroadLine.setOwner(player);
+            return 0;
+        }
+
+        railroadLine.setOwner(player);
+        return 0;
     }
 
     public int drawMission(Player player) {
@@ -281,8 +302,6 @@ public class GameModel implements Runnable {
 
 
     //endregion
-
-
 
 
     //region ------------------- GETTER SETTER TO_STRING ----------------------------
@@ -315,9 +334,9 @@ public class GameModel implements Runnable {
         String toString = "GameModelid=" + id +
                 ", name='" + name +
                 ", state=" + state
-                + ", owner=" + owner.getName()+ "\n"
+                + ", owner=" + owner.getName() + "\n"
                 + "\tPlayers:";
-        for(Player player : players) toString+="\t"+player.toString()+"\n";
+        for (Player player : players) toString += "\t" + player.toString() + "\n";
         return toString;
     }
 
@@ -404,7 +423,7 @@ public class GameModel implements Runnable {
         map.addDestination(winnipeg);
 
         map.addRailroadLine(new RailroadLine(vancouver, calgary, MapColor.GRAY, 3));
-        map.addRailroadLine(new RailroadLine(calgary,winnipeg, MapColor.WHITE, 6));
+        map.addRailroadLine(new RailroadLine(calgary, winnipeg, MapColor.WHITE, 6));
         map.addRailroadLine(new RailroadLine(winnipeg, saultstmarie, MapColor.GRAY, 6));
         map.addRailroadLine(new RailroadLine(saultstmarie, montreal, MapColor.BLACK, 5));
         map.addRailroadLine(new DoubleRailroadLine(montreal, boston, MapColor.GRAY, 2, MapColor.GRAY));
@@ -412,11 +431,11 @@ public class GameModel implements Runnable {
         map.addRailroadLine(new RailroadLine(montreal, toronto, MapColor.GRAY, 3));
         map.addRailroadLine(new DoubleRailroadLine(newyork, boston, MapColor.YELLOW, 2, MapColor.RED));
         map.addRailroadLine(new DoubleRailroadLine(newyork, pittsburgh, MapColor.YELLOW, 2, MapColor.GREEN));
-        map.addRailroadLine(new RailroadLine(toronto, pittsburgh, MapColor.GRAY,2));
+        map.addRailroadLine(new RailroadLine(toronto, pittsburgh, MapColor.GRAY, 2));
         map.addRailroadLine(new RailroadLine(toronto, saultstmarie, MapColor.GRAY, 2));
         map.addRailroadLine(new RailroadLine(toronto, duluth, MapColor.PINK, 6));
         map.addRailroadLine(new RailroadLine(saultstmarie, duluth, MapColor.GRAY, 3));
-        map.addRailroadLine(new RailroadLine(duluth, winnipeg, MapColor.BLACK,4));
+        map.addRailroadLine(new RailroadLine(duluth, winnipeg, MapColor.BLACK, 4));
         map.addRailroadLine(new RailroadLine(winnipeg, helena, MapColor.BLUE, 4));
         map.addRailroadLine(new RailroadLine(helena, calgary, MapColor.GRAY, 4));
         map.addRailroadLine(new RailroadLine(helena, duluth, MapColor.ORANGE, 6));
@@ -437,7 +456,7 @@ public class GameModel implements Runnable {
         map.addRailroadLine(new RailroadLine(pittsburgh, chicago, MapColor.BLACK, 3));
         map.addRailroadLine(new RailroadLine(chicago, omaha, MapColor.BLUE, 4));
         map.addRailroadLine(new RailroadLine(omaha, denver, MapColor.PINK, 4));
-        map.addRailroadLine(new RailroadLine(denver, helena, MapColor.GREEN,4));
+        map.addRailroadLine(new RailroadLine(denver, helena, MapColor.GREEN, 4));
         map.addRailroadLine(new RailroadLine(denver, saltlakecity, MapColor.YELLOW, 3));
         map.addRailroadLine(new RailroadLine(saltlakecity, lasvegas, MapColor.ORANGE, 3));
         map.addRailroadLine(new RailroadLine(lasvegas, losangeles, MapColor.GRAY, 2));
@@ -450,7 +469,7 @@ public class GameModel implements Runnable {
         map.addRailroadLine(new RailroadLine(santafe, elpaso, MapColor.GRAY, 2));
         map.addRailroadLine(new RailroadLine(santafe, phoenix, MapColor.GRAY, 3));
         map.addRailroadLine(new RailroadLine(elpaso, oklahomacity, MapColor.YELLOW, 5));
-        map.addRailroadLine(new RailroadLine(elpaso, dallas, MapColor.RED,4));
+        map.addRailroadLine(new RailroadLine(elpaso, dallas, MapColor.RED, 4));
         map.addRailroadLine(new RailroadLine(elpaso, houston, MapColor.GREEN, 6));
         map.addRailroadLine(new RailroadLine(houston, neworleans, MapColor.RED, 2));
         map.addRailroadLine(new DoubleRailroadLine(houston, dallas, MapColor.GRAY, 1, MapColor.GRAY));
@@ -465,7 +484,7 @@ public class GameModel implements Runnable {
         map.addRailroadLine(new RailroadLine(neworleans, miami, MapColor.RED, 6));
         map.addRailroadLine(new DoubleRailroadLine(neworleans, atlanta, MapColor.ORANGE, 4, MapColor.YELLOW));
         map.addRailroadLine(new RailroadLine(atlanta, miami, MapColor.BLUE, 5));
-        map.addRailroadLine(new RailroadLine(atlanta,charleston, MapColor.GRAY, 2));
+        map.addRailroadLine(new RailroadLine(atlanta, charleston, MapColor.GRAY, 2));
         map.addRailroadLine(new DoubleRailroadLine(atlanta, raleigh, MapColor.GRAY, 2, MapColor.GRAY));
         map.addRailroadLine(new RailroadLine(atlanta, nashville, MapColor.GRAY, 1));
         map.addRailroadLine(new RailroadLine(miami, charleston, MapColor.PINK, 4));
@@ -474,7 +493,7 @@ public class GameModel implements Runnable {
         map.addRailroadLine(new RailroadLine(raleigh, pittsburgh, MapColor.GRAY, 2));
         map.addRailroadLine(new RailroadLine(raleigh, nashville, MapColor.BLACK, 3));
         map.addRailroadLine(new RailroadLine(nashville, pittsburgh, MapColor.YELLOW, 4));
-        map.addRailroadLine(new RailroadLine(nashville, saintlouis, MapColor.GRAY,2));
+        map.addRailroadLine(new RailroadLine(nashville, saintlouis, MapColor.GRAY, 2));
         map.addRailroadLine(new RailroadLine(saintlouis, pittsburgh, MapColor.GREEN, 5));
         map.addRailroadLine(new DoubleRailroadLine(saintlouis, chicago, MapColor.GREEN, 2, MapColor.WHITE));
         map.addRailroadLine(new DoubleRailroadLine(saintlouis, kansascity, MapColor.BLUE, 2, MapColor.PINK));
@@ -489,36 +508,36 @@ public class GameModel implements Runnable {
     private ArrayList<Mission> getMissions() {
         ArrayList<Mission> missions = new ArrayList<>();
 
-        missions.add(new Mission(map.getDestinationByName("Boston"),map.getDestinationByName("Miami"),12));
-        missions.add(new Mission(map.getDestinationByName("Calgary"),map.getDestinationByName("Phoenix"),13));
-        missions.add(new Mission(map.getDestinationByName("Calgary"),map.getDestinationByName("Salt Lake City"),7));
-        missions.add(new Mission(map.getDestinationByName("Chicago"),map.getDestinationByName("New Orleans"),7));
-        missions.add(new Mission(map.getDestinationByName("Chicago"),map.getDestinationByName("Santa Fe"),9));
-        missions.add(new Mission(map.getDestinationByName("Dallas"),map.getDestinationByName("New York"),11));
-        missions.add(new Mission(map.getDestinationByName("Denver"),map.getDestinationByName("El Paso"),4));
-        missions.add(new Mission(map.getDestinationByName("Denver"),map.getDestinationByName("Pittsburgh"),11));
-        missions.add(new Mission(map.getDestinationByName("Duluth"),map.getDestinationByName("El Paso"),10));
-        missions.add(new Mission(map.getDestinationByName("Duluth"),map.getDestinationByName("Houston"),8));
-        missions.add(new Mission(map.getDestinationByName("Helena"),map.getDestinationByName("Los Angeles"),8));
-        missions.add(new Mission(map.getDestinationByName("Kansas City"),map.getDestinationByName("Houston"),5));
-        missions.add(new Mission(map.getDestinationByName("Los Angeles"),map.getDestinationByName("Chicago"),16));
-        missions.add(new Mission(map.getDestinationByName("Los Angeles"),map.getDestinationByName("Miami"),20));
-        missions.add(new Mission(map.getDestinationByName("Los Angeles"),map.getDestinationByName("New York"),21));
-        missions.add(new Mission(map.getDestinationByName("Montreal"),map.getDestinationByName("Atlanta"),9));
-        missions.add(new Mission(map.getDestinationByName("Montreal"),map.getDestinationByName("New Orleans"),13));
-        missions.add(new Mission(map.getDestinationByName("New York"),map.getDestinationByName("Atlanta"),6));
-        missions.add(new Mission(map.getDestinationByName("Portland"),map.getDestinationByName("Nashville"),17));
-        missions.add(new Mission(map.getDestinationByName("Portland"),map.getDestinationByName("Phoenix"),11));
-        missions.add(new Mission(map.getDestinationByName("San Francisco"),map.getDestinationByName("Atlanta"),17));
-        missions.add(new Mission(map.getDestinationByName("Sault St. Marie"),map.getDestinationByName("Nashville"),8));
-        missions.add(new Mission(map.getDestinationByName("Sault St. Marie"),map.getDestinationByName("Oklahoma City"),9));
-        missions.add(new Mission(map.getDestinationByName("Seattle"),map.getDestinationByName("Los Angeles"),9));
-        missions.add(new Mission(map.getDestinationByName("Seattle"),map.getDestinationByName("New York"),22));
-        missions.add(new Mission(map.getDestinationByName("Toronto"),map.getDestinationByName("Miami"),10));
-        missions.add(new Mission(map.getDestinationByName("Vancouver"),map.getDestinationByName("Montreal"),20));
-        missions.add(new Mission(map.getDestinationByName("Vancouver"),map.getDestinationByName("Santa Fe"),13));
-        missions.add(new Mission(map.getDestinationByName("Winnipeg"),map.getDestinationByName("Houston"),12));
-        missions.add(new Mission(map.getDestinationByName("Winnipeg"),map.getDestinationByName("Little Rock"),11));
+        missions.add(new Mission(map.getDestinationByName("Boston"), map.getDestinationByName("Miami"), 12));
+        missions.add(new Mission(map.getDestinationByName("Calgary"), map.getDestinationByName("Phoenix"), 13));
+        missions.add(new Mission(map.getDestinationByName("Calgary"), map.getDestinationByName("Salt Lake City"), 7));
+        missions.add(new Mission(map.getDestinationByName("Chicago"), map.getDestinationByName("New Orleans"), 7));
+        missions.add(new Mission(map.getDestinationByName("Chicago"), map.getDestinationByName("Santa Fe"), 9));
+        missions.add(new Mission(map.getDestinationByName("Dallas"), map.getDestinationByName("New York"), 11));
+        missions.add(new Mission(map.getDestinationByName("Denver"), map.getDestinationByName("El Paso"), 4));
+        missions.add(new Mission(map.getDestinationByName("Denver"), map.getDestinationByName("Pittsburgh"), 11));
+        missions.add(new Mission(map.getDestinationByName("Duluth"), map.getDestinationByName("El Paso"), 10));
+        missions.add(new Mission(map.getDestinationByName("Duluth"), map.getDestinationByName("Houston"), 8));
+        missions.add(new Mission(map.getDestinationByName("Helena"), map.getDestinationByName("Los Angeles"), 8));
+        missions.add(new Mission(map.getDestinationByName("Kansas City"), map.getDestinationByName("Houston"), 5));
+        missions.add(new Mission(map.getDestinationByName("Los Angeles"), map.getDestinationByName("Chicago"), 16));
+        missions.add(new Mission(map.getDestinationByName("Los Angeles"), map.getDestinationByName("Miami"), 20));
+        missions.add(new Mission(map.getDestinationByName("Los Angeles"), map.getDestinationByName("New York"), 21));
+        missions.add(new Mission(map.getDestinationByName("Montreal"), map.getDestinationByName("Atlanta"), 9));
+        missions.add(new Mission(map.getDestinationByName("Montreal"), map.getDestinationByName("New Orleans"), 13));
+        missions.add(new Mission(map.getDestinationByName("New York"), map.getDestinationByName("Atlanta"), 6));
+        missions.add(new Mission(map.getDestinationByName("Portland"), map.getDestinationByName("Nashville"), 17));
+        missions.add(new Mission(map.getDestinationByName("Portland"), map.getDestinationByName("Phoenix"), 11));
+        missions.add(new Mission(map.getDestinationByName("San Francisco"), map.getDestinationByName("Atlanta"), 17));
+        missions.add(new Mission(map.getDestinationByName("Sault St. Marie"), map.getDestinationByName("Nashville"), 8));
+        missions.add(new Mission(map.getDestinationByName("Sault St. Marie"), map.getDestinationByName("Oklahoma City"), 9));
+        missions.add(new Mission(map.getDestinationByName("Seattle"), map.getDestinationByName("Los Angeles"), 9));
+        missions.add(new Mission(map.getDestinationByName("Seattle"), map.getDestinationByName("New York"), 22));
+        missions.add(new Mission(map.getDestinationByName("Toronto"), map.getDestinationByName("Miami"), 10));
+        missions.add(new Mission(map.getDestinationByName("Vancouver"), map.getDestinationByName("Montreal"), 20));
+        missions.add(new Mission(map.getDestinationByName("Vancouver"), map.getDestinationByName("Santa Fe"), 13));
+        missions.add(new Mission(map.getDestinationByName("Winnipeg"), map.getDestinationByName("Houston"), 12));
+        missions.add(new Mission(map.getDestinationByName("Winnipeg"), map.getDestinationByName("Little Rock"), 11));
 
         return missions;
     }
@@ -541,8 +560,6 @@ public class GameModel implements Runnable {
 
         return cards;
     }
-
-
 
 
     //endregion

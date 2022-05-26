@@ -5,11 +5,11 @@ import java.io.DataInputStream;
 import java.net.Socket;
 import java.net.SocketException;
 
-public class ReceiveingThread extends Thread {
+public class ReceivingThread extends Thread {
     private Session session;
     protected DataInputStream receive;
 
-    protected ReceiveingThread(Socket clientSocket, Session session) throws Exception{
+    protected ReceivingThread(Socket clientSocket, Session session) throws Exception{
         receive = new DataInputStream(clientSocket.getInputStream());
         this.session = session;
     }
