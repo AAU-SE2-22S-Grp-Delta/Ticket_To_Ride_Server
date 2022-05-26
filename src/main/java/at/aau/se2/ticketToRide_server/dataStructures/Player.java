@@ -13,6 +13,9 @@ import java.util.LinkedList;
 public class Player implements Comparable {
 
 
+    public void joinGame(String word) {
+    }
+
     public enum Command {
         SYNC, //game model has changed -> prompts the client to synchronize
         DO_MOVE //informs this that the game is waiting for the valid player to perform a move

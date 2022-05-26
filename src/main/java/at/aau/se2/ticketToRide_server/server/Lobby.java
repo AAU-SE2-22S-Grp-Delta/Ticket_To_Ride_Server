@@ -32,7 +32,10 @@ public class Lobby {
     public void joinGame(String gameName, Player player) throws IllegalArgumentException{
         GameModel game = null;
         for (GameModel g : games) {
-            if (g.getName().equals(gameName)) game = g;
+            if (g.getName().equals(gameName)) {
+                game = g;
+                break;
+            }
         }
         if (game == null) throw new IllegalArgumentException("No game of the name " + gameName);
         for (Player p: game.getPlayers()) if (player.getName().equals(player.getName())) throw new IllegalArgumentException("Player of name " + player.getName() + "has already joint game of name " + gameName);
