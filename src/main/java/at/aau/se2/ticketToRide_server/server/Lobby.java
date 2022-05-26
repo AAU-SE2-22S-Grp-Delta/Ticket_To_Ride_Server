@@ -29,7 +29,7 @@ public class Lobby {
         games.add(game);
     }
 
-    public void joinGame(String gameName, Player player) throws IllegalArgumentException{
+    public void joinGame(String gameName, Player player) throws IllegalArgumentException {
         GameModel game = null;
         for (GameModel g : games) {
             if (g.getName().equals(gameName)) {
@@ -38,12 +38,15 @@ public class Lobby {
             }
         }
         if (game == null) throw new IllegalArgumentException("No game of the name " + gameName);
-        for (Player p: game.getPlayers()) if (player.getName().equals(player.getName())) throw new IllegalArgumentException("Player of name " + player.getName() + "has already joint game of name " + gameName);
+        for (Player p : game.getPlayers())
+            if (player.getName().equals(player.getName()))
+                throw new IllegalArgumentException("Player of name " + player.getName() + "has already joint game of name " + gameName);
         game.addPlayer(player);
     }
 
     /**
      * creates a new Player within the Lobby
+     *
      * @param name unique (in this Lobby) name
      * @return the Player if successful, null on fail
      */
@@ -60,16 +63,27 @@ public class Lobby {
     }
 
     /**
-     *
-     * @param name this name is listed in the loby
+     * Creates a game of the specified name
+     * @param name  this name is listed in the lobby
      * @param owner Player who starts the game
-     * @return 0 if successful, -1 on fail
+     * @return the game if created, else null
      */
-    public int createGame(String name, Player owner) {
-        if (name == null || name.length() == 0) name = DEFAULT_GAME_NAME + ++gameCounter;
+    public GameModel createGame(String name, Player owner) {
+        if (name == null || name.length() == 0) {
+            if (Configuration_Constants.debug) System.out.println("(DEBUG)\t Lobby.createGame() Illegal game format: " + name);
+            return null;
+        }
+
+        if (getGameByName(name)!=null) {
+            if (Configuration_Constants.debug) System.out.println("(DEBUG)\t Lobby.createGame() game of name " + name + " already exists");
+            return null;
+        }
+
+        name = DEFAULT_GAME_NAME + ++gameCounter;
         GameModel game = new GameModel(name, owner);
         this.games.add(game);
-        return 0;
+        if (Configuration_Constants.verbose) System.out.println("(VERBOSE)\t Lobby.createGame() game of name " + name + " created");
+        return game;
     }
 
 
@@ -79,5 +93,18 @@ public class Lobby {
 
     public ArrayList<GameModel> getGames() {
         return games;
+    }
+
+
+    /**
+     * Searches for the game of the specified name
+     * @param name
+     * @return the game on success, null on fail
+     */
+    public GameModel getGameByName(String name) {
+        for(GameModel game : this.games) {
+            if(name.equals(game.getName())) return game;
+        }
+        return null;
     }
 }
