@@ -183,6 +183,7 @@ public class Player implements Comparable {
         }
         game.setRailRoadLineOwner(this, railroadLine, c);
         this.handCards.removeAll(cards);
+        this.points = getPointsForRoutes(railroadLine.getDistance());
         if (Configuration_Constants.verbose)
             System.out.println("(DEBUG)\t Player.buildRailroadLine() Player " + this.name + " built railroad from " + dest1 + " to " + dest2);
         return;
@@ -375,6 +376,9 @@ public class Player implements Comparable {
         this.playerColor = playerColor;
     }
 
+    public GameModel getGame(){
+        return game;
+    }
 
     @Override
     public String toString() {

@@ -184,8 +184,20 @@ public class Session {
 
     }
 
-    private void getPoints() {
+    private String getPoints() {
+        GameModel gameModel = player.getGame();
+        if(gameModel == null) return "No Game";
 
+        StringBuilder builder = new StringBuilder();
+        ArrayList<Player> players = gameModel.getPlayers();
+        for (int i = 0; i < players.size()-1; i++) {
+            Player player = players.get(i);
+            builder.append(player.getName()).append(":").append(player.getPoints()).append(":");
+        }
+        Player lastPlayer = players.get(players.size()-1);
+        builder.append(lastPlayer.getName()).append(":").append(lastPlayer.getPoints());
+
+        return builder.toString();
     }
 
     private void getColors() {
