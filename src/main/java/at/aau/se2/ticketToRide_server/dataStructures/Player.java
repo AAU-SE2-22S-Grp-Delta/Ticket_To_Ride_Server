@@ -51,7 +51,6 @@ public class Player implements Comparable {
     private ArrayList<RailroadLine> ownsRailroads;
     //todo completed missions
     int points = 0;
-    private PreparedRailMaterial material = null;
 
 
     public Player(String name, Session session) {
@@ -144,51 +143,49 @@ public class Player implements Comparable {
     }
 
 
-    public PreparedRailMaterial prepareRailroadLine(String dest1, String dest2) {
+    public void buildRailroadLine(String dest1, String dest2, String color) {
         RailroadLine railroadLine = game.getRailroadLineByName(dest1, dest2);
         if (railroadLine == null) {
-            return null;
+            sendCommand("buildRailroad:null");
+            return;
         }
 
+        MapColor c = MapColor.getByString(color);
         if (railroadLine instanceof DoubleRailroadLine) {
             DoubleRailroadLine doubleRailroadLine = (DoubleRailroadLine) railroadLine;
-            MapColor color1 = doubleRailroadLine.getColor();
-            MapColor color2 = doubleRailroadLine.getColor2();
 
-            LinkedList<TrainCard> cardsOfColor1 = getCardsToBuildRail(color1, railroadLine.getDistance());
-            LinkedList<TrainCard> cardsOfColor2 = getCardsToBuildRail(color2, railroadLine.getDistance());
-
-            if (cardsOfColor1 != null && cardsOfColor2 != null) {
-                PreparedRailMaterial material = new PreparedRailMaterial();
-                material.cards1 = cardsOfColor1;
-                material.cards2 = cardsOfColor2;
-                material.railroadLine = railroadLine;
-                sendCommand("aknRailroad:" + dest1 + ":" + dest2 + ":" + color1 + ":" + color2);
-                return null;
-            } else if (cardsOfColor1 != null) {
-                PreparedRailMaterial material = new PreparedRailMaterial();
-                material.cards1 = cardsOfColor1;
-                material.railroadLine = railroadLine;
-                sendCommand("aknRailroad:" + dest1 + ":" + dest2 + ":" + color2);
-                return material;
-            } else if (cardsOfColor2 != null) {
-                PreparedRailMaterial material = new PreparedRailMaterial();
-                material.cards2 = cardsOfColor2;
-                sendCommand("aknRailroad:" + dest1 + ":" + dest2 + ":" + color1);
-                return material;
+            if (doubleRailroadLine.getColor() != c || (doubleRailroadLine.getColor() != c && doubleRailroadLine.getColor2() != c)) {
+                if (Configuration_Constants.debug)
+                    System.out.println("(DEBUG)\t Player.buildRailroadLine() no Rail of such color! railroad from " + dest1 + " to " + dest2);
+                sendCommand("buildRailroad:null");
+                return;
             }
-            sendCommand("aknRailroad:null");
-            return null;
+
+            LinkedList<TrainCard> cards = getCardsToBuildRail(c, railroadLine.getDistance());
+            if (cards == null) {
+                if (Configuration_Constants.debug)
+                    System.out.println("(DEBUG)\t Player.buildRailroadLine() Player " + this.name + " not enough cards of color " + c + ". Railroad from " + dest1 + " to " + dest2);
+                sendCommand("buildRailroad:null");
+                return;
+            }
+            game.setRailRoadLineOwner(this, railroadLine, c);
+            this.handCards.removeAll(cards);
+            if (Configuration_Constants.verbose)
+                System.out.println("(DEBUG)\t Player.buildRailroadLine() Player " + this.name + " built railroad from " + dest1 + " to " + dest2);
         }
 
-        LinkedList<TrainCard> cards = getCardsToBuildRail(railroadLine.getColor(), railroadLine.getDistance());
-        if (cards != null) {
-            this.material = new PreparedRailMaterial();
-            material.cards1 = cards;
-            material.railroadLine = railroadLine;
-            return material;
+        LinkedList<TrainCard> cards = getCardsToBuildRail(c, railroadLine.getDistance());
+        if (cards == null) {
+            if (Configuration_Constants.debug)
+                System.out.println("(DEBUG)\t Player.buildRailroadLine() Player " + this.name + " not enough cards of color " + c + ". Railroad from " + dest1 + " to " + dest2);
+            sendCommand("buildRailroad:null");
+            return;
         }
-        return null;
+        game.setRailRoadLineOwner(this, railroadLine, c);
+        this.handCards.removeAll(cards);
+        if (Configuration_Constants.verbose)
+            System.out.println("(DEBUG)\t Player.buildRailroadLine() Player " + this.name + " built railroad from " + dest1 + " to " + dest2);
+        return;
     }
 
 
@@ -203,54 +200,6 @@ public class Player implements Comparable {
             if (amount <= cards.size()) return cards;
         }
         return null;
-    }
-
-
-    public int confirmBuild(String dest1, String dest2, String color) {
-        if (this.material == null) {
-            if (Configuration_Constants.debug)
-                System.out.println("(DEBUG) Player.confirmBuild(): No prepared material for player of name " + name);
-            sendCommand("aknRailRoad:null");
-            return -1;
-        }
-
-        String d1 = material.railroadLine.getDestination1().getName();
-        String d2 = material.railroadLine.getDestination2().getName();
-
-        if (!((d1.equals(dest1) && d2.equals(dest2)) || (d2.equals(dest1) && d1.equals(dest2)))) {
-            if (Configuration_Constants.debug)
-                System.out.println("(DEBUG) Player.confirmBuild(): Destinations " + dest1 + " " + dest2 + " doesn't fit to RailroadLine from " + d1 + " to " + d2);
-            sendCommand("aknRailRoad:null");
-            return -1;
-        }
-
-        MapColor c = MapColor.getByString(color);
-        if (c == null) {
-            if (Configuration_Constants.debug)
-                System.out.println("(DEBUG) Player.confirmBuild(): Illegal color string: " + color);
-            sendCommand("aknRailRoad:null");
-            return -2;
-        }
-        if (game.setRailRoadLineOwner(this, material.railroadLine, c) == 0) {
-            LinkedList<TrainCard> toRemove = null;
-            if (material.railroadLine instanceof DoubleRailroadLine) {
-                DoubleRailroadLine doubleRailroadLine = (DoubleRailroadLine) material.railroadLine;
-                if (c == doubleRailroadLine.getColor()) {
-                    toRemove = material.cards1;
-                }
-                if (c == doubleRailroadLine.getColor2()) {
-                    toRemove = material.cards2;
-                }
-                this.handCards.removeAll(toRemove);
-                material = null;
-                return 0;
-            }
-            this.handCards.removeAll(material.cards1);
-            material = null;
-            return 0;
-        }
-        sendCommand("aknRailRoad:null");
-        return -1;
     }
 
 

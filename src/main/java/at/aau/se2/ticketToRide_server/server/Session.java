@@ -36,8 +36,7 @@ public class Session {
 
     private static final String COMMAND_GET_CARD_STACK = "cardStack";
     private static final String COMMAND_GET_CARD_OPEN = "cardOpen:" + REGEX_OPEN_CARD_ID;
-    private static final String COMMAND_PREPARE_RAILROAD = "buildRailRoad:" + REGEX_NAME + ":" + REGEX_NAME;
-    private static final String COMMAND_CONFIRM_RAILROAD = "aknRailRoad:" + REGEX_NAME + ":" + REGEX_NAME +":" + REGEX_COLOR;
+    private static final String COMMAND_BUILD_RAILROAD = "buildRailRoad:" + REGEX_NAME + ":" + REGEX_NAME + ":" + REGEX_COLOR;
     private static final String COMMAND_GET_MISSION = "getMission";
     private static final String COMMAND_CHOOSE_MISSION = "chooseMission:" + REGEX_MISSION_ID;
     //----------------------------------------------
@@ -103,8 +102,7 @@ public class Session {
                 //----- IN GAME COMMANDS --------------------------------------------------------
             else if (command.matches(COMMAND_GET_CARD_STACK)) this.getCardStack();
             else if (command.matches(COMMAND_GET_CARD_OPEN)) this.getCardOpen(command);
-            else if (command.matches(COMMAND_PREPARE_RAILROAD)) this.prepareRailroad(command);
-            else if (command.matches(COMMAND_CONFIRM_RAILROAD)) this.confirmRailroad(command);
+            else if (command.matches(COMMAND_BUILD_RAILROAD)) this.buildRailroad(command);
             else if (command.matches(COMMAND_GET_MISSION)) this.getMission();
             else if (command.matches(COMMAND_CHOOSE_MISSION)) this.chooseMission(command);
         }
@@ -209,14 +207,9 @@ public class Session {
         player.getCardOpen(id);
     }
 
-    private void prepareRailroad(String command) {
+    private void buildRailroad(String command) {
         String[] words = command.split(":");
-        player.prepareRailroadLine(words[1], words[2]);
-    }
-
-    private void confirmRailroad(String command) {
-        String[] words = command.split(":");
-        player.confirmBuild(words[1], words[2], words[3]);
+        player.buildRailroadLine(words[1], words[2], words[3]);
     }
 
     private void getMission() {
