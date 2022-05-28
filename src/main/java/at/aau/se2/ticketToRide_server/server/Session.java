@@ -186,7 +186,7 @@ public class Session {
 
     private String getPoints() {
         GameModel gameModel = player.getGame();
-        if(gameModel == null) return "No Game";
+        if(gameModel == null) return "null";
 
         StringBuilder builder = new StringBuilder();
         ArrayList<Player> players = gameModel.getPlayers();
