@@ -1,6 +1,9 @@
 package at.aau.se2.ticketToRide_server.server;
 
+import at.aau.se2.ticketToRide_server.dataStructures.DoubleRailroadLine;
+import at.aau.se2.ticketToRide_server.dataStructures.Map;
 import at.aau.se2.ticketToRide_server.dataStructures.Player;
+import at.aau.se2.ticketToRide_server.dataStructures.RailroadLine;
 import at.aau.se2.ticketToRide_server.dataStructures.TrainCard;
 import at.aau.se2.ticketToRide_server.models.GameModel;
 
@@ -180,10 +183,10 @@ public class Session {
         StringBuilder builder = new StringBuilder();
         for (int i = 0; i < handCards.size()-1; i++) {
             TrainCard handCard = handCards.get(i);
-            builder.append(handCard.getType()).append(":");
+            builder.append(handCard.getType().toString()).append(":");
         }
         TrainCard lastHandCard = handCards.get(handCards.size()-1);
-        builder.append(lastHandCard.getType());
+        builder.append(lastHandCard.getType().toString());
 
         return builder.toString();
     }
@@ -196,16 +199,33 @@ public class Session {
         StringBuilder builder = new StringBuilder();
         for (int i = 0; i < openCards.size()-1; i++) {
             TrainCard openCard = openCards.get(i);
-            builder.append(openCard.getType()).append(":");
+            builder.append(openCard.getType().toString()).append(":");
         }
         TrainCard lastOpenCard = openCards.get(openCards.size()-1);
-        builder.append(lastOpenCard.getType());
+        builder.append(lastOpenCard.getType().toString());
 
         return builder.toString();
     }
 
-    private void getMap() {
+    private String getMap() {
+        GameModel gameModel = player.getGame();
+        if(gameModel == null) return "null";
 
+        StringBuilder builder = new StringBuilder();
+        Map map  = gameModel.getMap();
+        ArrayList<RailroadLine> railroadLines = new ArrayList<>(map.getRailroadLines());
+        for (int i = 0; i < railroadLines.size()-1; i++) {
+            if(railroadLines.get(i) instanceof DoubleRailroadLine)
+                builder.append(i).append(":").append(railroadLines.get(i).getOwner()).append(":").append(((DoubleRailroadLine) railroadLines.get(i)).getOwner2()).append(";");
+            else
+                builder.append(i).append(":").append(railroadLines.get(i).getOwner()).append(";");
+        }
+        if(railroadLines.get(railroadLines.size()-1) instanceof DoubleRailroadLine)
+            builder.append(railroadLines.size()-1).append(":").append(railroadLines.get(railroadLines.size()-1).getOwner()).append(":").append(((DoubleRailroadLine) railroadLines.get(railroadLines.size()-1)).getOwner2()).append(";");
+        else
+            builder.append(railroadLines.size()-1).append(":").append(railroadLines.get(railroadLines.size()-1).getOwner()).append(";");
+
+        return builder.toString();
     }
 
     private String getPoints() {
@@ -232,10 +252,10 @@ public class Session {
         ArrayList<Player> players = gameModel.getPlayers();
         for (int i = 0; i < players.size()-1; i++) {
             Player player = players.get(i);
-            builder.append(player.getName()).append(":").append(player.getPlayerColor()).append(":");
+            builder.append(player.getName()).append(":").append(player.getPlayerColor().toString()).append(":");
         }
         Player lastplayer = players.get(players.size()-1);
-        builder.append(lastplayer.getName()).append(":").append(lastplayer.getPlayerColor());
+        builder.append(lastplayer.getName()).append(":").append(lastplayer.getPlayerColor().toString());
 
         return builder.toString();
     }

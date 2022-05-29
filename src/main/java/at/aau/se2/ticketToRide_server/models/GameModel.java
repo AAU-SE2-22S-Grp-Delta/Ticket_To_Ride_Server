@@ -217,6 +217,7 @@ public class GameModel implements Runnable {
     }
 
     public boolean hasLongestRailroad(Player player) {
+        getLongestConnectionFromEachPlayer();
         for (Player p : this.players) {
             if (p.equals(player)) continue;
             if (this.longestConnectionsForEachPlayer.get(player) <= this.longestConnectionsForEachPlayer.get(p)) {
@@ -341,6 +342,10 @@ public class GameModel implements Runnable {
 
     public ArrayList<TrainCard> getOpenCards(){
         return openCards;
+    }
+
+    public Map getMap(){
+        return map;
     }
 
     @Override
