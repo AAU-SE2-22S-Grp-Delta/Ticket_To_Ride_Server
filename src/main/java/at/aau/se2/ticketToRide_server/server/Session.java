@@ -224,7 +224,20 @@ public class Session {
         return builder.toString();
     }
 
-    private void getColors() {
+    private String getColors() {
+        GameModel gameModel = player.getGame();
+        if(gameModel == null) return "null";
+
+        StringBuilder builder = new StringBuilder();
+        ArrayList<Player> players = gameModel.getPlayers();
+        for (int i = 0; i < players.size()-1; i++) {
+            Player player = players.get(i);
+            builder.append(player.getName()).append(":").append(player.getPlayerColor()).append(":");
+        }
+        Player lastplayer = players.get(players.size()-1);
+        builder.append(lastplayer.getName()).append(":").append(lastplayer.getPlayerColor());
+
+        return builder.toString();
     }
 
 
