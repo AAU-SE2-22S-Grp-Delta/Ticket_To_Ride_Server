@@ -28,40 +28,27 @@ public class TrainCard implements Comparable{
         if (o instanceof MapColor) {
             MapColor color = (MapColor) o;
             switch (this.type) {
-                case BLUE -> {
+                case BLUE:
                     if (color == MapColor.BLUE) return 0;
                     return 1;
-                }
-
-                case RED -> {
+                case RED:
                     if (color == MapColor.RED) return 0;
                     return 1;
-                }
-
-                case BLACK -> {
+                case BLACK:
                     if (color == MapColor.BLACK) return 0;
                     return 1;
-                }
-
-                case GREEN -> {
+                case GREEN:
                     if (color == MapColor.GREEN) return 0;
                     return 1;
-                }
-
-                case WHITE -> {
+                case WHITE:
                     if (color == MapColor.WHITE) return 0;
                     return 1;
-                }
-
-                case ORANGE -> {
+                case ORANGE:
                     if (color == MapColor.ORANGE) return 0;
                     return 1;
-                }
-
-                case YELLOW -> {
+                case YELLOW:
                     if (color == MapColor.YELLOW) return 0;
                     return 1;
-                }
             }
         }
 

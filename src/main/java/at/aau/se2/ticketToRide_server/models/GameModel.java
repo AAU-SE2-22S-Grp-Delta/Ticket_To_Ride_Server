@@ -66,11 +66,21 @@ public class GameModel implements Runnable {
             exitGameCrashed();
         }
         switch (colorCounter++) {
-            case 0 -> player.setPlayerColor(Player.Color.RED);
-            case 1 -> player.setPlayerColor(Player.Color.BLUE);
-            case 2 -> player.setPlayerColor(Player.Color.GREEN);
-            case 3 -> player.setPlayerColor(Player.Color.YELLOW);
-            case 4 -> player.setPlayerColor(Player.Color.BLACK);
+            case 0:
+                player.setPlayerColor(Player.Color.RED);
+                break;
+            case 1:
+                player.setPlayerColor(Player.Color.BLUE);
+                break;
+            case 2:
+                player.setPlayerColor(Player.Color.GREEN);
+                break;
+            case 3:
+                player.setPlayerColor(Player.Color.YELLOW);
+                break;
+            case 4:
+                player.setPlayerColor(Player.Color.BLACK);
+                break;
         }
         this.owner = player;
         return 0;
