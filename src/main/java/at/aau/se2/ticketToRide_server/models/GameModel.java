@@ -339,6 +339,10 @@ public class GameModel implements Runnable {
         return owner;
     }
 
+    public ArrayList<TrainCard> getOpenCards(){
+        return openCards;
+    }
+
     @Override
     public String toString() {
         String toString = "GameModelid=" + id +

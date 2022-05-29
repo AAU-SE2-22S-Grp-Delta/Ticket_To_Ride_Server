@@ -188,8 +188,20 @@ public class Session {
         return builder.toString();
     }
 
-    private void getOpenCards() {
+    private String getOpenCards() {
+        GameModel gameModel = player.getGame();
+        if(gameModel == null) return "null";
 
+        ArrayList<TrainCard> openCards = gameModel.getOpenCards();
+        StringBuilder builder = new StringBuilder();
+        for (int i = 0; i < openCards.size()-1; i++) {
+            TrainCard openCard = openCards.get(i);
+            builder.append(openCard.getType()).append(":");
+        }
+        TrainCard lastOpenCard = openCards.get(openCards.size()-1);
+        builder.append(lastOpenCard.getType());
+
+        return builder.toString();
     }
 
     private void getMap() {
