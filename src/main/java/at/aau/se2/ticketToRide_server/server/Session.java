@@ -1,6 +1,7 @@
 package at.aau.se2.ticketToRide_server.server;
 
 import at.aau.se2.ticketToRide_server.dataStructures.Player;
+import at.aau.se2.ticketToRide_server.dataStructures.TrainCard;
 import at.aau.se2.ticketToRide_server.models.GameModel;
 
 import java.io.BufferedReader;
@@ -172,8 +173,19 @@ public class Session {
 
     //----- IN GAME REQUESTS --------------------------------------------------------
 
-    private void getHandCards() {
+    private String getHandCards() {
+        ArrayList<TrainCard> handCards = player.getHandCards();
+        if(handCards.size() == 0) return "null";
 
+        StringBuilder builder = new StringBuilder();
+        for (int i = 0; i < handCards.size()-1; i++) {
+            TrainCard handCard = handCards.get(i);
+            builder.append(handCard.getType()).append(":");
+        }
+        TrainCard lastHandCard = handCards.get(handCards.size()-1);
+        builder.append(lastHandCard.getType());
+
+        return builder.toString();
     }
 
     private void getOpenCards() {
