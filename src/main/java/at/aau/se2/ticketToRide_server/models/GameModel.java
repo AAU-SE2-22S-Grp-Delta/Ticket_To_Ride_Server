@@ -43,10 +43,11 @@ public class GameModel implements Runnable {
         this.name = name;
         this.state = State.WAITING_FOR_PLAYERS;
         players = new ArrayList<>();
+        this.trainCards = getTrainCards();
         this.initOpenCards();
 
-        this.trainCards = getTrainCards();
         this.missions = getMissions();
+        this.owner=owner;
     }
 
     //region ----------------  WAITING FOR PLAYERS ---------------------------------------
@@ -82,7 +83,7 @@ public class GameModel implements Runnable {
                 player.setPlayerColor(Player.Color.BLACK);
                 break;
         }
-        this.owner = player;
+
         return 0;
     }
 

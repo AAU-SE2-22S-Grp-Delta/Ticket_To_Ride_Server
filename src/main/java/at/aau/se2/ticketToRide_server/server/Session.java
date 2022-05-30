@@ -21,7 +21,7 @@ public class Session {
     private static final String REGEX_COLOR = "(blue)|(green)|(yellow)|(red)|(white)|(orange)|(gray)|(black)|(pink)";
 
     private static final String COMMAND_ENTER_LOBBY = "enterLobby:" + REGEX_NAME;
-    private static final String COMMAND_CREATE_GAME = "createGame";
+    private static final String COMMAND_CREATE_GAME = "createGame:"+REGEX_NAME;
     private static final String COMMAND_EXIT_GAME = "exitGame";
     private static final String COMMAND_START_GAME = "startGame";
     private static final String COMMAND_JOIN_GAME = "joinGame:" + REGEX_NAME;
@@ -65,7 +65,7 @@ public class Session {
     //region --------------------------------- PARSING -----------------------------------------------------------------
 
     void parseCommand(String received) {
-        if (Configuration_Constants.verbose) System.out.println("(VERBOSE)\tSession: received: " + received);
+        if (Configuration_Constants.verbose) System.out.println("(VERBOSE)\tSession received: " + received);
 
         String[] commands = received.split(";");
 
@@ -118,16 +118,16 @@ public class Session {
     private void listPlayersLobby() {
     }
 
-    private String listGames() {
-        if (Lobby.getInstance().getGames().size() == 0) return "empty";
+    private void listGames() {
+        if (Lobby.getInstance().getGames().size() == 0) send("listGames:null");
         StringBuilder builder = new StringBuilder();
         ArrayList<GameModel> games = Lobby.getInstance().getGames();
-        for (int i = 0; i < games.size() - 1; i++) {
+        for (int i = 0; i < games.size()-1; i++) {
             GameModel game = games.get(i);
             builder.append(game.getName()).append(":").append(game.getId()).append(";");
         }
         builder.append(games.get(games.size() - 1).getName()).append(":").append(games.get(games.size() - 1).getId());
-        return builder.toString();
+        send("listGames:" + builder.toString());
     }
 
     private void listPlayersGame() {
@@ -273,7 +273,7 @@ public class Session {
 
     private void getCardOpen(String command) {
 
-        player.getCardOpen(id);
+//        player.getCardOpen(id);
     }
 
     private void buildRailroad(String command) {
