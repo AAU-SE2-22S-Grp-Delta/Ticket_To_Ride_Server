@@ -123,15 +123,16 @@ public class Session {
     }
 
     private void listGames() {
-        if (Lobby.getInstance().getGames().size() == 0) send("listGames:null");
         StringBuilder builder = new StringBuilder();
         ArrayList<GameModel> games = Lobby.getInstance().getGames();
-        for (int i = 0; i < games.size()-1; i++) {
-            GameModel game = games.get(i);
-            builder.append(game.getName()).append(":").append(game.getId()).append(";");
+
+        if (games.size() == 0) {
+            builder.append("null");
+        } else {
+            games.forEach(g -> builder.append(g.getName()).append(DELIMITER_VALUE));
         }
-        builder.append(games.get(games.size() - 1).getName()).append(":").append(games.get(games.size() - 1).getId());
-        send("listGames:" + builder.toString());
+
+        send(REQUEST_LIST_GAMES, builder.toString());
     }
 
     private void listPlayersGame() {
