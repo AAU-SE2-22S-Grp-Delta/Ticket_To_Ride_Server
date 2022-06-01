@@ -25,7 +25,7 @@ public class Session {
     private static final String REGEX_COLOR = "(blue)|(green)|(yellow)|(red)|(white)|(orange)|(gray)|(black)|(pink)";
 
     private static final String COMMAND_ENTER_LOBBY = "enterLobby:" + REGEX_NAME;
-    private static final String COMMAND_CREATE_GAME = "createGame:"+REGEX_NAME;
+    private static final String COMMAND_CREATE_GAME = "createGame:" + REGEX_NAME;
     private static final String COMMAND_EXIT_GAME = "exitGame";
     private static final String COMMAND_START_GAME = "startGame";
     private static final String COMMAND_JOIN_GAME = "joinGame:" + REGEX_NAME;
@@ -120,6 +120,16 @@ public class Session {
     //---- GENERAL REQUESTS ---------------------------------------------------------
 
     private void listPlayersLobby() {
+        StringBuilder builder = new StringBuilder();
+        ArrayList<Player> players = Lobby.getInstance().getPlayers();
+
+        if (players.size() == 0) {
+            builder.append("null");
+        } else {
+            players.forEach(p -> builder.append(p.getName()).append(DELIMITER_VALUE));
+        }
+
+        send(REQUEST_LIST_PLAYERS_LOBBY, builder.toString());
     }
 
     private void listGames() {
