@@ -15,6 +15,10 @@ import java.util.LinkedList;
 
 public class Session {
     //---------- REGEX FOR PARSER ------------------
+    private static final String DELIMITER_COMMAND = ":";
+    private static final String DELIMITER_MULTI = ";";
+    private static final String DELIMITER_VALUE = ",";
+
     private static final String REGEX_NAME = "[^:;]*?";
     private static final String REGEX_OPEN_CARD_ID = "[01234]";
     private static final String REGEX_MISSION_ID = "[//d][//d]?";
