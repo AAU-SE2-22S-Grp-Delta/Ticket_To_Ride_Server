@@ -123,7 +123,7 @@ public class Session {
         StringBuilder builder = new StringBuilder();
         ArrayList<Player> players = Lobby.getInstance().getPlayers();
 
-        if (players.size() == 0) {
+        if (players.isEmpty()) {
             builder.append("null");
         } else {
             players.forEach(p -> builder.append(p.getName()).append(DELIMITER_VALUE));
@@ -136,7 +136,7 @@ public class Session {
         StringBuilder builder = new StringBuilder();
         ArrayList<GameModel> games = Lobby.getInstance().getGames();
 
-        if (games.size() == 0) {
+        if (games.isEmpty()) {
             builder.append("null");
         } else {
             games.forEach(g -> builder.append(g.getName()).append(DELIMITER_VALUE));
@@ -193,7 +193,7 @@ public class Session {
 
     private String getHandCards() {
         ArrayList<TrainCard> handCards = player.getHandCards();
-        if(handCards.size() == 0) return "null";
+        if (handCards.isEmpty()) return "null";
 
         StringBuilder builder = new StringBuilder();
         for (int i = 0; i < handCards.size()-1; i++) {
