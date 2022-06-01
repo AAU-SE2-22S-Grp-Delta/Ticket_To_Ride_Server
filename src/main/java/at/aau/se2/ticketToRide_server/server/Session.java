@@ -303,9 +303,18 @@ public class Session {
 
 
     public int send(String toClient) {
-        if (sendingThread == null) return -1;
+        if (sendingThread == null) {
+            return -1;
+        }
         sendingThread.setCommand(toClient);
         return 0;
+    }
+
+    private void send(String command, String toClient) {
+        if (toClient.endsWith(DELIMITER_VALUE)) {
+            toClient = toClient.substring(0, toClient.length() - 1);
+        }
+        send(command + DELIMITER_COMMAND + toClient);
     }
 
     void setReceivingThread(ReceivingThread receivingThread) {
