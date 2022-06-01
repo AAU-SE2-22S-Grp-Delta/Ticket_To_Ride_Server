@@ -45,10 +45,11 @@ public class GameModel implements Runnable {
         this.name = name;
         this.state = State.WAITING_FOR_PLAYERS;
         players = new ArrayList<>();
+        this.trainCards = getTrainCards();
         this.initOpenCards();
 
-        this.trainCards = getTrainCards();
         this.missions = getMissions();
+        this.owner=owner;
     }
 
     //region ----------------  WAITING FOR PLAYERS ---------------------------------------
@@ -84,7 +85,7 @@ public class GameModel implements Runnable {
                 player.setPlayerColor(Player.Color.BLACK);
                 break;
         }
-        this.owner = player;
+
         return 0;
     }
 
@@ -219,6 +220,7 @@ public class GameModel implements Runnable {
     }
 
     public boolean hasLongestRailroad(Player player) {
+        getLongestConnectionFromEachPlayer();
         for (Player p : this.players) {
             if (p.equals(player)) continue;
             if (this.longestConnectionsForEachPlayer.get(player) <= this.longestConnectionsForEachPlayer.get(p)) {
@@ -339,6 +341,14 @@ public class GameModel implements Runnable {
 
     public Player getOwner() {
         return owner;
+    }
+
+    public ArrayList<TrainCard> getOpenCards(){
+        return openCards;
+    }
+
+    public Map getMap(){
+        return map;
     }
 
     @Override

@@ -1,6 +1,10 @@
 package at.aau.se2.ticketToRide_server.server;
 
+import at.aau.se2.ticketToRide_server.dataStructures.DoubleRailroadLine;
+import at.aau.se2.ticketToRide_server.dataStructures.Map;
 import at.aau.se2.ticketToRide_server.dataStructures.Player;
+import at.aau.se2.ticketToRide_server.dataStructures.RailroadLine;
+import at.aau.se2.ticketToRide_server.dataStructures.TrainCard;
 import at.aau.se2.ticketToRide_server.models.GameModel;
 
 import java.io.BufferedReader;
@@ -17,7 +21,7 @@ public class Session {
     private static final String REGEX_COLOR = "(blue)|(green)|(yellow)|(red)|(white)|(orange)|(gray)|(black)|(pink)";
 
     private static final String COMMAND_ENTER_LOBBY = "enterLobby:" + REGEX_NAME;
-    private static final String COMMAND_CREATE_GAME = "createGame";
+    private static final String COMMAND_CREATE_GAME = "createGame:"+REGEX_NAME;
     private static final String COMMAND_EXIT_GAME = "exitGame";
     private static final String COMMAND_START_GAME = "startGame";
     private static final String COMMAND_JOIN_GAME = "joinGame:" + REGEX_NAME;
@@ -61,7 +65,7 @@ public class Session {
     //region --------------------------------- PARSING -----------------------------------------------------------------
 
     void parseCommand(String received) {
-        if (Configuration_Constants.verbose) System.out.println("(VERBOSE)\tSession: received: " + received);
+        if (Configuration_Constants.verbose) System.out.println("(VERBOSE)\tSession received: " + received);
 
         String[] commands = received.split(";");
 
@@ -114,16 +118,16 @@ public class Session {
     private void listPlayersLobby() {
     }
 
-    private String listGames() {
-        if (Lobby.getInstance().getGames().size() == 0) return "empty";
+    private void listGames() {
+        if (Lobby.getInstance().getGames().size() == 0) send("listGames:null");
         StringBuilder builder = new StringBuilder();
         ArrayList<GameModel> games = Lobby.getInstance().getGames();
-        for (int i = 0; i < games.size() - 1; i++) {
+        for (int i = 0; i < games.size()-1; i++) {
             GameModel game = games.get(i);
             builder.append(game.getName()).append(":").append(game.getId()).append(";");
         }
         builder.append(games.get(games.size() - 1).getName()).append(":").append(games.get(games.size() - 1).getId());
-        return builder.toString();
+        send("listGames:" + builder.toString());
     }
 
     private void listPlayersGame() {
@@ -172,16 +176,56 @@ public class Session {
 
     //----- IN GAME REQUESTS --------------------------------------------------------
 
-    private void getHandCards() {
+    private String getHandCards() {
+        ArrayList<TrainCard> handCards = player.getHandCards();
+        if(handCards.size() == 0) return "null";
 
+        StringBuilder builder = new StringBuilder();
+        for (int i = 0; i < handCards.size()-1; i++) {
+            TrainCard handCard = handCards.get(i);
+            builder.append(handCard.getType().toString()).append(":");
+        }
+        TrainCard lastHandCard = handCards.get(handCards.size()-1);
+        builder.append(lastHandCard.getType().toString());
+
+        return builder.toString();
     }
 
-    private void getOpenCards() {
+    private String getOpenCards() {
+        GameModel gameModel = player.getGame();
+        if(gameModel == null) return "null";
 
+        ArrayList<TrainCard> openCards = gameModel.getOpenCards();
+        StringBuilder builder = new StringBuilder();
+        for (int i = 0; i < openCards.size()-1; i++) {
+            TrainCard openCard = openCards.get(i);
+            builder.append(openCard.getType().toString()).append(":");
+        }
+        TrainCard lastOpenCard = openCards.get(openCards.size()-1);
+        builder.append(lastOpenCard.getType().toString());
+
+        return builder.toString();
     }
 
-    private void getMap() {
+    private String getMap() {
+        GameModel gameModel = player.getGame();
+        if(gameModel == null) return "null";
 
+        StringBuilder builder = new StringBuilder();
+        Map map  = gameModel.getMap();
+        ArrayList<RailroadLine> railroadLines = new ArrayList<>(map.getRailroadLines());
+        for (int i = 0; i < railroadLines.size()-1; i++) {
+            if(railroadLines.get(i) instanceof DoubleRailroadLine)
+                builder.append(i).append(":").append(railroadLines.get(i).getOwner()).append(":").append(((DoubleRailroadLine) railroadLines.get(i)).getOwner2()).append(";");
+            else
+                builder.append(i).append(":").append(railroadLines.get(i).getOwner()).append(";");
+        }
+        if(railroadLines.get(railroadLines.size()-1) instanceof DoubleRailroadLine)
+            builder.append(railroadLines.size()-1).append(":").append(railroadLines.get(railroadLines.size()-1).getOwner()).append(":").append(((DoubleRailroadLine) railroadLines.get(railroadLines.size()-1)).getOwner2()).append(";");
+        else
+            builder.append(railroadLines.size()-1).append(":").append(railroadLines.get(railroadLines.size()-1).getOwner()).append(";");
+
+        return builder.toString();
     }
 
     private String getPoints() {
@@ -200,7 +244,20 @@ public class Session {
         return builder.toString();
     }
 
-    private void getColors() {
+    private String getColors() {
+        GameModel gameModel = player.getGame();
+        if(gameModel == null) return "null";
+
+        StringBuilder builder = new StringBuilder();
+        ArrayList<Player> players = gameModel.getPlayers();
+        for (int i = 0; i < players.size()-1; i++) {
+            Player player = players.get(i);
+            builder.append(player.getName()).append(":").append(player.getPlayerColor().toString()).append(":");
+        }
+        Player lastplayer = players.get(players.size()-1);
+        builder.append(lastplayer.getName()).append(":").append(lastplayer.getPlayerColor().toString());
+
+        return builder.toString();
     }
 
 
@@ -216,7 +273,7 @@ public class Session {
 
     private void getCardOpen(String command) {
 
-        player.getCardOpen(id);
+//        player.getCardOpen(id);
     }
 
     private void buildRailroad(String command) {

@@ -79,7 +79,7 @@ public class Lobby {
             return null;
         }
 
-        name = DEFAULT_GAME_NAME + ++gameCounter;
+//        name = DEFAULT_GAME_NAME + ++gameCounter;
         GameModel game = new GameModel(name, owner);
         this.games.add(game);
         if (Configuration_Constants.verbose) System.out.println("(VERBOSE)\t Lobby.createGame() game of name " + name + " created");
