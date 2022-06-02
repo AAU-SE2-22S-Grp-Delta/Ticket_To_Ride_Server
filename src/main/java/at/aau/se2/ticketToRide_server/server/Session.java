@@ -30,10 +30,11 @@ public class Session {
     private static final String COMMAND_START_GAME = "startGame";
     private static final String COMMAND_JOIN_GAME = "joinGame:" + REGEX_NAME;
     private static final String COMMAND_LEAVE = "leave";
+    private static final String COMMAND_LIST_PLAYERS_GAME = "listPlayersGame";
 
     private static final String REQUEST_LIST_GAMES = "listGames";
     private static final String REQUEST_LIST_PLAYERS_LOBBY = "listPlayersLobby";
-    private static final String REQUEST_LIST_PLAYERS_GAME = "listPlayersGame:" + REGEX_NAME;
+    private static final String REQUEST_LIST_PLAYERS_GAME = COMMAND_LIST_PLAYERS_GAME + DELIMITER_COMMAND + REGEX_NAME;
     private static final String REQUEST_GAME_STATE = "getGameState:" + REGEX_NAME;
 
     private static final String REQUEST_GET_HAND_CARDS = "getHandCards";
@@ -146,6 +147,16 @@ public class Session {
     }
 
     private void listPlayersGame() {
+        StringBuilder builder = new StringBuilder();
+        ArrayList<Player> players = player.getGame().getPlayers();
+
+        if (players.isEmpty()) {
+            builder.append("null");
+        } else {
+            players.forEach(p -> builder.append(p.getName()).append(DELIMITER_VALUE));
+        }
+
+        send(COMMAND_LIST_PLAYERS_GAME, builder.toString());
     }
 
     private void getGameState(String command) {
