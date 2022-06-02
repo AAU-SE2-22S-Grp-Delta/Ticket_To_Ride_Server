@@ -8,7 +8,7 @@ import java.util.LinkedList;
 public class SendingThread extends Thread {
     private final DataOutputStream send;
     private final Object lock = new Object();
-    private LinkedList<String> outputBuffer = new LinkedList<>();
+    private final LinkedList<String> outputBuffer = new LinkedList<>();
 
     public SendingThread(Socket clientSocket) throws Exception {
         this.send = new DataOutputStream(clientSocket.getOutputStream());
@@ -17,7 +17,7 @@ public class SendingThread extends Thread {
     @Override
     public void run() {
         if (Configuration_Constants.verbose) System.out.println("(VERBOSE)\tSendingThread: has been started ...");
-        String command = null;
+        String command;
         while (true) {
             try {
                 synchronized (lock) {
@@ -38,7 +38,7 @@ public class SendingThread extends Thread {
     public void sendCommand(String command) {
         synchronized (lock) {
             this.outputBuffer.add(command);
-            lock.notify();
+            lock.notifyAll();
         }
     }
 
