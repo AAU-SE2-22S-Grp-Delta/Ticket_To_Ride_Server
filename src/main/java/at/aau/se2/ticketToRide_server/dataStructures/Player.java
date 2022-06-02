@@ -320,16 +320,13 @@ public class Player implements Comparable {
     /**
      * Notifies this player that this is player [name]'s turn
      */
-    public void actionCall(String playerOnTheMove) {
-        this.sendCommand("actionCall:"+playerOnTheMove);
+    public void actionCall(String playerOnTheMove, int actionPoints) {
+        this.sendCommand("actionCall:"+playerOnTheMove + ":" + actionPoints);
     }
 
     /**
      * informs this client that the game is waiting for the valid player to perform a move
      */
-    public void doMove(String playerName, int actionsLeft) {
-        sendCommand("doMove:" + playerName + ":" + actionsLeft);
-    }
 
 
     private int sendCommand(String command) {

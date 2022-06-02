@@ -129,6 +129,7 @@ public class GameModel implements Runnable {
         while (checkIfOver()) {
             move();
         }
+        //TODO ending game methods
     }
 
     /**
@@ -172,17 +173,20 @@ public class GameModel implements Runnable {
     private void move() {
         //wait for move and inform clients
         this.actionsLeft = 2;
-        for (Player player : players) {
-            player.doMove(players.get(activePlayer).getName(), actionsLeft);
-        }
 
         while (actionsLeft > 0) {
-            //broadcast whose turn e.g. "actionCall:[Player1]"
-            //lock
-            //write
-            //unlock
-            //check if over
-            //broadcast sync flag
+            try {
+                synchronized (this) {
+                    actionCall();
+                    if (Configuration_Constants.verbose)
+                        System.out.println("(VERBOSE)\tGameModel.move called and waiting for action");
+                    this.wait(); //Waits until a action is done
+                    sync();      //then the sync broadcast
+                }
+            } catch (Exception e) {
+                if (Configuration_Constants.debug) System.out.println("(DEBUG)\t Error in GameModel.move");
+                e.printStackTrace();
+            }
         }
     }
 
@@ -193,7 +197,7 @@ public class GameModel implements Runnable {
     private void actionCall() {
         String playerOnTheMove = players.get(this.activePlayer).getName();
         for (Player p : this.players) {
-            p.actionCall(playerOnTheMove);
+            p.actionCall(playerOnTheMove, actionsLeft);
         }
     }
 
@@ -271,64 +275,71 @@ public class GameModel implements Runnable {
     //TODO LOCKS WHILE CHANGING GAME STATE!!!
 
     public int drawOpenCard(Player player, int openCardId) {
-        if (!players.get(activePlayer).equals(player)) {
-            //TODO return failure or block info?
-            if (Configuration_Constants.verbose)
-                System.out.println("(VERBOSE)\t Player" + player.getName() + " was blocked trying pick open card while players " + players.get(activePlayer) + "turn.");
-            return -1;
-        }
+        synchronized (this) {
+            if (!players.get(activePlayer).equals(player)) {
+                if (Configuration_Constants.verbose)
+                    System.out.println("(VERBOSE)\t Player" + player.getName() + " was blocked trying pick open card while players " + players.get(activePlayer) + "turn.");
+                return -1;
+            }
 
-        //TODO: check if the chosen card is a TrainCard (costs TrainCard = 3 => then turn is over)
+            //TODO: check if the chosen card is a TrainCard (costs TrainCard = 3 => then turn is over)
 
-        if (actionsLeft == 2) {
-            //TODO: draw cards and call player.addHandCard(getCardfromStack(OpenCardID) or something
-            return actionsLeft -= 2;
-        }
-        if (actionsLeft == 2 || actionsLeft == 1) {
-            return --actionsLeft;
+            if (actionsLeft == 2) {
+                //TODO: draw cards and call player.addHandCard(getCardfromStack(OpenCardID) or something
+                return actionsLeft -= 2;
+            }
+            if (actionsLeft == 2 || actionsLeft == 1) {
+                return --actionsLeft;
+            }
         }
         throw new IllegalStateException("(FATAL) GameModel: No more moves left when called drawOpenCard");
     }
 
 
     public int drawCardFromStack(Player player) {
-        if (!players.get(activePlayer).equals(player)) {
-            //TODO return failure or block info?
-            if (Configuration_Constants.verbose)
-                System.out.println("(VERBOSE)\t Player" + player.getName() + " was blocked trying pick card from stack while players " + players.get(activePlayer) + "turn.");
-            return -1;
-        }
-        if (actionsLeft > 0 && trainCards.size() > 0) {
-            //TODO this is a temp workaround for testing purposes
-            TrainCard card = trainCards.remove(0);
-            player.addHandCard(card);
-            --actionsLeft;
+        synchronized (this) {
+            if (!players.get(activePlayer).equals(player)) {
+                if (Configuration_Constants.verbose)
+                    System.out.println("(VERBOSE)\t Player" + player.getName() + " was blocked trying pick card from stack while players " + players.get(activePlayer) + "turn.");
+                return -1;
+            }
+            if (actionsLeft > 0 && trainCards.size() > 0) {
+                TrainCard card = trainCards.remove(0);
+                player.addHandCard(card);
+                --actionsLeft;
+                this.notify();
+            }
         }
         throw new IllegalStateException("(FATAL) GameModel: At this point the move should be processed");
     }
 
 
-    public int setRailRoadLineOwner(Player player, RailroadLine railroadLine, MapColor color) {
-        if (!players.get(activePlayer).equals(player)) {
-            if (Configuration_Constants.debug)
-                System.out.println("(DEBUG)\t Player" + player.getName() + " was blocked trying to build road while players " + players.get(activePlayer) + "turn.");
-            return -1;
-        }
+    public int setRailRoadLineOwner(Player player, RailroadLine railroadLine, MapColor color){
+        synchronized (this) {
+            if (!players.get(activePlayer).equals(player)) {
+                if (Configuration_Constants.debug)
+                    System.out.println("(DEBUG)\t Player" + player.getName() + " was blocked trying to build road while players " + players.get(activePlayer) + "turn.");
+                return -1;
+            }
 
-        if (railroadLine.getOwner() == null) {
-            if (Configuration_Constants.debug)
-                System.out.println("(DEBUG)\t GameModel.setRailRoadLineOwner() Rail has owner named " + railroadLine.getOwner().getName() + ". Can't set owner to " + player.getName());
-            return -1;
-        }
+            if (railroadLine.getOwner() == null) {
+                if (Configuration_Constants.debug)
+                    System.out.println("(DEBUG)\t GameModel.setRailRoadLineOwner() Rail has owner named " + railroadLine.getOwner().getName() + ". Can't set owner to " + player.getName());
+                return -1;
+            }
 
-        if (railroadLine instanceof DoubleRailroadLine) {
-            DoubleRailroadLine doubleRailroadLine = (DoubleRailroadLine) railroadLine;
-            if (doubleRailroadLine.getColor2().equals(color) && doubleRailroadLine.getOwner2() == null) doubleRailroadLine.setOwner2(player);
-            else if (doubleRailroadLine.getColor().equals(color)) doubleRailroadLine.setOwner(player);
-            return 0;
-        }
+            if (railroadLine instanceof DoubleRailroadLine) {
+                DoubleRailroadLine doubleRailroadLine = (DoubleRailroadLine) railroadLine;
+                if (doubleRailroadLine.getColor2().equals(color) && doubleRailroadLine.getOwner2() == null)
+                    doubleRailroadLine.setOwner2(player);
+                else if (doubleRailroadLine.getColor().equals(color)) doubleRailroadLine.setOwner(player);
+                return 0;
+            }
 
-        railroadLine.setOwner(player);
+            this.actionsLeft = 0;
+            railroadLine.setOwner(player);
+        }
+        this.notify();
         return 0;
     }
 
