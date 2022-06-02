@@ -34,8 +34,6 @@ public class GameModel implements Runnable {
 
 
     //visible to all
-
-
     private Map map = getMapInstance();
     private ArrayList<TrainCard> openCards = new ArrayList<>();
     private HashMap<Player, Integer> longestConnectionsForEachPlayer = new HashMap<>();
@@ -188,6 +186,27 @@ public class GameModel implements Runnable {
         }
     }
 
+
+    /**
+     * Broadcasts to all players that this is player [name]'s turn
+     */
+    private void actionCall() {
+        String playerOnTheMove = players.get(this.activePlayer).getName();
+        for (Player p : this.players) {
+            p.actionCall(playerOnTheMove);
+        }
+    }
+
+    /**
+     * Notifies all players that the game model has changed
+     */
+    private void sync() {
+        for (Player p : this.players) {
+            p.sync();
+        }
+    }
+
+
     /**
      * searches for a railroadLine which names are equal to dest1 and dest2
      *
@@ -208,6 +227,8 @@ public class GameModel implements Runnable {
 
 
     //endregion
+
+
 
 
     //region -------------------------------- END GAME METHODS ---------------------------------------------------------
@@ -240,6 +261,8 @@ public class GameModel implements Runnable {
 
 
     //endregion
+
+
 
 
     //region ---------------------- PLAYER ACTIONS ---------------------------------------------------------------------
@@ -318,6 +341,9 @@ public class GameModel implements Runnable {
     //endregion
 
 
+
+
+
     //region ------------------- GETTER SETTER TO_STRING ----------------------------
     public static int getIdCounter() {
         return idCounter;
@@ -364,6 +390,8 @@ public class GameModel implements Runnable {
 
 
     //endregion
+
+
 
 
     //region ---------------------- STATIC GENERATORS ---------------------------------------

@@ -22,19 +22,12 @@ public class ReceivingThread extends Thread {
                 String line = receive.readLine();
                 System.out.println("ReceivingThread: received " + line);
                 session.parseCommand(line);
-            } catch (SocketException se) {
+            } catch (SocketException | NullPointerException se) {
                 System.out.println("ReceivingThread: lost connection");
                 //Todo close session
                 System.out.println("ReceivingThread: shutting down ...");
                 break;
-            }
-            catch (NullPointerException npe) {
-                System.out.println("ReceivingThread: lost connection");
-                //Todo close session
-                System.out.println("ReceivingThread: shutting down ...");
-                break;
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 System.out.println("ReceivingThread: Some error occurred ...");
                 e.printStackTrace();
             }
