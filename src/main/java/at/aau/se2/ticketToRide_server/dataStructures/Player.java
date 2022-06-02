@@ -12,8 +12,6 @@ import java.util.LinkedList;
  * Player-Class represents a person who is playing the Game
  */
 public class Player implements Comparable {
-
-
     public enum Command {
         SYNC, //game model has changed -> prompts the client to synchronize
         DO_MOVE //informs this that the game is waiting for the valid player to perform a move
@@ -106,7 +104,7 @@ public class Player implements Comparable {
         return null;
     }
 
-    public int chooseMissoions(LinkedList<Integer> chosen) {
+    public int chooseMissions(LinkedList<Integer> chosen) {
         return -1;
     }
 
@@ -319,6 +317,12 @@ public class Player implements Comparable {
         sendCommand("sync");
     }
 
+    /**
+     * Notifies this players that this is player [name]'s turn
+     */
+    public void actionCall(String playerOnTheMove) {
+        this.sendCommand("actionCall:"+playerOnTheMove);
+    }
 
     /**
      * informs this client that the game is waiting for the valid player to perform a move

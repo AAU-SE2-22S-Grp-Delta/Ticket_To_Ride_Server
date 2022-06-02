@@ -313,7 +313,7 @@ public class Session {
 
     private void chooseMission(String command) {
         LinkedList<Integer> chosen = new LinkedList<>();
-        player.chooseMissoions(chosen);
+        player.chooseMissions(chosen);
     }
 
     private void exitGame() {
@@ -324,6 +324,11 @@ public class Session {
     //endregion
 
 
+
+
+    //region ------------------------------------ NETWORK ACTIVITY -----------------------------------------------------
+
+
     public int send(String toClient) {
         if (sendingThread == null) {
             return -1;
@@ -332,6 +337,7 @@ public class Session {
         return 0;
     }
 
+
     private void send(String command, String toClient) {
         if (toClient.endsWith(DELIMITER_VALUE)) {
             toClient = toClient.substring(0, toClient.length() - 1);
@@ -339,11 +345,16 @@ public class Session {
         send(command + DELIMITER_COMMAND + toClient);
     }
 
+
     void setReceivingThread(ReceivingThread receivingThread) {
         this.receivingThread = receivingThread;
     }
 
+
     void setSendingThread(SendingThread sendingThread) {
         this.sendingThread = sendingThread;
     }
+
+
+    //endregion
 }
