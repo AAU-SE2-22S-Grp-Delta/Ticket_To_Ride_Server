@@ -106,8 +106,12 @@ public class Player implements Comparable {
         return this.game.startGame(this);
     }
 
-    public TrainCard getCardStack() {
-        return null;
+    public int getCardStack() {
+        if (this.state != State.GAMING) {
+            sendCommand("cardStack:null");
+            return -1;
+        }
+        return game.drawCardFromStack(this);
     }
 
     public TrainCard getCardOpen(int id) {
