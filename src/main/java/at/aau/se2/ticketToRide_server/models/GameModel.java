@@ -325,6 +325,7 @@ public class GameModel implements Runnable {
                 player.addHandCard(card);
                 --actionsLeft;
                 this.notify();
+                return 1;
             }
         }
         throw new IllegalStateException("(FATAL) GameModel: At this point the move should be processed");
