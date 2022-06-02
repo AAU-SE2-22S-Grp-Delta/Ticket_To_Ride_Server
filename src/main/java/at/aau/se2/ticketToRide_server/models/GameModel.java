@@ -141,9 +141,10 @@ public class GameModel implements Runnable {
     @Override
     public void run() {
         if (Configuration_Constants.verbose) System.out.println("(VERBOSE)\tGameModel.run() Game loop up");
-        while (checkIfOver()) {
+        while (!checkIfOver()) {
             move();
         }
+        if (Configuration_Constants.verbose) System.out.println("(VERBOSE)\tGameModel.run() Game loop broke");
         //TODO ending game methods
     }
 
@@ -186,15 +187,14 @@ public class GameModel implements Runnable {
      * while actualisation information is locked
      */
     private void move() {
-        //wait for move and inform clients
-
+        if (Configuration_Constants.verbose) System.out.println("(VERBOSE)\tGameModel.move() move start");
         while (actionsLeft > 0) {
             try {
                 synchronized (this) {
                     this.actionsLeft = 2;
                     actionCall();
                     if (Configuration_Constants.verbose)
-                        System.out.println("(VERBOSE)\tGameModel.move called and waiting for action");
+                        System.out.println("(VERBOSE)\tGameModel.move() called and waiting for action");
                     this.wait(); //Waits until a action is done
                     sync();      //then the sync broadcast
                 }
@@ -210,6 +210,7 @@ public class GameModel implements Runnable {
      * Broadcasts to all players that this is player [name]'s turn
      */
     private void actionCall() {
+        if (Configuration_Constants.verbose) System.out.println("(VERBOSE)\tGameModel.actionCall() calling players...");
         String playerOnTheMove = players.get(this.activePlayer).getName();
         for (Player p : this.players) {
             p.actionCall(playerOnTheMove, actionsLeft);
