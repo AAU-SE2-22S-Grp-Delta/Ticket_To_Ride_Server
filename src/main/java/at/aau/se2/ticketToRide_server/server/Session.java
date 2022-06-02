@@ -94,21 +94,21 @@ public class Session {
             else if (command.matches(REQUEST_LIST_PLAYERS_GAME)) this.listPlayersGame();
             else if (command.matches(REQUEST_GAME_STATE)) this.getGameState(command);
 
-            //---- GENERAL COMMANDS ---------------------------------------------------------
+                //---- GENERAL COMMANDS ---------------------------------------------------------
             else if (command.matches(COMMAND_CREATE_GAME)) this.createGame(command);
             else if (command.matches(COMMAND_JOIN_GAME)) this.joinGame(command);
             else if (command.matches(COMMAND_START_GAME)) this.startGame();
             else if (command.matches(COMMAND_EXIT_GAME)) this.exitGame();
             else if (command.matches(COMMAND_LEAVE)) this.leave();
 
-            //----- IN GAME REQUESTS --------------------------------------------------------
+                //----- IN GAME REQUESTS --------------------------------------------------------
             else if (command.matches(REQUEST_GET_HAND_CARDS)) this.getHandCards();
             else if (command.matches(REQUEST_GET_OPEN_CARDS)) this.getOpenCards();
             else if (command.matches(REQUEST_GET_MAP)) this.getMap();
             else if (command.matches(REQUEST_GET_POINTS)) this.getPoints();
             else if (command.matches(REQUEST_GET_COLORS)) this.getColors();
 
-            //----- IN GAME COMMANDS --------------------------------------------------------
+                //----- IN GAME COMMANDS --------------------------------------------------------
             else if (command.matches(COMMAND_GET_CARD_STACK)) this.getCardStack();
             else if (command.matches(COMMAND_GET_CARD_OPEN)) this.getCardOpen(command);
             else if (command.matches(COMMAND_BUILD_RAILROAD)) this.buildRailroad(command);
@@ -193,7 +193,7 @@ public class Session {
     private void joinGame(String command) {
         String[] words = command.split(":");
         GameModel game = Lobby.getInstance().getGameByName(words[1]);
-        player.joinGame(game);
+        if (player.joinGame(game)<0) send("joinGame:null");
     }
 
     private void leave() {
@@ -207,82 +207,86 @@ public class Session {
         if (handCards.isEmpty()) return "null";
 
         StringBuilder builder = new StringBuilder();
-        for (int i = 0; i < handCards.size()-1; i++) {
+        for (int i = 0; i < handCards.size() - 1; i++) {
             TrainCard handCard = handCards.get(i);
             builder.append(handCard.getType().toString()).append(":");
         }
-        TrainCard lastHandCard = handCards.get(handCards.size()-1);
+        TrainCard lastHandCard = handCards.get(handCards.size() - 1);
         builder.append(lastHandCard.getType().toString());
 
+        //TODO send not return string LOCK while accessing game!!! Do this in player class cause encapsulation
         return builder.toString();
     }
 
     private String getOpenCards() {
         GameModel gameModel = player.getGame();
-        if(gameModel == null) return "null";
+        if (gameModel == null) return "null";
 
         ArrayList<TrainCard> openCards = gameModel.getOpenCards();
         StringBuilder builder = new StringBuilder();
-        for (int i = 0; i < openCards.size()-1; i++) {
+        for (int i = 0; i < openCards.size() - 1; i++) {
             TrainCard openCard = openCards.get(i);
             builder.append(openCard.getType().toString()).append(":");
         }
-        TrainCard lastOpenCard = openCards.get(openCards.size()-1);
+        TrainCard lastOpenCard = openCards.get(openCards.size() - 1);
         builder.append(lastOpenCard.getType().toString());
 
+        //TODO send not return string LOCK while accessing game!!! Do this in player class cause encapsulation
         return builder.toString();
     }
 
     private String getMap() {
         GameModel gameModel = player.getGame();
-        if(gameModel == null) return "null";
+        if (gameModel == null) return "null";
 
         StringBuilder builder = new StringBuilder();
-        Map map  = gameModel.getMap();
+        Map map = gameModel.getMap();
         ArrayList<RailroadLine> railroadLines = new ArrayList<>(map.getRailroadLines());
-        for (int i = 0; i < railroadLines.size()-1; i++) {
-            if(railroadLines.get(i) instanceof DoubleRailroadLine)
+        for (int i = 0; i < railroadLines.size() - 1; i++) {
+            if (railroadLines.get(i) instanceof DoubleRailroadLine)
                 builder.append(i).append(":").append(railroadLines.get(i).getOwner()).append(":").append(((DoubleRailroadLine) railroadLines.get(i)).getOwner2()).append(";");
             else
                 builder.append(i).append(":").append(railroadLines.get(i).getOwner()).append(";");
         }
-        if(railroadLines.get(railroadLines.size()-1) instanceof DoubleRailroadLine)
-            builder.append(railroadLines.size()-1).append(":").append(railroadLines.get(railroadLines.size()-1).getOwner()).append(":").append(((DoubleRailroadLine) railroadLines.get(railroadLines.size()-1)).getOwner2()).append(";");
+        if (railroadLines.get(railroadLines.size() - 1) instanceof DoubleRailroadLine)
+            builder.append(railroadLines.size() - 1).append(":").append(railroadLines.get(railroadLines.size() - 1).getOwner()).append(":").append(((DoubleRailroadLine) railroadLines.get(railroadLines.size() - 1)).getOwner2()).append(";");
         else
-            builder.append(railroadLines.size()-1).append(":").append(railroadLines.get(railroadLines.size()-1).getOwner()).append(";");
+            builder.append(railroadLines.size() - 1).append(":").append(railroadLines.get(railroadLines.size() - 1).getOwner()).append(";");
 
         return builder.toString();
     }
 
     private String getPoints() {
         GameModel gameModel = player.getGame();
-        if(gameModel == null) return "null";
+        if (gameModel == null) return "null";
 
         StringBuilder builder = new StringBuilder();
         ArrayList<Player> players = gameModel.getPlayers();
-        for (int i = 0; i < players.size()-1; i++) {
+        for (int i = 0; i < players.size() - 1; i++) {
             Player player = players.get(i);
             builder.append(player.getName()).append(":").append(player.getPoints()).append(":");
         }
-        Player lastPlayer = players.get(players.size()-1);
+        Player lastPlayer = players.get(players.size() - 1);
         builder.append(lastPlayer.getName()).append(":").append(lastPlayer.getPoints());
 
+        //TODO send not return string LOCK while accessing game!!! Do this in player class cause encapsulation
         return builder.toString();
     }
 
     private String getColors() {
         GameModel gameModel = player.getGame();
-        if(gameModel == null) return "null";
+        if (gameModel == null) return "null";
 
         StringBuilder builder = new StringBuilder();
         ArrayList<Player> players = gameModel.getPlayers();
-        for (int i = 0; i < players.size()-1; i++) {
+        for (int i = 0; i < players.size() - 1; i++) {
             Player player = players.get(i);
             builder.append(player.getName()).append(":").append(player.getPlayerColor().toString()).append(":");
         }
-        Player lastplayer = players.get(players.size()-1);
+        Player lastplayer = players.get(players.size() - 1);
         builder.append(lastplayer.getName()).append(":").append(lastplayer.getPlayerColor().toString());
 
+        //TODO send not return string LOCK while accessing game!!! Do this in player class cause encapsulation
         return builder.toString();
     }
 
@@ -290,7 +294,7 @@ public class Session {
     //----- IN GAME COMMANDS -------------------------------------------------------
 
     private void startGame() {
-        player.startGame();
+        if (player.startGame()< 0) send("startGame:null");
     }
 
     private void getCardStack() {
@@ -322,8 +326,6 @@ public class Session {
 
 
     //endregion
-
-
 
 
     //region ------------------------------------ NETWORK ACTIVITY -----------------------------------------------------
