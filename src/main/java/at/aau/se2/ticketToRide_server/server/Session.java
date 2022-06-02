@@ -71,6 +71,7 @@ public class Session {
 
     void parseCommand(String received) {
         if (Configuration_Constants.verbose) System.out.println("(VERBOSE)\tSession received: " + received);
+        if (Configuration_Constants.echo) send("echo:"+received);
 
         String[] commands = received.split(";");
 
