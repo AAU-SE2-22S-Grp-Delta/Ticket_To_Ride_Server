@@ -92,8 +92,18 @@ public class Player implements Comparable {
     //region ----------------------------------- IN GAME METHODS -------------------------------------------------------
 
 
+    /**
+     * Tries to start the game
+     * Games are started by their owners
+     * @return 0 on success, -1 on fail
+     */
     public int startGame() {
-        return -1;
+        if (state != State.GAMING) {
+            if (Configuration_Constants.debug) System.out.println("(DEBUG)\t Player.startGame() called while not in game");
+            return -1;
+        }
+
+        return this.game.startGame(this);
     }
 
     public TrainCard getCardStack() {

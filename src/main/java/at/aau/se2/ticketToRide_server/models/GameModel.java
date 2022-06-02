@@ -87,15 +87,28 @@ public class GameModel implements Runnable {
         return 0;
     }
 
-    public void startGame(Player whoIsPerformingThisAction) {
-        if (!whoIsPerformingThisAction.equals(owner))
-            throw new IllegalCallerException(whoIsPerformingThisAction.getName() + " is not the owner, aborting to start game!");
-        if (this.state != State.WAITING_FOR_PLAYERS)
-            throw new IllegalStateException("Game is not in state WAITING_FOR_PLAYERS!");
+
+    /**
+     * starts the game, if the owner calls this method and there are more than two players in the game
+     * @param whoIsPerformingThisAction calling player - should be owner
+     * @return 0 on success, -1 on fail
+     */
+    public int startGame (Player whoIsPerformingThisAction) {
+        if (!whoIsPerformingThisAction.equals(owner)) {
+            System.out.println("(DEBUG)\tGameModel.startGame() called from player who is not owner");
+            return -1;
+        }
+
+        if (this.state != State.WAITING_FOR_PLAYERS) {
+            System.out.println("(DEBUG)\tGameModel.startGame() Game is not in state WAITING_FOR_PLAYERS!");
+            return -1;
+        }
+
         this.state = State.RUNNING;
         Thread gameLoop = new Thread(this);
         Collections.shuffle(players);
         gameLoop.start();
+        return 0;
     }
 
     private void exitGameCrashed() {
@@ -172,11 +185,11 @@ public class GameModel implements Runnable {
      */
     private void move() {
         //wait for move and inform clients
-        this.actionsLeft = 2;
 
         while (actionsLeft > 0) {
             try {
                 synchronized (this) {
+                    this.actionsLeft = 2;
                     actionCall();
                     if (Configuration_Constants.verbose)
                         System.out.println("(VERBOSE)\tGameModel.move called and waiting for action");
