@@ -79,7 +79,7 @@ public class Session {
             //----------- At this point in control flow the session leader must have called enterLobby to assign session Owner ----------
             //----------- when adding commands which don't necessarily need a session owner, put them above the following check ---------
             if (this.player == null) {
-                sendingThread.setCommand("ERROR: Not in Lobby");
+                sendingThread.sendCommand("ERROR: Not in Lobby");
                 if (Configuration_Constants.debug) {
                     System.out.printf("(DEBUG)\t Session %d received command '%s' while sessionOwner=null\n", this.id, command);
                     send(command + ":null");
@@ -93,21 +93,21 @@ public class Session {
             else if (command.matches(REQUEST_LIST_PLAYERS_GAME)) this.listPlayersGame();
             else if (command.matches(REQUEST_GAME_STATE)) this.getGameState(command);
 
-                //---- GENERAL COMMANDS ---------------------------------------------------------
+            //---- GENERAL COMMANDS ---------------------------------------------------------
             else if (command.matches(COMMAND_CREATE_GAME)) this.createGame(command);
             else if (command.matches(COMMAND_JOIN_GAME)) this.joinGame(command);
             else if (command.matches(COMMAND_START_GAME)) this.startGame();
             else if (command.matches(COMMAND_EXIT_GAME)) this.exitGame();
             else if (command.matches(COMMAND_LEAVE)) this.leave();
 
-                //----- IN GAME REQUESTS --------------------------------------------------------
+            //----- IN GAME REQUESTS --------------------------------------------------------
             else if (command.matches(REQUEST_GET_HAND_CARDS)) this.getHandCards();
             else if (command.matches(REQUEST_GET_OPEN_CARDS)) this.getOpenCards();
             else if (command.matches(REQUEST_GET_MAP)) this.getMap();
             else if (command.matches(REQUEST_GET_POINTS)) this.getPoints();
             else if (command.matches(REQUEST_GET_COLORS)) this.getColors();
 
-                //----- IN GAME COMMANDS --------------------------------------------------------
+            //----- IN GAME COMMANDS --------------------------------------------------------
             else if (command.matches(COMMAND_GET_CARD_STACK)) this.getCardStack();
             else if (command.matches(COMMAND_GET_CARD_OPEN)) this.getCardOpen(command);
             else if (command.matches(COMMAND_BUILD_RAILROAD)) this.buildRailroad(command);
@@ -317,7 +317,7 @@ public class Session {
         if (sendingThread == null) {
             return -1;
         }
-        sendingThread.setCommand(toClient);
+        sendingThread.sendCommand(toClient);
         return 0;
     }
 

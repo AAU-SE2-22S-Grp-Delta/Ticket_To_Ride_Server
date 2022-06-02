@@ -3,13 +3,14 @@ package at.aau.se2.ticketToRide_server.server;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
+import java.util.LinkedList;
 
 public class SendingThread extends Thread {
     protected Socket clientSocket;
     protected DataOutputStream send;
     private Object lock;
 
-    private String command = null;
+    private LinkedList<String> outputBuffer = new LinkedList<>();
 
     public SendingThread(Socket clientSocket) throws Exception {
         this.clientSocket = clientSocket;
@@ -19,34 +20,35 @@ public class SendingThread extends Thread {
 
     @Override
     public void run() {
+        if (Configuration_Constants.verbose) System.out.println("(VERBOSE)\tSendingThread: has been started ...");
+        String command = null;
         while (true) {
             try {
-                System.out.println("SendingThread: has been started ...");
                 synchronized (lock) {
-                    if (command == null) {
-                        System.out.println("SendingThread: Pause sending thread");
+                    if (outputBuffer.isEmpty()) {
+                        if (Configuration_Constants.verbose) System.out.println("(VERBOSE)\tSendingThread: Pause sending thread");
                         lock.wait();
-                        System.out.println("SendingThread: Continue sending thread");
+                        if (Configuration_Constants.verbose) System.out.println("(VERBOSE)\tSendingThread: Continue sending thread");
                     }
-                    if (command != null && sendCommand(command) == 0) command = null;
+                    command = outputBuffer.remove();
                 }
-
+                sendToClient(command);
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
     }
 
-    public void setCommand(String command) {
-        this.command = command;
+    public void sendCommand(String command) {
         synchronized (lock) {
+            this.outputBuffer.add(command);
             lock.notify();
         }
     }
 
-    public int sendCommand(String command) {
+    private int sendToClient(String command) {
         try {
-            System.out.println("SendingThread: sending " + command);
+            if (Configuration_Constants.verbose) System.out.println("(VERBOSE)\tSendingThread: sending " + command);
             send.writeBytes(command + "\n");
         } catch (IOException e) {
             e.printStackTrace();
