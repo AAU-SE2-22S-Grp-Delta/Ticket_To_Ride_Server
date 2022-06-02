@@ -318,7 +318,7 @@ public class Player implements Comparable {
     }
 
     /**
-     * Notifies this players that this is player [name]'s turn
+     * Notifies this player that this is player [name]'s turn
      */
     public void actionCall(String playerOnTheMove) {
         this.sendCommand("actionCall:"+playerOnTheMove);
