@@ -94,6 +94,7 @@ public class GameModel implements Runnable {
      * @return 0 on success, -1 on fail
      */
     public int startGame (Player whoIsPerformingThisAction) {
+        if (Configuration_Constants.verbose) System.out.println(("(VERBOSE)\t GameModel.startGame() starting game " + this.name + "..."));
         if (!whoIsPerformingThisAction.equals(owner)) {
             System.out.println("(DEBUG)\tGameModel.startGame() called from player who is not owner");
             return -1;
@@ -139,6 +140,7 @@ public class GameModel implements Runnable {
 
     @Override
     public void run() {
+        if (Configuration_Constants.verbose) System.out.println("(VERBOSE)\tGameModel.run() Game loop up");
         while (checkIfOver()) {
             move();
         }
