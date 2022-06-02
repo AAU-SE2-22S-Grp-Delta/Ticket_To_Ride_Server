@@ -2,7 +2,6 @@ package at.aau.se2.ticketToRide_server.server;
 
 
 import java.io.DataInputStream;
-import java.io.InputStreamReader;
 import java.net.Socket;
 import java.net.SocketException;
 
@@ -23,7 +22,13 @@ public class ReceivingThread extends Thread {
                 String line = receive.readLine();
                 System.out.println("ReceivingThread: received " + line);
                 session.parseCommand(line);
-            } catch (SocketException | NullPointerException se) {
+            } catch (SocketException se) {
+                System.out.println("ReceivingThread: lost connection");
+                //Todo close session
+                System.out.println("ReceivingThread: shutting down ...");
+                break;
+            }
+            catch (NullPointerException npe) {
                 System.out.println("ReceivingThread: lost connection");
                 //Todo close session
                 System.out.println("ReceivingThread: shutting down ...");
