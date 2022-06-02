@@ -188,6 +188,7 @@ public class GameModel implements Runnable {
      */
     private void move() {
         if (Configuration_Constants.verbose) System.out.println("(VERBOSE)\tGameModel.move() move start");
+        this.actionsLeft = 2;
         while (actionsLeft > 0) {
             try {
                 synchronized (this) {
