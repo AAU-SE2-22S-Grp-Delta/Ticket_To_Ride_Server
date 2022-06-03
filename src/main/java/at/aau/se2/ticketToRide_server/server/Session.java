@@ -14,6 +14,29 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 
 public class Session {
+    private static int sessionCounter = 0;
+
+    private final int id;
+    Socket session;
+    private ReceivingThread receivingThread;
+    private SendingThread sendingThread;
+    BufferedReader inFromClient;
+    DataOutputStream sendToClient;
+
+    Player player;
+
+
+    public Session(Socket session) throws Exception {
+        this.id = sessionCounter++;
+        this.session = session;
+        new SetupSessionThread(this, session).start();
+    }
+
+
+
+    //region --------------------------------- PARSING -----------------------------------------------------------------
+
+
     //---------- REGEX FOR PARSER ------------------
     private static final String DELIMITER_COMMAND = ":";
     private static final String DELIMITER_MULTI = ";";
@@ -50,28 +73,12 @@ public class Session {
     private static final String COMMAND_CHOOSE_MISSION = "chooseMission:" + REGEX_MISSION_ID;
     //----------------------------------------------
 
-    private static int sessionCounter = 0;
 
-    private final int id;
-    Socket session;
-    private ReceivingThread receivingThread;
-    private SendingThread sendingThread;
-    BufferedReader inFromClient;
-    DataOutputStream sendToClient;
 
-    Player player;
-
-    public Session(Socket session) throws Exception {
-        this.id = sessionCounter++;
-        this.session = session;
-        new SetupSessionThread(this, session).start();
-    }
-
-    //region --------------------------------- PARSING -----------------------------------------------------------------
 
     void parseCommand(String received) {
         if (Configuration_Constants.verbose) System.out.println("(VERBOSE)\tSession received: " + received);
-        if (Configuration_Constants.echo) send("echo:"+received);
+        if (Configuration_Constants.echo) send("echo:" + received);
 
         String[] commands = received.split(";");
 
@@ -92,7 +99,7 @@ public class Session {
             //---- GENERAL REQUESTS ---------------------------------------------------------
             if (command.matches(REQUEST_LIST_GAMES)) this.listGames();
             else if (command.matches(REQUEST_LIST_PLAYERS_LOBBY)) this.listPlayersLobby();
-            else if (command.matches(REQUEST_LIST_PLAYERS_GAME)) this.listPlayersGame();
+            else if (command.matches(REQUEST_LIST_PLAYERS_GAME)) this.listPlayersGame(command);
             else if (command.matches(REQUEST_GAME_STATE)) this.getGameState(command);
 
                 //---- GENERAL COMMANDS ---------------------------------------------------------
@@ -119,54 +126,43 @@ public class Session {
     }
 
 
-    //---- GENERAL REQUESTS ---------------------------------------------------------
+    //endregion
+
+
+
+
+    //region---- LOBBY REQUESTS ---------------------------------------------------------
+
 
     private void listPlayersLobby() {
-        StringBuilder builder = new StringBuilder();
-        ArrayList<Player> players = Lobby.getInstance().getPlayers();
-
-        if (players.isEmpty()) {
-            builder.append("null");
-        } else {
-            players.forEach(p -> builder.append(p.getName()).append(DELIMITER_VALUE));
-        }
-
-        String toClient = prepareSend(REQUEST_LIST_GAMES, builder.toString());
-        send(toClient);
+        send(player.listPlayersLobby());
     }
+
 
     private void listGames() {
-        StringBuilder builder = new StringBuilder();
-        ArrayList<GameModel> games = Lobby.getInstance().getGames();
-
-        if (games.isEmpty()) {
-            builder.append("null");
-        } else {
-            games.forEach(g -> builder.append(g.getName()).append(DELIMITER_VALUE));
-        }
-
-        String toClient = prepareSend(REQUEST_LIST_GAMES, builder.toString());
-        send(toClient);
+        send(player.listGames());
     }
 
-    private void listPlayersGame() {
-        StringBuilder builder = new StringBuilder();
-        ArrayList<Player> players = player.getGame().getPlayers();
 
-        if (players.isEmpty()) {
-            builder.append("null");
-        } else {
-            players.forEach(p -> builder.append(p.getName()).append(DELIMITER_VALUE));
-        }
-
-        String toClient = prepareSend(COMMAND_LIST_PLAYERS_GAME, builder.toString());
-        send(toClient);
+    private void listPlayersGame(String command) {
+        String[] words = command.split(DELIMITER_COMMAND);
+        send(player.listPlayersGame(words[1]));
     }
+
 
     private void getGameState(String command) {
+        String[] words = command.split(DELIMITER_COMMAND);
+        send(player.getGameState(words[1]));
     }
 
-    //---- GENERAL COMMANDS ---------------------------------------------------------
+
+    //endregion
+
+
+
+
+    //region ---- LOBBY COMMANDS ---------------------------------------------------------
+
 
     private void enterLobby(String command) {
         if (Configuration_Constants.verbose) System.out.println("(VERBOSE)\tSession.enterLobby() called");
@@ -178,37 +174,46 @@ public class Session {
         }
 
         String[] words = command.split(":");
-        this.player = Lobby.getInstance().createPlayer(words[1], this);
+        this.player = Player.enterLobby(words[1], this);
         if (Configuration_Constants.verbose) System.out.println("(VERBOSE)\tCreated Player " + words[1]);
     }
 
+
     private void createGame(String command) {
         String[] words = command.split(":");
-        GameModel game = Lobby.getInstance().createGame(words[1], this.player);
-        if (game == null) {
+
+        if (player.createGame(words[1]) < 0) {
             if (Configuration_Constants.debug) System.out.println("(DEBUG)\tCreating game " + words[1] + " failed");
             send("createGame:null");
             return;
         }
-        player.joinGame(game);
         if (Configuration_Constants.verbose) System.out.println("(VERBOSE)\tCreated game " + words[1]);
     }
 
+
     private void joinGame(String command) {
         String[] words = command.split(":");
-        GameModel game = Lobby.getInstance().getGameByName(words[1]);
-        if (player.joinGame(game)<0) send("joinGame:null");
+        if (player.joinGame(words[1]) < 0) send("joinGame:null");
     }
+
 
     private void leave() {
 
     }
 
-    //----- IN GAME REQUESTS --------------------------------------------------------
+
+    //endregion
+
+
+
+
+    //region ----- GAME REQUESTS --------------------------------------------------------
+
 
     private void getHandCards() {
-        if (player.getState()!= Player.State.GAMING) {
-            if (Configuration_Constants.debug) System.out.println("(DEBUG)\tSession.getHandCards() player is not gaming");
+        if (player.getState() != Player.State.GAMING) {
+            if (Configuration_Constants.debug)
+                System.out.println("(DEBUG)\tSession.getHandCards() player is not gaming");
             send(REQUEST_GET_HAND_CARDS + DELIMITER_COMMAND + REGEX_NULL);
             return;
         }
@@ -233,7 +238,10 @@ public class Session {
         send(builder.toString());
     }
 
+
     private void getOpenCards() {
+
+
         StringBuilder builder = new StringBuilder();
         GameModel gameModel = player.getGame();
 
@@ -250,6 +258,7 @@ public class Session {
         String toClient = prepareSend(REQUEST_GET_OPEN_CARDS, builder.toString());
         send(toClient);
     }
+
 
     private String getMap() {
         GameModel gameModel = player.getGame();
@@ -272,6 +281,7 @@ public class Session {
         return builder.toString();
     }
 
+
     private String getPoints() {
         GameModel gameModel = player.getGame();
         if (gameModel == null) return "null";
@@ -289,6 +299,7 @@ public class Session {
         return builder.toString();
     }
 
+
     private String getColors() {
         GameModel gameModel = player.getGame();
         if (gameModel == null) return "null";
@@ -297,44 +308,54 @@ public class Session {
         ArrayList<Player> players = gameModel.getPlayers();
         for (int i = 0; i < players.size() - 1; i++) {
             Player player = players.get(i);
-            builder.append(player.getName()).append(":").append(player.getPlayerColor().toString()).append(":");
+            builder.append(player.getName()).append(":").append(player.getColor().toString()).append(":");
         }
         Player lastplayer = players.get(players.size() - 1);
-        builder.append(lastplayer.getName()).append(":").append(lastplayer.getPlayerColor().toString());
+        builder.append(lastplayer.getName()).append(":").append(lastplayer.getColor().toString());
 
         //TODO send not return string LOCK while accessing game!!! Do this in player class cause encapsulation
         return builder.toString();
     }
 
 
-    //----- IN GAME COMMANDS -------------------------------------------------------
+    //endregion
+
+
+    //region ----- GAME COMMANDS -------------------------------------------------------
+
 
     private void startGame() {
-        if (player.startGame()< 0) send("startGame:null");
+        if (player.startGame() < 0) send("startGame:null");
     }
 
+
     private void getCardStack() {
-        player.getCardStack();
+        player.drawCardStack();
     }
+
 
     private void getCardOpen(String command) {
 
 //        player.getCardOpen(id);
     }
 
+
     private void buildRailroad(String command) {
         String[] words = command.split(":");
         player.buildRailroadLine(words[1], words[2], words[3]);
     }
 
+
     private void getMission() {
         player.getMissions();
     }
+
 
     private void chooseMission(String command) {
         LinkedList<Integer> chosen = new LinkedList<>();
         player.chooseMissions(chosen);
     }
+
 
     private void exitGame() {
         player.exitGame();
@@ -346,6 +367,7 @@ public class Session {
 
     //region ------------------------------------ NETWORK ACTIVITY -----------------------------------------------------
 
+
     private String prepareSend(String command, String toClient) {
         // If delimiter exists at the end remove it before send
         if (toClient.endsWith(DELIMITER_VALUE)) {
@@ -356,6 +378,7 @@ public class Session {
         return command + DELIMITER_COMMAND + toClient;
     }
 
+
     public int send(String toClient) {
         if (sendingThread == null) {
             return -1;
@@ -363,6 +386,7 @@ public class Session {
         sendingThread.sendCommand(toClient);
         return 0;
     }
+
 
     void setReceivingThread(ReceivingThread receivingThread) {
         this.receivingThread = receivingThread;

@@ -2,6 +2,7 @@ package at.aau.se2.ticketToRide_server.dataStructures;
 
 import at.aau.se2.ticketToRide_server.models.GameModel;
 import at.aau.se2.ticketToRide_server.server.Configuration_Constants;
+import at.aau.se2.ticketToRide_server.server.Lobby;
 import at.aau.se2.ticketToRide_server.server.Session;
 
 import javax.swing.*;
@@ -12,6 +13,9 @@ import java.util.LinkedList;
  * Player-Class represents a person who is playing the Game
  */
 public class Player implements Comparable {
+
+
+
     public enum Command {
         SYNC, //game model has changed -> prompts the client to synchronize
         DO_MOVE //informs this that the game is waiting for the valid player to perform a move
@@ -21,6 +25,7 @@ public class Player implements Comparable {
 
     public enum Color {
         RED(0), BLUE(1), GREEN(2), YELLOW(3), BLACK(4);
+
 
         Color(int i) {
         }
@@ -59,20 +64,69 @@ public class Player implements Comparable {
     }
 
 
-    //region ----------------------------------- GENERAL ACTIONS -------------------------------------------------------
+    //region ----------------------------------- LOBBY REQUESTS ------------------------------------------------------
+
+
+    public String listPlayersLobby() {
+        return Lobby.getInstance().listPlayersLobby();
+    }
+
+
+    public String listGames() {
+        return Lobby.getInstance().listGames();
+    }
+
+
+    public String listPlayersGame(String gameName) {
+        return Lobby.getInstance().listPlayersGame(gameName);
+    }
+
+
+    public String getGameState(String gameName) {
+        return Lobby.getInstance().listPlayersGame(gameName);
+    }
+
+
+    //endregion
+
+
+
+
+    //region ----------------------------------- LOBBY ACTIONS -------------------------------------------------------
+
+
+    public static Player enterLobby(String name, Session session) {
+        Player player = Lobby.getInstance().enterLobby(name, session);
+        if (player == null ) return null;
+        return player;
+    }
+
+
+    public int createGame(String gameName) {
+        GameModel game = Lobby.getInstance().createGame(gameName, this);
+        if (game == null) return -1;
+        return this.joinGame(gameName);
+    }
+
 
     /**
      * Player joins the specified game if in state waiting for players
      *
-     * @param game
+     * @param gameName the name of the game
      * @return 0 on success, -1 on fail
      */
-    public int joinGame(GameModel game) {
+    public int joinGame(String gameName) {
         if (state.equals(State.GAMING)) {
             if (Configuration_Constants.debug)
                 System.out.println("(DEBUG)\t Player.joinGame() called while Player " + name + " was in game " + this.game.getName());
             return -1;
         }
+
+        GameModel game = Lobby.getInstance().joinGame(gameName, this);
+        if (game == null) {
+            return -1;
+        }
+
         state = State.GAMING;
         this.numStones = 45;
         this.handCards = new ArrayList<>();
@@ -86,27 +140,89 @@ public class Player implements Comparable {
         return 0;
     }
 
+
+    public int leave() {
+        //TODO impl
+        return -1;
+    }
+
+
     //endregion
 
 
-    //region ----------------------------------- IN GAME METHODS -------------------------------------------------------
+
+
+    //region ------------------------------------ GAME REQUESTS --------------------------------------------------------
+
+
+    public String getHandCards() {
+        //TODO impl Linker
+        return null;
+    }
+
+
+    public String getOpenCards() {
+        //TODO impl Linker
+        return null;
+    }
+
+
+    public String getMap() {
+        //TODO impl Linker
+        return null;
+    }
+
+
+    public String getPoints() {
+        //TODO impl Linker
+        return null;
+    }
+
+
+    public String getColor() {
+        //TODO impl Linker
+        return null;
+    }
+
+
+    public String getMissions() {
+        //TODO impl Linker
+        return null;
+    }
+
+
+    public String getNumStones() {
+        //TODO impl Linker
+        return null;
+    }
+
+
+    //endregion
+
+
+
+
+    //region ---------------------------------------- GAME ACTIONS -----------------------------------------------------
 
 
     /**
      * Tries to start the game
      * Games are started by their owners
+     *
      * @return 0 on success, -1 on fail
      */
     public int startGame() {
         if (state != State.GAMING) {
-            if (Configuration_Constants.debug) System.out.println("(DEBUG)\t Player.startGame() called while not in game");
+            if (Configuration_Constants.debug)
+                System.out.println("(DEBUG)\t Player.startGame() called while not in game");
             return -1;
         }
 
         return this.game.startGame(this);
     }
 
-    public int getCardStack() {
+
+    public int drawCardStack() {
         if (this.state != State.GAMING) {
             sendCommand("cardStack:null");
             return -1;
@@ -114,46 +230,16 @@ public class Player implements Comparable {
         return game.drawCardFromStack(this);
     }
 
-    public TrainCard getCardOpen(int id) {
-        return null;
-    }
 
     public int chooseMissions(LinkedList<Integer> chosen) {
+        //TODO impl
         return -1;
     }
 
-    public int exitGame() {
+
+    public int drawCardOpen(int id) {
+        //TODO impl
         return -1;
-    }
-
-
-    public void setPoints(int points) {
-        this.points = points;
-    }
-
-    public int getPoints() {
-        return points;
-    }
-
-    public ArrayList<TrainCard> getHandCards() {
-        return handCards;
-    }
-
-    public ArrayList<Mission> getMissions() {
-        return missions;
-    }
-
-
-    public void addHandCard(TrainCard card) {
-        if (this.state != State.GAMING) {
-            if (Configuration_Constants.debug)
-                System.out.println("(DEBUG\tPlayer: Tried to add HandCard while player " + name + "wasn't in a game.");
-            throw new IllegalStateException("Player is not in Game!");
-        }
-        if (Configuration_Constants.verbose)
-            System.out.println("(VERBOSE)\tPlayer.addHandCard() Card="+card.getType().toString());
-        if (card == null) throw new IllegalArgumentException("card is Null!");
-        this.handCards.add(card);
     }
 
 
@@ -218,7 +304,20 @@ public class Player implements Comparable {
     }
 
 
-    //Punkte für vollständige Strecken
+    public int exitGame() {
+        //TODO impl
+        return -1;
+    }
+
+
+    //endregion
+
+
+
+
+    //region ------------------------------------ ACTION HELPER METHODS ------------------------------------------------
+
+
     private int getPointsForRoutes(int lengthOfRoute) {
         switch (lengthOfRoute) {
             case 1:
@@ -236,16 +335,6 @@ public class Player implements Comparable {
             default:
                 throw new IllegalStateException("Unexpected value: " + lengthOfRoute);
         }
-    }
-
-
-    public void addMission(Mission mission) {
-        if (this.state != State.GAMING) {
-            if (Configuration_Constants.debug)
-                System.out.println("(DEBUG\tPlayer: Tried to add mission while player " + name + "wasn't in a game.");
-            throw new IllegalStateException("Player is not in Game!");
-        }
-        this.missions.add(mission);
     }
 
 
@@ -276,7 +365,60 @@ public class Player implements Comparable {
     //endregion
 
 
-    //region ---------------------------- ENDING GAME METHODS ----------------------------------------------------------
+
+
+    //region ------------------------------------- INTERFACE GAME PLAYER -----------------------------------------------
+
+
+    public void setPoints(int points) {
+        this.points = points;
+    }
+
+
+    public void addHandCard(TrainCard card) {
+        if (this.state != State.GAMING) {
+            if (Configuration_Constants.debug)
+                System.out.println("(DEBUG\tPlayer: Tried to add HandCard while player " + name + "wasn't in a game.");
+            throw new IllegalStateException("Player is not in Game!");
+        }
+        if (Configuration_Constants.verbose)
+            System.out.println("(VERBOSE)\tPlayer.addHandCard() Card=" + card.getType().toString());
+        if (card == null) throw new IllegalArgumentException("card is Null!");
+        this.handCards.add(card);
+    }
+
+
+    public void addMission(Mission mission) {
+        if (this.state != State.GAMING) {
+            if (Configuration_Constants.debug)
+                System.out.println("(DEBUG\tPlayer: Tried to add mission while player " + name + "wasn't in a game.");
+            throw new IllegalStateException("Player is not in Game!");
+        }
+        this.missions.add(mission);
+    }
+
+
+    public void setPlayerColor(Color playerColor) {
+        if (this.state == State.GAMING && this.playerColor != null) {
+            if (Configuration_Constants.debug)
+                System.out.println("(DEBUG)\tCalled Player.getPlayerColor() while Player was in Game!");
+            return;
+        }
+        this.playerColor = playerColor;
+    }
+
+
+    public int getStones() {
+        return this.numStones;
+    }
+
+
+    //endregion
+
+
+
+
+    //region ------------------------------------- ENDING GAME METHODS -------------------------------------------------
 
 
     public void calculatePointsAtGameEnd() {
@@ -291,6 +433,7 @@ public class Player implements Comparable {
         //Zusatzpunkte für längste Strecke
         if (game.hasLongestRailroad(this)) points += 10;
     }
+
 
     public int findLongestConnection() {
         ArrayList<Integer> connectedRailroadLength = new ArrayList<>();
@@ -308,6 +451,7 @@ public class Player implements Comparable {
         return longestConnection;
     }
 
+
     //Count length of connection
     private int findRailroadLine(RailroadLine railroadLine) {
         Destination startDestination = railroadLine.getDestination2();
@@ -320,7 +464,11 @@ public class Player implements Comparable {
         }
         return counter;
     }
+
+
     //endregion
+
+
 
 
     //region --------------------------- SERVER CLIENT COMMUNICATION ---------------------------------------------------
@@ -333,12 +481,14 @@ public class Player implements Comparable {
         sendCommand("sync");
     }
 
+
     /**
      * Notifies this player that this is player [name]'s turn
      */
     public void actionCall(String playerOnTheMove, int actionPoints) {
-        this.sendCommand("actionCall:"+playerOnTheMove + ":" + actionPoints);
+        this.sendCommand("actionCall:" + playerOnTheMove + ":" + actionPoints);
     }
+
 
     /**
      * informs this client that the game is waiting for the valid player to perform a move
@@ -353,12 +503,15 @@ public class Player implements Comparable {
     //endregion
 
 
+
+
     // region ------------------------------ SETTER GETTER TO STRING ---------------------------------------------------
 
 
     public State getState() {
         return state;
     }
+
 
     public int getId() {
         return id;
@@ -373,9 +526,8 @@ public class Player implements Comparable {
     }
 
 
-    public int getNumStones() {
-        return numStones;
-    }
+
+
 
 
     public String getName() {
@@ -383,23 +535,6 @@ public class Player implements Comparable {
     }
 
 
-    public Color getPlayerColor() {
-        return playerColor;
-    }
-
-
-    public void setPlayerColor(Color playerColor) {
-        if (this.state == State.GAMING && this.playerColor!=null) {
-            if (Configuration_Constants.debug)
-                System.out.println("(DEBUG)\tCalled Player.getPlayerColor() while Player was in Game!");
-            return;
-        }
-        this.playerColor = playerColor;
-    }
-
-    public GameModel getGame(){
-        return game;
-    }
 
     @Override
     public String toString() {

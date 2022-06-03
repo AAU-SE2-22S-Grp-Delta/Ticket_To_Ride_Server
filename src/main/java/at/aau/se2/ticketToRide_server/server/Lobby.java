@@ -12,7 +12,7 @@ public class Lobby {
     private static int gameCounter = 0;
 
     private ArrayList<Player> players;
-    private ArrayList<GameModel> games;
+    private final ArrayList<GameModel> games;
 
     private Lobby() {
         players = new ArrayList<>();
@@ -24,25 +24,75 @@ public class Lobby {
         return lobby;
     }
 
-    public void startNewGame(Player owner, String name) {
-        GameModel game = new GameModel(name, owner);
-        games.add(game);
+
+
+
+    //region ----------------------------------- LOBBY REQUESTS ------------------------------------------------------
+
+
+    public String listPlayersLobby() {
+        StringBuilder builder = new StringBuilder("listPlayersLobby");
+
+        synchronized (this) {
+            for (Player player : this.players) {
+                builder.append(":").append(player.getName());
+            }
+            this.notify();
+        }
+        return builder.toString();
     }
 
-    public void joinGame(String gameName, Player player) throws IllegalArgumentException {
-        GameModel game = null;
-        for (GameModel g : games) {
-            if (g.getName().equals(gameName)) {
-                game = g;
-                break;
+
+    public String listGames() {
+        StringBuilder builder = new StringBuilder("listGames");
+
+        synchronized (this) {
+            for (GameModel game: this.games) {
+                builder.append(":").append(game.getName());
             }
+            this.notify();
         }
-        if (game == null) throw new IllegalArgumentException("No game of the name " + gameName);
-        for (Player p : game.getPlayers())
-            if (player.getName().equals(player.getName()))
-                throw new IllegalArgumentException("Player of name " + player.getName() + "has already joint game of name " + gameName);
-        game.addPlayer(player);
+        return builder.toString();
     }
+
+
+    public String listPlayersGame(String gameName) {
+        String playersList = "listPlayersGame:noSuchGame";
+        synchronized (this) {
+            for (GameModel game : this.games) {
+                if (game.getName().equals(gameName)) {
+                    playersList = game.listPlayersGame();
+                    break;
+                }
+            }
+            this.notify();
+        }
+        return playersList;
+    }
+
+
+    private String getGameState(String gameName) {
+        String gameState = "getGameState:noSuchGame";
+        synchronized (this) {
+            for (GameModel game : this.games) {
+                if (game.getName().equals(gameName)) {
+                    gameState = game.listPlayersGame();
+                    break;
+                }
+            }
+            this.notify();
+        }
+        return gameState;
+    }
+
+
+    //endregion
+
+
+
+
+    //region ----------------------------------- LOBBY ACTIONS -------------------------------------------------------
+
 
     /**
      * creates a new Player within the Lobby
@@ -50,41 +100,92 @@ public class Lobby {
      * @param name unique (in this Lobby) name
      * @return the Player if successful, null on fail
      */
-    public Player createPlayer(String name, Session session) {
-        for (Player player : players) if (player.getName().equals(name)) return null; //if name is already in use
-        Player player = new Player(name, session);
-        players.add(player);
+    public Player enterLobby(String name, Session session) {
+        Player player = null;
+        synchronized (players) {
+            for (Player p : players) {
+                if (p.getName().equals(name)) {//if name is already in use
+                    if (Configuration_Constants.debug) System.out.println("(DEBUG)\t Lobby.enterLobby() Name " + name + "already in use");
+                    break;
+                }
+                else {
+                    player = new Player(name, session);
+                    players.add(player);
+                }
+            }
+            players.notify();
+        }
         return player;
     }
 
-    public Player getPlayerByName(String name) {
-        for (Player player : players) if (player.getName().equals(name)) return player;
-        return null;
-    }
 
     /**
-     * Creates a game of the specified name
-     * @param name  this name is listed in the lobby
+     * Creates a game of the specified gameName
+     * @param gameName  this gameName is listed in the lobby
      * @param owner Player who starts the game
      * @return the game if created, else null
      */
-    public GameModel createGame(String name, Player owner) {
-        if (name == null || name.length() == 0) {
-            if (Configuration_Constants.debug) System.out.println("(DEBUG)\t Lobby.createGame() Illegal game format: " + name);
+    public GameModel createGame(String gameName, Player owner) {
+        if (gameName == null || gameName.length() == 0) {
+            if (Configuration_Constants.debug)
+                System.out.println("(DEBUG)\t Lobby.createGame() Illegal game format: " + gameName);
             return null;
         }
 
-        if (getGameByName(name)!=null) {
-            if (Configuration_Constants.debug) System.out.println("(DEBUG)\t Lobby.createGame() game of name " + name + " already exists");
-            return null;
+        GameModel game = null;
+        synchronized (games) {
+            if (getGameByName(gameName) != null) {
+                if (Configuration_Constants.debug)
+                    System.out.println("(DEBUG)\t Lobby.createGame() game of gameName " + gameName + " already exists");
+            }
+            else {
+                game = new GameModel(gameName, owner);
+                this.games.add(game);
+                if (Configuration_Constants.verbose)
+                    System.out.println("(VERBOSE)\t Lobby.createGame() game of gameName " + gameName + " created");
+            }
+            games.notify();
         }
-
-//        name = DEFAULT_GAME_NAME + ++gameCounter;
-        GameModel game = new GameModel(name, owner);
-        this.games.add(game);
-        if (Configuration_Constants.verbose) System.out.println("(VERBOSE)\t Lobby.createGame() game of name " + name + " created");
         return game;
     }
+
+
+    public GameModel joinGame(String gameName, Player player) {
+        GameModel game = null;
+        synchronized (games) {
+            for (GameModel g : games) {
+                if (g.getName().equals(gameName)) {
+                    game = g;
+                    break;
+                }
+            }
+            if (game == null) {
+                if (Configuration_Constants.debug) System.out.println("(DEBUG)\tLobby.joinGame() No game of name " + gameName);
+            }
+            else {
+                    game.addPlayer(player);
+            }
+            this.games.notify();
+        }
+        return game;
+    }
+
+
+    public int leave() {
+        //TODO impl - This is the leave server command
+        //exitGame
+        //exitServer - exit sever in Session after successful leaving game
+        return -1;
+    }
+
+
+    //endregion
+
+
+
+
+
+
 
 
     public ArrayList<Player> getPlayers() {
@@ -96,12 +197,7 @@ public class Lobby {
     }
 
 
-    /**
-     * Searches for the game of the specified name
-     * @param name
-     * @return the game on success, null on fail
-     */
-    public GameModel getGameByName(String name) {
+    private GameModel getGameByName(String name) {
         for(GameModel game : this.games) {
             if(name.equals(game.getName())) return game;
         }

@@ -122,6 +122,39 @@ public class GameModel implements Runnable {
     //endregion
 
 
+
+
+    //region ------------------- REQUESTS FROM LOBBY -------------------------------
+
+
+    public String listPlayersGame() {
+        StringBuilder builder = new StringBuilder("listPlayersGame");
+
+        synchronized (this) {
+            for (Player player : this.players) {
+                builder.append(":").append(player.getName());
+            }
+            this.notify();
+        }
+        return builder.toString();
+    }
+
+
+    private String getGameState(String command) {
+        String state;
+        synchronized (this) {
+            state = this.state.toString();
+            this.notify();
+        }
+        return state;
+    }
+
+
+    //endregion
+
+
+
+
     //region -------------------- GAME INITIALIZATION ------------------------------
 
     //TODO init visible cards
@@ -164,7 +197,7 @@ public class GameModel implements Runnable {
             return true;
         } else {
             for (Player player : players) {
-                if (player.getNumStones() <= 2) {
+                if (player.getStones() <= 2) {
                     if (countdown != -1) {
                         countdown = players.size();
                     }
@@ -406,7 +439,7 @@ public class GameModel implements Runnable {
     }
 
     public ArrayList<TrainCard> getOpenCards(){
-        return openCards;
+            return openCards;
     }
 
     public Map getMap(){
