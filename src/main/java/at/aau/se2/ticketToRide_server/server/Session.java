@@ -131,7 +131,8 @@ public class Session {
             players.forEach(p -> builder.append(p.getName()).append(DELIMITER_VALUE));
         }
 
-        send(REQUEST_LIST_PLAYERS_LOBBY + DELIMITER_COMMAND + builder.toString());
+        String toClient = prepareSend(REQUEST_LIST_GAMES, builder.toString());
+        send(toClient);
     }
 
     private void listGames() {
@@ -144,7 +145,8 @@ public class Session {
             games.forEach(g -> builder.append(g.getName()).append(DELIMITER_VALUE));
         }
 
-        send(REQUEST_LIST_GAMES + DELIMITER_COMMAND + builder.toString());
+        String toClient = prepareSend(REQUEST_LIST_GAMES, builder.toString());
+        send(toClient);
     }
 
     private void listPlayersGame() {
@@ -157,7 +159,8 @@ public class Session {
             players.forEach(p -> builder.append(p.getName()).append(DELIMITER_VALUE));
         }
 
-        send(COMMAND_LIST_PLAYERS_GAME + DELIMITER_COMMAND + builder.toString());
+        String toClient = prepareSend(COMMAND_LIST_PLAYERS_GAME, builder.toString());
+        send(toClient);
     }
 
     private void getGameState(String command) {
@@ -342,6 +345,15 @@ public class Session {
 
     //region ------------------------------------ NETWORK ACTIVITY -----------------------------------------------------
 
+    private String prepareSend(String command, String toClient) {
+        // If delimiter exists at the end remove it before send
+        if (toClient.endsWith(DELIMITER_VALUE)) {
+            toClient = toClient.substring(0, toClient.length() - 1);
+        }
+
+        // Build string for sending to the client
+        return command + DELIMITER_COMMAND + toClient;
+    }
 
     public int send(String toClient) {
         if (sendingThread == null) {
