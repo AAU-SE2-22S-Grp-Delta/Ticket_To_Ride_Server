@@ -192,7 +192,6 @@ public class GameModel implements Runnable {
         while (actionsLeft > 0) {
             try {
                 synchronized (this) {
-                    this.actionsLeft = 2;
                     actionCall();
                     if (Configuration_Constants.verbose)
                         System.out.println("(VERBOSE)\tGameModel.move() called and waiting for action");
@@ -304,7 +303,7 @@ public class GameModel implements Runnable {
             if (actionsLeft == 2) {
                 //TODO: draw cards and call player.addHandCard(getCardfromStack(OpenCardID) or something
                 return actionsLeft -= 2;
-            }
+            };
             if (actionsLeft == 2 || actionsLeft == 1) {
                 return --actionsLeft;
             }
@@ -317,9 +316,11 @@ public class GameModel implements Runnable {
         synchronized (this) {
             if (!players.get(activePlayer).equals(player)) {
                 if (Configuration_Constants.verbose)
-                    System.out.println("(VERBOSE)\t Player" + player.getName() + " was blocked trying pick card from stack while players " + players.get(activePlayer) + "turn.");
+                    System.out.println("(VERBOSE)\tGameModel.drawCardFromStack() Player" + player.getName() + " was blocked trying pick card from stack while players " + players.get(activePlayer) + "turn.");
                 return -1;
             }
+            if (Configuration_Constants.verbose)
+                System.out.println("(VERBOSE)\tGameModel.drawCardFromStack() drawing card...");
             if (actionsLeft > 0 && trainCards.size() > 0) {
                 TrainCard card = trainCards.remove(0);
                 player.addHandCard(card);

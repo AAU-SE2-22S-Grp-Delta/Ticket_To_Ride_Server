@@ -150,6 +150,8 @@ public class Player implements Comparable {
                 System.out.println("(DEBUG\tPlayer: Tried to add HandCard while player " + name + "wasn't in a game.");
             throw new IllegalStateException("Player is not in Game!");
         }
+        if (Configuration_Constants.verbose)
+            System.out.println("(VERBOSE)\tPlayer.addHandCard() Card="+card.getType().toString());
         if (card == null) throw new IllegalArgumentException("card is Null!");
         this.handCards.add(card);
     }
@@ -353,6 +355,10 @@ public class Player implements Comparable {
 
     // region ------------------------------ SETTER GETTER TO STRING ---------------------------------------------------
 
+
+    public State getState() {
+        return state;
+    }
 
     public int getId() {
         return id;
