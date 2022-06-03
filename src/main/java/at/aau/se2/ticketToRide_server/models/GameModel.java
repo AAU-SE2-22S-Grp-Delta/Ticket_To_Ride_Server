@@ -239,7 +239,7 @@ public class GameModel implements Runnable {
         for (RailroadLine r : map.getRailroadLines()) {
             String d1 = r.getDestination1().getName();
             String d2 = r.getDestination2().getName();
-            if (destination1.equals(d1) && destination2.equals(d1) || destination1.equals(d2) && destination2.equals(d1)) {
+            if (destination1.equals(d1) && destination2.equals(d2) || destination1.equals(d2) && destination2.equals(d1)) {
                 return r;
             }
         }
@@ -338,28 +338,33 @@ public class GameModel implements Runnable {
         synchronized (this) {
             if (!players.get(activePlayer).equals(player)) {
                 if (Configuration_Constants.debug)
-                    System.out.println("(DEBUG)\t Player" + player.getName() + " was blocked trying to build road while players " + players.get(activePlayer) + "turn.");
+                    System.out.println("(DEBUG)\tPlayer" + player.getName() + " was blocked trying to build road while players " + players.get(activePlayer) + "turn.");
                 return -1;
             }
 
-            if (railroadLine.getOwner() == null) {
+            if (railroadLine.getOwner() != null) {
                 if (Configuration_Constants.debug)
-                    System.out.println("(DEBUG)\t GameModel.setRailRoadLineOwner() Rail has owner named " + railroadLine.getOwner().getName() + ". Can't set owner to " + player.getName());
+                    System.out.println("(DEBUG)\tGameModel.setRailRoadLineOwner() Rail has owner named " + railroadLine.getOwner().getName() + ". Can't set owner to " + player.getName());
                 return -1;
             }
 
             if (railroadLine instanceof DoubleRailroadLine) {
                 DoubleRailroadLine doubleRailroadLine = (DoubleRailroadLine) railroadLine;
-                if (doubleRailroadLine.getColor2().equals(color) && doubleRailroadLine.getOwner2() == null)
+                if (doubleRailroadLine.getColor2().equals(color) && doubleRailroadLine.getOwner2() == null) {
                     doubleRailroadLine.setOwner2(player);
-                else if (doubleRailroadLine.getColor().equals(color)) doubleRailroadLine.setOwner(player);
+                    if (Configuration_Constants.verbose) System.out.println("(VERBOSE)\nGameModel.setRailRoadLineOwner() DoubleRailOwner="+player.getName());
+                }
+                else if (doubleRailroadLine.getColor().equals(color)) {
+                    doubleRailroadLine.setOwner(player);
+                    if (Configuration_Constants.verbose) System.out.println("(VERBOSE)\nGameModel.setRailRoadLineOwner() RailOwner="+player.getName());
+                }
                 return 0;
             }
 
             this.actionsLeft = 0;
             railroadLine.setOwner(player);
+            this.notify();
         }
-        this.notify();
         return 0;
     }
 

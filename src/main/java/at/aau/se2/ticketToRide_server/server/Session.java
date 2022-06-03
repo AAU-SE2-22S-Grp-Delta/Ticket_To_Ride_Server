@@ -20,10 +20,9 @@ public class Session {
     private static final String DELIMITER_VALUE = ",";
 
     private static final String REGEX_NULL = "null";
-    private static final String REGEX_NAME = "[^:;]*?";
+    private static final String REGEX_NAME = "[^//W]+";
     private static final String REGEX_OPEN_CARD_ID = "[01234]";
     private static final String REGEX_MISSION_ID = "[//d][//d]?";
-    private static final String REGEX_COLOR = "(blue)|(green)|(yellow)|(red)|(white)|(orange)|(gray)|(black)|(pink)";
 
     private static final String COMMAND_ENTER_LOBBY = "enterLobby:" + REGEX_NAME;
     private static final String COMMAND_CREATE_GAME = "createGame:" + REGEX_NAME;
@@ -46,7 +45,7 @@ public class Session {
 
     private static final String COMMAND_GET_CARD_STACK = "cardStack";
     private static final String COMMAND_GET_CARD_OPEN = "cardOpen:" + REGEX_OPEN_CARD_ID;
-    private static final String COMMAND_BUILD_RAILROAD = "buildRailRoad:" + REGEX_NAME + ":" + REGEX_NAME + ":" + REGEX_COLOR;
+    private static final String COMMAND_BUILD_RAILROAD = "buildRailroad:" + REGEX_NAME + ":" + REGEX_NAME + ":" + REGEX_NAME;
     private static final String COMMAND_GET_MISSION = "getMission";
     private static final String COMMAND_CHOOSE_MISSION = "chooseMission:" + REGEX_MISSION_ID;
     //----------------------------------------------
