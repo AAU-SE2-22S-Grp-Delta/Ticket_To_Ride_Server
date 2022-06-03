@@ -143,6 +143,8 @@ public class GameModel implements Runnable {
         if (Configuration_Constants.verbose) System.out.println("(VERBOSE)\tGameModel.run() Game loop up");
         while (!checkIfOver()) {
             move();
+            if (Configuration_Constants.verbose) System.out.println("(VERBOSE)\tGameModel.run() Next round");
+            activePlayer = ++activePlayer%players.size();
         }
         if (Configuration_Constants.verbose) System.out.println("(VERBOSE)\tGameModel.run() Game loop broke");
         //TODO ending game methods
