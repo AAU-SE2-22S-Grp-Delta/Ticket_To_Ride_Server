@@ -79,7 +79,7 @@ public class Session {
         for (String command : commands) {
             if (command.matches(COMMAND_ENTER_LOBBY)) {
                 this.enterLobby(command);
-                return;
+                continue;
             }
 
             //----------- At this point in control flow the session leader must have called enterLobby to assign session Owner ----------

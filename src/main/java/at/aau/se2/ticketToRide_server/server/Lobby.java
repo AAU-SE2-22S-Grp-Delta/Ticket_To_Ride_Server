@@ -103,15 +103,17 @@ public class Lobby {
     public Player enterLobby(String name, Session session) {
         Player player = null;
         synchronized (players) {
+            boolean found = false;
             for (Player p : players) {
                 if (p.getName().equals(name)) {//if name is already in use
                     if (Configuration_Constants.debug) System.out.println("(DEBUG)\t Lobby.enterLobby() Name " + name + "already in use");
+                    found = false;
                     break;
                 }
-                else {
-                    player = new Player(name, session);
-                    players.add(player);
-                }
+            }
+            if (!found) {
+                player = new Player(name, session);
+                players.add(player);
             }
             players.notify();
         }
