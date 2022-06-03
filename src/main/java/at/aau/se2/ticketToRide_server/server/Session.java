@@ -19,6 +19,7 @@ public class Session {
     private static final String DELIMITER_MULTI = ";";
     private static final String DELIMITER_VALUE = ",";
 
+    private static final String REGEX_NULL = "null";
     private static final String REGEX_NAME = "[^:;]*?";
     private static final String REGEX_OPEN_CARD_ID = "[01234]";
     private static final String REGEX_MISSION_ID = "[//d][//d]?";
@@ -131,7 +132,7 @@ public class Session {
             players.forEach(p -> builder.append(p.getName()).append(DELIMITER_VALUE));
         }
 
-        send(REQUEST_LIST_PLAYERS_LOBBY, builder.toString());
+        send(REQUEST_LIST_PLAYERS_LOBBY + DELIMITER_COMMAND + builder.toString());
     }
 
     private void listGames() {
@@ -144,7 +145,7 @@ public class Session {
             games.forEach(g -> builder.append(g.getName()).append(DELIMITER_VALUE));
         }
 
-        send(REQUEST_LIST_GAMES, builder.toString());
+        send(REQUEST_LIST_GAMES + DELIMITER_COMMAND + builder.toString());
     }
 
     private void listPlayersGame() {
@@ -157,7 +158,7 @@ public class Session {
             players.forEach(p -> builder.append(p.getName()).append(DELIMITER_VALUE));
         }
 
-        send(COMMAND_LIST_PLAYERS_GAME, builder.toString());
+        send(COMMAND_LIST_PLAYERS_GAME + DELIMITER_COMMAND + builder.toString());
     }
 
     private void getGameState(String command) {
@@ -203,20 +204,31 @@ public class Session {
 
     //----- IN GAME REQUESTS --------------------------------------------------------
 
-    private String getHandCards() {
+    private void getHandCards() {
+        if (player.getState()!= Player.State.GAMING) {
+            if (Configuration_Constants.debug) System.out.println("(DEBUG)\tSession.getHandCards() player is not gaming");
+            send(REQUEST_GET_HAND_CARDS + DELIMITER_COMMAND + REGEX_NULL);
+            return;
+        }
+
+        if (Configuration_Constants.verbose) System.out.println("(VERBOSE)\tSession.getHandCards() listing cards...");
         ArrayList<TrainCard> handCards = player.getHandCards();
-        if (handCards.isEmpty()) return "null";
+
+        if (handCards.size() == 0) {
+            send(REQUEST_GET_HAND_CARDS + DELIMITER_COMMAND + REGEX_NULL);
+            return;
+        }
 
         StringBuilder builder = new StringBuilder();
         for (int i = 0; i < handCards.size() - 1; i++) {
             TrainCard handCard = handCards.get(i);
             builder.append(handCard.getType().toString()).append(":");
         }
+
         TrainCard lastHandCard = handCards.get(handCards.size() - 1);
         builder.append(lastHandCard.getType().toString());
 
-        //TODO send not return string LOCK while accessing game!!! Do this in player class cause encapsulation
-        return builder.toString();
+        send(builder.toString());
     }
 
     private String getOpenCards() {
@@ -339,15 +351,6 @@ public class Session {
         sendingThread.sendCommand(toClient);
         return 0;
     }
-
-
-    private void send(String command, String toClient) {
-        if (toClient.endsWith(DELIMITER_VALUE)) {
-            toClient = toClient.substring(0, toClient.length() - 1);
-        }
-        send(command + DELIMITER_COMMAND + toClient);
-    }
-
 
     void setReceivingThread(ReceivingThread receivingThread) {
         this.receivingThread = receivingThread;
