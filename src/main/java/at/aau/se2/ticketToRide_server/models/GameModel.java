@@ -632,14 +632,14 @@ public class GameModel implements Runnable {
     private static ArrayList<TrainCard> getTrainCards() {
         ArrayList<TrainCard> cards = new ArrayList<>();
         for (int i = 0; i < 12; i++) {
-            cards.add(new TrainCard(TrainCard.Type.BLACK));
+            cards.add(new TrainCard(TrainCard.Type.PINK));
             cards.add(new TrainCard(TrainCard.Type.BLUE));
             cards.add(new TrainCard(TrainCard.Type.GREEN));
-            cards.add(new TrainCard(TrainCard.Type.ORANGE));
+            cards.add(new TrainCard(TrainCard.Type.YELLOW));
             cards.add(new TrainCard(TrainCard.Type.RED));
             cards.add(new TrainCard(TrainCard.Type.WHITE));
-            cards.add(new TrainCard(TrainCard.Type.YELLOW));
-            cards.add(new TrainCard(TrainCard.Type.PINK));
+            cards.add(new TrainCard(TrainCard.Type.ORANGE));
+            cards.add(new TrainCard(TrainCard.Type.BLACK));
         }
         for (int i = 0; i < 14; i++) {
             cards.add(new TrainCard(TrainCard.Type.LOCOMOTIVE));
