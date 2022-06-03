@@ -51,6 +51,13 @@ public class TrainCard implements Comparable<Object> {
         return type;
     }
 
+
+    @Override
+    public String toString() {
+        return type.toString();
+    }
+
+
     @Override
     public int compareTo(Object o) {
         if (o instanceof TrainCard) {

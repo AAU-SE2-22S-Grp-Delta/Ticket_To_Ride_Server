@@ -11,7 +11,7 @@ public class Lobby {
     private static String DEFAULT_GAME_NAME = "game ";
     private static int gameCounter = 0;
 
-    private ArrayList<Player> players;
+    private final ArrayList<Player> players;
     private final ArrayList<GameModel> games;
 
     private Lobby() {
@@ -33,11 +33,11 @@ public class Lobby {
     public String listPlayersLobby() {
         StringBuilder builder = new StringBuilder("listPlayersLobby");
 
-        synchronized (this) {
+        synchronized (players) {
             for (Player player : this.players) {
                 builder.append(":").append(player.getName());
             }
-            this.notify();
+           players.notify();
         }
         return builder.toString();
     }

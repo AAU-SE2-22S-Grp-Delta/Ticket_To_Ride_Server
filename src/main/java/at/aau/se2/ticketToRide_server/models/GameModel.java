@@ -26,14 +26,14 @@ public class GameModel implements Runnable {
     //invisible
     private ArrayList<Player> players;
     private Player owner;
-    private ArrayList<TrainCard> trainCards;
+    private final ArrayList<TrainCard> trainCardsStack;
     //todo Ablagestapel
     private ArrayList<Mission> missions;
     private int activePlayer = 0;  //counts who is next
 
 
     //visible to all
-    private Map map = getMapInstance();
+    private final Map map = getMapInstance();
     private ArrayList<TrainCard> openCards = new ArrayList<>();
     private HashMap<Player, Integer> longestConnectionsForEachPlayer = new HashMap<>();
 
@@ -42,7 +42,7 @@ public class GameModel implements Runnable {
         this.name = name;
         this.state = State.WAITING_FOR_PLAYERS;
         players = new ArrayList<>();
-        this.trainCards = getTrainCards();
+        this.trainCardsStack = getTrainCards();
         this.initOpenCards();
 
         this.missions = getMissions();
@@ -86,30 +86,6 @@ public class GameModel implements Runnable {
         return 0;
     }
 
-
-    /**
-     * starts the game, if the owner calls this method and there are more than two players in the game
-     * @param whoIsPerformingThisAction calling player - should be owner
-     * @return 0 on success, -1 on fail
-     */
-    public int startGame (Player whoIsPerformingThisAction) {
-        if (Configuration_Constants.verbose) System.out.println(("(VERBOSE)\t GameModel.startGame() starting game " + this.name + "..."));
-        if (!whoIsPerformingThisAction.equals(owner)) {
-            System.out.println("(DEBUG)\tGameModel.startGame() called from player who is not owner");
-            return -1;
-        }
-
-        if (this.state != State.WAITING_FOR_PLAYERS) {
-            System.out.println("(DEBUG)\tGameModel.startGame() Game is not in state WAITING_FOR_PLAYERS!");
-            return -1;
-        }
-
-        this.state = State.RUNNING;
-        Thread gameLoop = new Thread(this);
-        Collections.shuffle(players);
-        gameLoop.start();
-        return 0;
-    }
 
     private void exitGameCrashed() {
         this.state = State.CRASHED;
@@ -161,11 +137,13 @@ public class GameModel implements Runnable {
     private void initOpenCards() {
         this.openCards = new ArrayList<>();
         for (int i = 0; i < 5; i++) {
-            this.openCards.add(this.trainCards.remove(0));
+            this.openCards.add(this.trainCardsStack.remove(0));
         }
     }
 
     //endregion
+
+
 
 
     //region ----------------------- GAMING -----------------------------------------
@@ -319,10 +297,95 @@ public class GameModel implements Runnable {
 
 
 
-    //region ---------------------- PLAYER ACTIONS ---------------------------------------------------------------------
+    //region ----- GAME REQUESTS ---------------------------------------------------------------------------------------
 
 
-    //TODO LOCKS WHILE CHANGING GAME STATE!!!
+    public String getOpenCards() {
+        StringBuilder builder = new StringBuilder("getOpenCards");
+        synchronized (this) {
+            for (TrainCard card : this.trainCardsStack) {
+                builder.append(":").append(trainCardsStack);
+            }
+            this.notify();
+        }
+        return builder.toString();
+    }
+
+
+    public String getMap() {
+        StringBuilder builder = new StringBuilder();
+        synchronized (this) {
+            ArrayList<RailroadLine> railroadLines = new ArrayList<>(map.getRailroadLines());
+            for (int i = 0; i < railroadLines.size() - 1; i++) {
+                if (railroadLines.get(i) instanceof DoubleRailroadLine)
+                    builder.append(i).append(":").append(railroadLines.get(i).getOwner()).append(":").append(((DoubleRailroadLine) railroadLines.get(i)).getOwner2()).append(";");
+                else
+                    builder.append(i).append(":").append(railroadLines.get(i).getOwner()).append(";");
+            }
+            if (railroadLines.get(railroadLines.size() - 1) instanceof DoubleRailroadLine)
+                builder.append(railroadLines.size() - 1).append(":").append(railroadLines.get(railroadLines.size() - 1).getOwner()).append(":").append(((DoubleRailroadLine) railroadLines.get(railroadLines.size() - 1)).getOwner2()).append(";");
+            else
+                builder.append(railroadLines.size() - 1).append(":").append(railroadLines.get(railroadLines.size() - 1).getOwner()).append(";");
+            this.notify();
+        }
+        return builder.toString();
+    }
+
+
+    public String getColors() {
+        StringBuilder builder = new StringBuilder("getColors");
+        for (Player player : this.players) {
+            builder.append(player.getName()).append(player.getPlayerColor().toString());
+        }
+
+        return builder.toString();
+    }
+
+
+    public String getPoints() {
+        StringBuilder builder = new StringBuilder("getColors");
+        synchronized (this) {
+            for (Player player : this.players) {
+                builder.append(player.getName()).append(player.getPlayerPoints());
+            }
+            this.notify();
+        }
+        return builder.toString();
+    }
+
+
+    //endregion
+
+
+
+
+    //region ----- GAME COMMANDS ---------------------------------------------------------------------------------------
+
+
+    /**
+     * starts the game, if the owner calls this method and there are more than two players in the game
+     * @param whoIsPerformingThisAction calling player - should be owner
+     * @return 0 on success, -1 on fail
+     */
+    public int startGame (Player whoIsPerformingThisAction) {
+        if (Configuration_Constants.verbose) System.out.println(("(VERBOSE)\t GameModel.startGame() starting game " + this.name + "..."));
+        if (!whoIsPerformingThisAction.equals(owner)) {
+            System.out.println("(DEBUG)\tGameModel.startGame() called from player who is not owner");
+            return -1;
+        }
+
+        if (this.state != State.WAITING_FOR_PLAYERS) {
+            System.out.println("(DEBUG)\tGameModel.startGame() Game is not in state WAITING_FOR_PLAYERS!");
+            return -1;
+        }
+
+        this.state = State.RUNNING;
+        Thread gameLoop = new Thread(this);
+        Collections.shuffle(players);
+        gameLoop.start();
+        return 0;
+    }
+
 
     public int drawOpenCard(Player player, int openCardId) {
         synchronized (this) {
@@ -341,69 +404,79 @@ public class GameModel implements Runnable {
             if (actionsLeft == 2 || actionsLeft == 1) {
                 return --actionsLeft;
             }
+            this.notify();
         }
         throw new IllegalStateException("(FATAL) GameModel: No more moves left when called drawOpenCard");
     }
 
 
     public int drawCardFromStack(Player player) {
+        int retVal = -1;
         synchronized (this) {
             if (!players.get(activePlayer).equals(player)) {
                 if (Configuration_Constants.verbose)
                     System.out.println("(VERBOSE)\tGameModel.drawCardFromStack() Player" + player.getName() + " was blocked trying pick card from stack while players " + players.get(activePlayer) + "turn.");
-                return -1;
             }
-            if (Configuration_Constants.verbose)
-                System.out.println("(VERBOSE)\tGameModel.drawCardFromStack() drawing card...");
-            if (actionsLeft > 0 && trainCards.size() > 0) {
-                TrainCard card = trainCards.remove(0);
-                player.addHandCard(card);
-                --actionsLeft;
-                this.notify();
-                return 1;
+            else {
+                if (Configuration_Constants.verbose)
+                    System.out.println("(VERBOSE)\tGameModel.drawCardFromStack() drawing card...");
+                if (actionsLeft > 0 && trainCardsStack.size() > 0) {
+                    TrainCard card = trainCardsStack.remove(0);
+                    player.addHandCard(card);
+                    --actionsLeft;
+                    retVal = 0;
+                }
             }
+            this.notify();
         }
-        throw new IllegalStateException("(FATAL) GameModel: At this point the move should be processed");
+        return retVal;
     }
 
 
     public int setRailRoadLineOwner(Player player, RailroadLine railroadLine, MapColor color){
+        int retVal = -1;
         synchronized (this) {
             if (!players.get(activePlayer).equals(player)) {
                 if (Configuration_Constants.debug)
                     System.out.println("(DEBUG)\tPlayer" + player.getName() + " was blocked trying to build road while players " + players.get(activePlayer) + "turn.");
-                return -1;
             }
-
-            if (railroadLine.getOwner() != null) {
+            else if (railroadLine.getOwner() != null) {
                 if (Configuration_Constants.debug)
                     System.out.println("(DEBUG)\tGameModel.setRailRoadLineOwner() Rail has owner named " + railroadLine.getOwner().getName() + ". Can't set owner to " + player.getName());
-                return -1;
             }
-
-            if (railroadLine instanceof DoubleRailroadLine) {
+            else if (railroadLine instanceof DoubleRailroadLine) {
                 DoubleRailroadLine doubleRailroadLine = (DoubleRailroadLine) railroadLine;
                 if (doubleRailroadLine.getColor2().equals(color) && doubleRailroadLine.getOwner2() == null) {
                     doubleRailroadLine.setOwner2(player);
+                    retVal = 0;
                     if (Configuration_Constants.verbose) System.out.println("(VERBOSE)\nGameModel.setRailRoadLineOwner() DoubleRailOwner="+player.getName());
                 }
                 else if (doubleRailroadLine.getColor().equals(color)) {
                     doubleRailroadLine.setOwner(player);
-                    if (Configuration_Constants.verbose) System.out.println("(VERBOSE)\nGameModel.setRailRoadLineOwner() RailOwner="+player.getName());
+                    retVal = 0;
+                    if (Configuration_Constants.verbose) System.out.println("(VERBOSE)\nGameModel.setRailRoadLineOwner() DoubleRailOwner="+player.getName());
                 }
-                return 0;
             }
-
-            this.actionsLeft = 0;
-            railroadLine.setOwner(player);
+            else {
+                this.actionsLeft = 0;
+                railroadLine.setOwner(player);
+                retVal = 0;
+                if (Configuration_Constants.verbose) System.out.println("(VERBOSE)\nGameModel.setRailRoadLineOwner() RailOwner="+player.getName());
+            }
             this.notify();
         }
-        return 0;
+        return retVal;
     }
 
-    public int drawMission(Player player) {
+    public String drawMission(Player player) {
         //TODO impl Method
         throw new IllegalStateException("(FATAL) GameModel: At this point the move should be processed");
+    }
+
+
+    public int exitGame (Player player) {
+        //TODO impl
+        return -1;
     }
 
 
@@ -436,14 +509,6 @@ public class GameModel implements Runnable {
 
     public Player getOwner() {
         return owner;
-    }
-
-    public ArrayList<TrainCard> getOpenCards(){
-            return openCards;
-    }
-
-    public Map getMap(){
-        return map;
     }
 
     @Override

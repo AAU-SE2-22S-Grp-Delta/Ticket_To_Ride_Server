@@ -1,16 +1,10 @@
 package at.aau.se2.ticketToRide_server.server;
 
-import at.aau.se2.ticketToRide_server.dataStructures.DoubleRailroadLine;
-import at.aau.se2.ticketToRide_server.dataStructures.Map;
 import at.aau.se2.ticketToRide_server.dataStructures.Player;
-import at.aau.se2.ticketToRide_server.dataStructures.RailroadLine;
-import at.aau.se2.ticketToRide_server.dataStructures.TrainCard;
-import at.aau.se2.ticketToRide_server.models.GameModel;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.net.Socket;
-import java.util.ArrayList;
 import java.util.LinkedList;
 
 public class Session {
@@ -117,10 +111,10 @@ public class Session {
             else if (command.matches(REQUEST_GET_COLORS)) this.getColors();
 
                 //----- IN GAME COMMANDS --------------------------------------------------------
-            else if (command.matches(COMMAND_GET_CARD_STACK)) this.getCardStack();
-            else if (command.matches(COMMAND_GET_CARD_OPEN)) this.getCardOpen(command);
+            else if (command.matches(COMMAND_GET_CARD_STACK)) this.drawCardStack();
+            else if (command.matches(COMMAND_GET_CARD_OPEN)) this.drawCardOpen(command);
             else if (command.matches(COMMAND_BUILD_RAILROAD)) this.buildRailroad(command);
-            else if (command.matches(COMMAND_GET_MISSION)) this.getMission();
+            else if (command.matches(COMMAND_GET_MISSION)) this.drawMission();
             else if (command.matches(COMMAND_CHOOSE_MISSION)) this.chooseMission(command);
         }
     }
@@ -211,114 +205,33 @@ public class Session {
 
 
     private void getHandCards() {
-        if (player.getState() != Player.State.GAMING) {
-            if (Configuration_Constants.debug)
-                System.out.println("(DEBUG)\tSession.getHandCards() player is not gaming");
-            send(REQUEST_GET_HAND_CARDS + DELIMITER_COMMAND + REGEX_NULL);
-            return;
-        }
-
-        if (Configuration_Constants.verbose) System.out.println("(VERBOSE)\tSession.getHandCards() listing cards...");
-        ArrayList<TrainCard> handCards = player.getHandCards();
-
-        if (handCards.size() == 0) {
-            send(REQUEST_GET_HAND_CARDS + DELIMITER_COMMAND + REGEX_NULL);
-            return;
-        }
-
-        StringBuilder builder = new StringBuilder();
-        for (int i = 0; i < handCards.size() - 1; i++) {
-            TrainCard handCard = handCards.get(i);
-            builder.append(handCard.getType().toString()).append(":");
-        }
-
-        TrainCard lastHandCard = handCards.get(handCards.size() - 1);
-        builder.append(lastHandCard.getType().toString());
-
-        send(builder.toString());
+        send(player.getHandCards());
     }
 
 
     private void getOpenCards() {
-
-
-        StringBuilder builder = new StringBuilder();
-        GameModel gameModel = player.getGame();
-
-        if (gameModel == null) {
-            builder.append("null");
-        } else {
-            ArrayList<TrainCard> openCards = gameModel.getOpenCards();
-            openCards.forEach(c -> builder.append(c.getType()).append(DELIMITER_VALUE));
-        }
-
-        //TODO send not return string LOCK while accessing game!!! Do this in player class cause encapsulation
-        //return builder.toString();
-
-        String toClient = prepareSend(REQUEST_GET_OPEN_CARDS, builder.toString());
-        send(toClient);
+        send(player.getOpenCards());
     }
 
 
-    private String getMap() {
-        GameModel gameModel = player.getGame();
-        if (gameModel == null) return "null";
-
-        StringBuilder builder = new StringBuilder();
-        Map map = gameModel.getMap();
-        ArrayList<RailroadLine> railroadLines = new ArrayList<>(map.getRailroadLines());
-        for (int i = 0; i < railroadLines.size() - 1; i++) {
-            if (railroadLines.get(i) instanceof DoubleRailroadLine)
-                builder.append(i).append(":").append(railroadLines.get(i).getOwner()).append(":").append(((DoubleRailroadLine) railroadLines.get(i)).getOwner2()).append(";");
-            else
-                builder.append(i).append(":").append(railroadLines.get(i).getOwner()).append(";");
-        }
-        if (railroadLines.get(railroadLines.size() - 1) instanceof DoubleRailroadLine)
-            builder.append(railroadLines.size() - 1).append(":").append(railroadLines.get(railroadLines.size() - 1).getOwner()).append(":").append(((DoubleRailroadLine) railroadLines.get(railroadLines.size() - 1)).getOwner2()).append(";");
-        else
-            builder.append(railroadLines.size() - 1).append(":").append(railroadLines.get(railroadLines.size() - 1).getOwner()).append(";");
-
-        return builder.toString();
+    private void getMap() {
+        send(player.getMap());
     }
 
 
-    private String getPoints() {
-        GameModel gameModel = player.getGame();
-        if (gameModel == null) return "null";
-
-        StringBuilder builder = new StringBuilder();
-        ArrayList<Player> players = gameModel.getPlayers();
-        for (int i = 0; i < players.size() - 1; i++) {
-            Player player = players.get(i);
-            builder.append(player.getName()).append(":").append(player.getPoints()).append(":");
-        }
-        Player lastPlayer = players.get(players.size() - 1);
-        builder.append(lastPlayer.getName()).append(":").append(lastPlayer.getPoints());
-
-        //TODO send not return string LOCK while accessing game!!! Do this in player class cause encapsulation
-        return builder.toString();
+    private void getPoints() {
+        send(player.getPoints());
     }
 
 
-    private String getColors() {
-        GameModel gameModel = player.getGame();
-        if (gameModel == null) return "null";
-
-        StringBuilder builder = new StringBuilder();
-        ArrayList<Player> players = gameModel.getPlayers();
-        for (int i = 0; i < players.size() - 1; i++) {
-            Player player = players.get(i);
-            builder.append(player.getName()).append(":").append(player.getColor().toString()).append(":");
-        }
-        Player lastplayer = players.get(players.size() - 1);
-        builder.append(lastplayer.getName()).append(":").append(lastplayer.getColor().toString());
-
-        //TODO send not return string LOCK while accessing game!!! Do this in player class cause encapsulation
-        return builder.toString();
+    private void getColors() {
+        send(player.getPoints());
     }
 
 
     //endregion
+
+
 
 
     //region ----- GAME COMMANDS -------------------------------------------------------
@@ -329,14 +242,14 @@ public class Session {
     }
 
 
-    private void getCardStack() {
-        player.drawCardStack();
+    private void drawCardStack() {
+        if (player.drawCardStack()<0) send("getCardStack:null)");
     }
 
 
-    private void getCardOpen(String command) {
-
-//        player.getCardOpen(id);
+    private void drawCardOpen(String command) {
+        String[] words = command.split(DELIMITER_COMMAND);
+        player.drawCardOpen(Integer.parseInt(words[1]));
     }
 
 
@@ -346,14 +259,18 @@ public class Session {
     }
 
 
-    private void getMission() {
-        player.getMissions();
+    private void drawMission() {
+        send(player.drawMission());
     }
 
 
     private void chooseMission(String command) {
+        String[] words = command.split(DELIMITER_COMMAND);
         LinkedList<Integer> chosen = new LinkedList<>();
-        player.chooseMissions(chosen);
+        for (int i = 1; i < words.length; i++) {
+            chosen.add(Integer.parseInt(words[i]));
+        }
+        if (player.chooseMissions(chosen)<0) send("choseMission:null");
     }
 
 

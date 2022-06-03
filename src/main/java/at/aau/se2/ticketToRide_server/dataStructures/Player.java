@@ -156,44 +156,50 @@ public class Player implements Comparable {
 
 
     public String getHandCards() {
-        //TODO impl Linker
-        return null;
+        if (this.state != State.GAMING) {
+            return "getHandCards:null";
+        }
+        StringBuilder handCards = new StringBuilder("getHandCards:");
+        for (TrainCard card : this.handCards) {
+            handCards.append(card.getType().toString());
+        }
+        return handCards.toString();
     }
 
 
     public String getOpenCards() {
-        //TODO impl Linker
-        return null;
+        if (state != State.GAMING) return "openHandCard:null";
+        return game.getOpenCards();
     }
 
 
     public String getMap() {
-        //TODO impl Linker
-        return null;
+        if (state != State.GAMING) return "getMap:null";
+        return game.getMap();
     }
 
 
     public String getPoints() {
-        //TODO impl Linker
-        return null;
+        if (state != State.GAMING) return "getPoints:null";
+        return game.getPoints();
     }
 
 
-    public String getColor() {
-        //TODO impl Linker
-        return null;
+    public String getColors() {
+        if (state != State.GAMING) return "getColor:null";
+        return game.getColors();
     }
 
 
     public String getMissions() {
-        //TODO impl Linker
+        //TODO impl
         return null;
     }
 
 
     public String getNumStones() {
-        //TODO impl Linker
-        return null;
+        if (state != State.GAMING) return "getNumStones:null";
+        return "getNumStones:"+((Integer)numStones).toString();
     }
 
 
@@ -202,7 +208,7 @@ public class Player implements Comparable {
 
 
 
-    //region ---------------------------------------- GAME ACTIONS -----------------------------------------------------
+    //region ---------------------------------------- GAME COMMANDS -----------------------------------------------------
 
 
     /**
@@ -228,6 +234,12 @@ public class Player implements Comparable {
             return -1;
         }
         return game.drawCardFromStack(this);
+    }
+
+
+    public String drawMission() {
+        //TODO check game Model impl and then adapt
+        return game.drawMission(this);
     }
 
 
@@ -510,6 +522,16 @@ public class Player implements Comparable {
 
     public State getState() {
         return state;
+    }
+
+
+    public int getPlayerPoints() {
+        return points;
+    }
+
+
+    public Color getPlayerColor() {
+        return playerColor;
     }
 
 
