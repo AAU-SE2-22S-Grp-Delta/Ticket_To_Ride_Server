@@ -77,7 +77,10 @@ public class Session {
         String[] commands = received.split(";");
 
         for (String command : commands) {
-            if (command.matches(COMMAND_ENTER_LOBBY)) this.enterLobby(command);
+            if (command.matches(COMMAND_ENTER_LOBBY)) {
+                this.enterLobby(command);
+                return;
+            }
 
             //----------- At this point in control flow the session leader must have called enterLobby to assign session Owner ----------
             //----------- when adding commands which don't necessarily need a session owner, put them above the following check ---------
