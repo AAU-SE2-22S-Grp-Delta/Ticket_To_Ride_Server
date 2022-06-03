@@ -634,6 +634,7 @@ public class GameModel implements Runnable {
             cards.add(new TrainCard(TrainCard.Type.RED));
             cards.add(new TrainCard(TrainCard.Type.WHITE));
             cards.add(new TrainCard(TrainCard.Type.YELLOW));
+            cards.add(new TrainCard(TrainCard.Type.PINK));
         }
         for (int i = 0; i < 14; i++) {
             cards.add(new TrainCard(TrainCard.Type.LOCOMOTIVE));
