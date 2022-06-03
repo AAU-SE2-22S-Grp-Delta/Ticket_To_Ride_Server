@@ -233,21 +233,22 @@ public class Session {
         send(builder.toString());
     }
 
-    private String getOpenCards() {
-        GameModel gameModel = player.getGame();
-        if (gameModel == null) return "null";
-
-        ArrayList<TrainCard> openCards = gameModel.getOpenCards();
+    private void getOpenCards() {
         StringBuilder builder = new StringBuilder();
-        for (int i = 0; i < openCards.size() - 1; i++) {
-            TrainCard openCard = openCards.get(i);
-            builder.append(openCard.getType().toString()).append(":");
+        GameModel gameModel = player.getGame();
+
+        if (gameModel == null) {
+            builder.append("null");
+        } else {
+            ArrayList<TrainCard> openCards = gameModel.getOpenCards();
+            openCards.forEach(c -> builder.append(c.getType()).append(DELIMITER_VALUE));
         }
-        TrainCard lastOpenCard = openCards.get(openCards.size() - 1);
-        builder.append(lastOpenCard.getType().toString());
 
         //TODO send not return string LOCK while accessing game!!! Do this in player class cause encapsulation
-        return builder.toString();
+        //return builder.toString();
+
+        String toClient = prepareSend(REQUEST_GET_OPEN_CARDS, builder.toString());
+        send(toClient);
     }
 
     private String getMap() {
