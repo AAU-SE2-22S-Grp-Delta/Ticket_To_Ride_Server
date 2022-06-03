@@ -303,8 +303,8 @@ public class GameModel implements Runnable {
     public String getOpenCards() {
         StringBuilder builder = new StringBuilder("getOpenCards");
         synchronized (this) {
-            for (TrainCard card : this.trainCardsStack) {
-                builder.append(":").append(trainCardsStack);
+            for (TrainCard card : this.openCards) {
+                builder.append(":").append(card);
             }
             this.notify();
         }
