@@ -6,7 +6,7 @@ public class TrainCard implements Comparable{
 
 
     public enum Type {
-        BLUE("blue"), GREEN("green"), YELLOW("yellow"), RED("red"), WHITE("white"), ORANGE("orange"), BLACK("black"), LOCOMOTIVE("locomotive");
+        PINK("pink"), BLUE("blue"), GREEN("green"), YELLOW("yellow"), RED("red"), WHITE("white"), ORANGE("orange"), BLACK("black"), LOCOMOTIVE("locomotive");
         private String value;
 
         Type (String value) {
@@ -26,6 +26,7 @@ public class TrainCard implements Comparable{
             if (color.equals("white")) return WHITE;
             if (color.equals("orange")) return ORANGE;
             if (color.equals("black")) return BLACK;
+            if (color.equals("pink")) return PINK;
             if (color.equals("locomotive")) return LOCOMOTIVE;
             return null;
         }

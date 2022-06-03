@@ -21,7 +21,6 @@ public class GameModel implements Runnable {
     private int colorCounter = 0;   //to assign colors to players
     private int actionsLeft;        //to manage a move
     private int countdown = -1;     // for the last moves before end
-//    private Object lock;            //synchronization
 
 
     //invisible
