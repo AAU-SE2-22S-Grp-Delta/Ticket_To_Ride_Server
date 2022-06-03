@@ -10,6 +10,7 @@ public class TrainCard implements Comparable{
         private String value;
 
         Type (String value) {
+            this.value = value;
         }
 
         @Override
