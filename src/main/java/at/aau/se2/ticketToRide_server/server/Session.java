@@ -39,7 +39,6 @@ public class Session {
     private static final String REGEX_NULL = "null";
     private static final String REGEX_NAME = "[^//W]+";
     private static final String REGEX_OPEN_CARD_ID = "[01234]";
-    private static final String REGEX_MISSION_ID = "[//d][//d]?";
 
     private static final String COMMAND_ENTER_LOBBY = "enterLobby:" + REGEX_NAME;
     private static final String COMMAND_CREATE_GAME = "createGame:" + REGEX_NAME;
@@ -64,8 +63,8 @@ public class Session {
     private static final String COMMAND_DRAW_CARD_STACK = "cardStack";
     private static final String COMMAND_DRAW_CARD_OPEN = "cardOpen:" + REGEX_OPEN_CARD_ID;
     private static final String COMMAND_BUILD_RAILROAD = "buildRailroad:" + REGEX_NAME + ":" + REGEX_NAME + ":" + REGEX_NAME;
-    private static final String COMMAND_DRAW_MISSION = "getMission";
-    private static final String COMMAND_CHOOSE_MISSION = "chooseMission:" + REGEX_MISSION_ID;
+    private static final String COMMAND_DRAW_MISSION = "drawMission";
+    private static final String COMMAND_CHOOSE_MISSION = "chooseMission:?(\\d\\d?)?(:\\d\\d?){0,2}";
     //----------------------------------------------
 
 
@@ -244,7 +243,7 @@ public class Session {
 
 
 
-    //region ----- GAME COMMANDS -------------------------------------------------------
+    //region ----- GAME COMMANDS ---------------------------------------------------------------------------------------
 
 
     private void startGame() {
@@ -270,7 +269,7 @@ public class Session {
 
 
     private void drawMission() {
-        //TODO impl
+        send(player.drawMission());
     }
 
 

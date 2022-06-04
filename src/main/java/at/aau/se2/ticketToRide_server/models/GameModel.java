@@ -2,10 +2,12 @@ package at.aau.se2.ticketToRide_server.models;
 
 import at.aau.se2.ticketToRide_server.dataStructures.*;
 import at.aau.se2.ticketToRide_server.server.Configuration_Constants;
+import org.w3c.dom.ls.LSOutput;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedList;
 
 enum State {
     WAITING_FOR_PLAYERS, RUNNING, OVER, CRASHED
@@ -18,9 +20,11 @@ public class GameModel implements Runnable {
     private int id;
     private String name;
     private State state;
-    private int colorCounter = 0;   //to assign colors to players
-    private int actionsLeft;        //to manage a move
-    private int countdown = -1;     // for the last moves before end
+    private int colorCounter = 0;           //to assign colors to players
+    private int actionsLeft;                //to manage a move
+    private int countdown = -1;             //for the last moves before end
+    private LinkedList<Mission>[] set3s;    //when player has to choose missions, the options are temp in here
+    private boolean[] waitForCoice;         //when player has to choose missions, the game will remember to wait for the coice
 
 
     //invisible
@@ -37,19 +41,20 @@ public class GameModel implements Runnable {
     private ArrayList<TrainCard> openCards = new ArrayList<>();
     private HashMap<Player, Integer> longestConnectionsForEachPlayer = new HashMap<>();
 
+
     public GameModel(String name, Player owner) {
         this.id = idCounter++;
         this.name = name;
         this.state = State.WAITING_FOR_PLAYERS;
         players = new ArrayList<>();
         this.trainCardsStack = getTrainCards();
-        this.initOpenCards();
 
         this.missions = getMissions();
-        this.owner=owner;
+        this.owner = owner;
     }
 
     //region ----------------  WAITING FOR PLAYERS ---------------------------------------
+
 
     public int addPlayer(Player player) {
         try {
@@ -133,6 +138,7 @@ public class GameModel implements Runnable {
 
     //region -------------------- GAME INITIALIZATION ------------------------------
 
+
     //TODO init visible cards
     private void initOpenCards() {
         this.openCards = new ArrayList<>();
@@ -141,24 +147,41 @@ public class GameModel implements Runnable {
         }
     }
 
+
+    private void initMissionChoosers() {
+        this.set3s = new LinkedList[players.size()];
+        this.waitForCoice = new boolean[players.size()];
+        for (int i = 0; i < players.size(); i++) {
+            set3s[i] = new LinkedList<>();
+            waitForCoice[i] = false;
+        }
+
+    }
+
     //endregion
 
 
 
 
-    //region ----------------------- GAMING -----------------------------------------
+    //region ----- GAME LOOP -------------------------------------------------------------------------------------------
+
 
     @Override
     public void run() {
+        this.initOpenCards();
+        initMissionChoosers();
+
+
         if (Configuration_Constants.verbose) System.out.println("(VERBOSE)\tGameModel.run() Game loop up");
         while (!checkIfOver()) {
             move();
             if (Configuration_Constants.verbose) System.out.println("(VERBOSE)\tGameModel.run() Next round");
-            activePlayer = ++activePlayer%players.size();
+            activePlayer = ++activePlayer % players.size();
         }
         if (Configuration_Constants.verbose) System.out.println("(VERBOSE)\tGameModel.run() Game loop broke");
         //TODO ending game methods
     }
+
 
     /**
      * checks if the game is over
@@ -184,6 +207,7 @@ public class GameModel implements Runnable {
             return false;
         }
     }
+
 
     /**
      * sends a signal to the player whose turn it is
@@ -223,6 +247,7 @@ public class GameModel implements Runnable {
             p.actionCall(playerOnTheMove, actionsLeft);
         }
     }
+
 
     /**
      * Notifies all players that the game model has changed
@@ -266,6 +291,7 @@ public class GameModel implements Runnable {
             player.calculatePointsAtGameEnd();
         }
     }
+
 
     public boolean hasLongestRailroad(Player player) {
         getLongestConnectionFromEachPlayer();
@@ -312,10 +338,10 @@ public class GameModel implements Runnable {
         synchronized (this) {
             for (RailroadLine line : map.getRailroadLines()) {
                 Player owner = line.getOwner();
-                builder.append(line.getDestination1().getName()).append(":").append(line.getDestination2().getName()).append(":").append(owner==null?"null":owner.getName());
+                builder.append(line.getDestination1().getName()).append(":").append(line.getDestination2().getName()).append(":").append(owner == null ? "null" : owner.getName());
                 if (line instanceof DoubleRailroadLine) {
                     Player owner2 = ((DoubleRailroadLine) line).getOwner2();
-                    builder.append(":").append(owner2==null?"null":owner2.getName());
+                    builder.append(":").append(owner2 == null ? "null" : owner2.getName());
                 }
                 builder.append(";");
             }
@@ -358,11 +384,13 @@ public class GameModel implements Runnable {
 
     /**
      * starts the game, if the owner calls this method and there are more than two players in the game
+     *
      * @param whoIsPerformingThisAction calling player - should be owner
      * @return 0 on success, -1 on fail
      */
-    public int startGame (Player whoIsPerformingThisAction) {
-        if (Configuration_Constants.verbose) System.out.println(("(VERBOSE)\t GameModel.startGame() starting game " + this.name + "..."));
+    public int startGame(Player whoIsPerformingThisAction) {
+        if (Configuration_Constants.verbose)
+            System.out.println(("(VERBOSE)\t GameModel.startGame() starting game " + this.name + "..."));
         if (!whoIsPerformingThisAction.equals(owner)) {
             System.out.println("(DEBUG)\tGameModel.startGame() called from player who is not owner");
             return -1;
@@ -394,7 +422,8 @@ public class GameModel implements Runnable {
             if (actionsLeft == 2) {
                 //TODO: draw cards and call player.addHandCard(getCardfromStack(OpenCardID) or something
                 return actionsLeft -= 2;
-            };
+            }
+            ;
             if (actionsLeft == 2 || actionsLeft == 1) {
                 return --actionsLeft;
             }
@@ -410,8 +439,7 @@ public class GameModel implements Runnable {
             if (!players.get(activePlayer).equals(player)) {
                 if (Configuration_Constants.verbose)
                     System.out.println("(VERBOSE)\tGameModel.drawCardFromStack() Player" + player.getName() + " was blocked trying pick card from stack while players " + players.get(activePlayer) + "turn.");
-            }
-            else {
+            } else {
                 if (Configuration_Constants.verbose)
                     System.out.println("(VERBOSE)\tGameModel.drawCardFromStack() drawing card...");
                 if (actionsLeft > 0 && trainCardsStack.size() > 0) {
@@ -427,48 +455,97 @@ public class GameModel implements Runnable {
     }
 
 
-    public int setRailRoadLineOwner(Player player, RailroadLine railroadLine, MapColor color){
+    public int setRailRoadLineOwner(Player player, RailroadLine railroadLine, MapColor color) {
         int retVal = -1;
         synchronized (this) {
             if (!players.get(activePlayer).equals(player)) {
                 if (Configuration_Constants.debug)
                     System.out.println("(DEBUG)\tPlayer" + player.getName() + " was blocked trying to build road while players " + players.get(activePlayer) + "turn.");
-            }
-            else if (railroadLine.getOwner() != null) {
+            } else if (railroadLine.getOwner() != null) {
                 if (Configuration_Constants.debug)
                     System.out.println("(DEBUG)\tGameModel.setRailRoadLineOwner() Rail has owner named " + railroadLine.getOwner().getName() + ". Can't set owner to " + player.getName());
-            }
-            else if (railroadLine instanceof DoubleRailroadLine) {
+            } else if (railroadLine instanceof DoubleRailroadLine) {
                 DoubleRailroadLine doubleRailroadLine = (DoubleRailroadLine) railroadLine;
                 if (doubleRailroadLine.getColor2().equals(color) && doubleRailroadLine.getOwner2() == null) {
                     doubleRailroadLine.setOwner2(player);
                     retVal = 0;
-                    if (Configuration_Constants.verbose) System.out.println("(VERBOSE)\nGameModel.setRailRoadLineOwner() DoubleRailOwner="+player.getName());
-                }
-                else if (doubleRailroadLine.getColor().equals(color)) {
+                    if (Configuration_Constants.verbose)
+                        System.out.println("(VERBOSE)\nGameModel.setRailRoadLineOwner() DoubleRailOwner=" + player.getName());
+                } else if (doubleRailroadLine.getColor().equals(color)) {
                     doubleRailroadLine.setOwner(player);
                     retVal = 0;
-                    if (Configuration_Constants.verbose) System.out.println("(VERBOSE)\nGameModel.setRailRoadLineOwner() DoubleRailOwner="+player.getName());
+                    if (Configuration_Constants.verbose)
+                        System.out.println("(VERBOSE)\nGameModel.setRailRoadLineOwner() DoubleRailOwner=" + player.getName());
                 }
-            }
-            else {
+            } else {
                 this.actionsLeft = 0;
                 railroadLine.setOwner(player);
                 retVal = 0;
-                if (Configuration_Constants.verbose) System.out.println("(VERBOSE)\nGameModel.setRailRoadLineOwner() RailOwner="+player.getName());
+                if (Configuration_Constants.verbose)
+                    System.out.println("(VERBOSE)\nGameModel.setRailRoadLineOwner() RailOwner=" + player.getName());
             }
             this.notify();
         }
         return retVal;
     }
 
+
     public String drawMission(Player player) {
-        //TODO impl Method
-        throw new IllegalStateException("(FATAL) GameModel: At this point the move should be processed");
+        String response = "drawMission:null";
+        synchronized (this) {
+            int playerPosition = 0;
+            while (players.get(playerPosition++).compareTo(player) != 0) ; //find position in list
+            if (missions.size() == 0) response = "drawMission:empty";
+            else if (set3s[playerPosition].isEmpty()) {
+                set3s[playerPosition] = new LinkedList<>();
+                for (int i = 0; !missions.isEmpty() && i < 3; i++) {
+                    set3s[playerPosition].add(missions.remove(0));
+                }
+
+                response = "drawMission";
+                for (Mission mission : set3s[playerPosition]) {
+                    response += ":" + mission.getId();
+                }
+            } else {
+                if (Configuration_Constants.debug) System.out.println("(DEBUG)\tGameModel.drawMission() called when player has to coose mission");
+            }
+            this.notify();
+        }
+        return response;
     }
 
 
-    public int exitGame (Player player) {
+    public int chooseMissions(LinkedList<Integer> chosen, Player player) {
+        int retVal = -1;
+        synchronized (this) {
+
+            int counter = chosen.size(); //to check if all missions was dealt by the game
+            int playerPosition = 0;
+            LinkedList<Mission> toAdd = new LinkedList<>();
+            while (players.get(playerPosition++).compareTo(player) != 0) ; //find position in list
+            for (int choice : chosen) {
+                for (Mission mission : set3s[playerPosition]) {
+                    if (mission.getId() == choice) {
+                        counter--;
+                        toAdd.add(mission);
+                    }
+                }
+            }
+            if (counter > 0) {
+                if (Configuration_Constants.debug) System.out.println("(DEBUG)\tGameModel.chooseMissions() illegal choice when called");
+            }
+            else {
+                for (Mission mission : toAdd) player.addMission(mission);
+                retVal = 0;
+                this.actionsLeft = 0;
+            }
+            this.notify();
+        }
+        return retVal;
+    }
+
+
+    public int exitGame(Player player) {
         //TODO impl
         return -1;
     }
@@ -479,31 +556,36 @@ public class GameModel implements Runnable {
 
 
 
-
     //region ------------------- GETTER SETTER TO_STRING ----------------------------
     public static int getIdCounter() {
         return idCounter;
     }
 
+
     public int getId() {
         return id;
     }
+
 
     public String getName() {
         return name;
     }
 
+
     public State getState() {
         return state;
     }
+
 
     public ArrayList<Player> getPlayers() {
         return players;
     }
 
+
     public Player getOwner() {
         return owner;
     }
+
 
     @Override
     public String toString() {
@@ -686,36 +768,36 @@ public class GameModel implements Runnable {
     private ArrayList<Mission> getMissions() {
         ArrayList<Mission> missions = new ArrayList<>();
 
-        missions.add(new Mission(map.getDestinationByName("Boston"),map.getDestinationByName("Miami"),12,1));
-        missions.add(new Mission(map.getDestinationByName("Calgary"),map.getDestinationByName("Phoenix"),13,2));
-        missions.add(new Mission(map.getDestinationByName("Calgary"),map.getDestinationByName("Salt Lake City"),7,3));
-        missions.add(new Mission(map.getDestinationByName("Chicago"),map.getDestinationByName("New Orleans"),7,4));
-        missions.add(new Mission(map.getDestinationByName("Chicago"),map.getDestinationByName("Santa Fe"),9,5));
-        missions.add(new Mission(map.getDestinationByName("Dallas"),map.getDestinationByName("New York"),11,6));
-        missions.add(new Mission(map.getDestinationByName("Denver"),map.getDestinationByName("El Paso"),4,7));
-        missions.add(new Mission(map.getDestinationByName("Denver"),map.getDestinationByName("Pittsburgh"),11,8));
-        missions.add(new Mission(map.getDestinationByName("Duluth"),map.getDestinationByName("El Paso"),10,9));
-        missions.add(new Mission(map.getDestinationByName("Duluth"),map.getDestinationByName("Houston"),8,10));
-        missions.add(new Mission(map.getDestinationByName("Helena"),map.getDestinationByName("Los Angeles"),8,11));
-        missions.add(new Mission(map.getDestinationByName("Kansas City"),map.getDestinationByName("Houston"),5,12));
-        missions.add(new Mission(map.getDestinationByName("Los Angeles"),map.getDestinationByName("Chicago"),16,13));
-        missions.add(new Mission(map.getDestinationByName("Los Angeles"),map.getDestinationByName("Miami"),20,14));
-        missions.add(new Mission(map.getDestinationByName("Los Angeles"),map.getDestinationByName("New York"),21,15));
-        missions.add(new Mission(map.getDestinationByName("Montreal"),map.getDestinationByName("Atlanta"),9,16));
-        missions.add(new Mission(map.getDestinationByName("Montreal"),map.getDestinationByName("New Orleans"),13,17));
-        missions.add(new Mission(map.getDestinationByName("New York"),map.getDestinationByName("Atlanta"),6,18));
-        missions.add(new Mission(map.getDestinationByName("Portland"),map.getDestinationByName("Nashville"),17,19));
-        missions.add(new Mission(map.getDestinationByName("Portland"),map.getDestinationByName("Phoenix"),11,20));
-        missions.add(new Mission(map.getDestinationByName("San Francisco"),map.getDestinationByName("Atlanta"),17,21));
-        missions.add(new Mission(map.getDestinationByName("Sault St. Marie"),map.getDestinationByName("Nashville"),8,22));
-        missions.add(new Mission(map.getDestinationByName("Sault St. Marie"),map.getDestinationByName("Oklahoma City"),9,23));
-        missions.add(new Mission(map.getDestinationByName("Seattle"),map.getDestinationByName("Los Angeles"),9,24));
-        missions.add(new Mission(map.getDestinationByName("Seattle"),map.getDestinationByName("New York"),22,25));
-        missions.add(new Mission(map.getDestinationByName("Toronto"),map.getDestinationByName("Miami"),10,26));
-        missions.add(new Mission(map.getDestinationByName("Vancouver"),map.getDestinationByName("Montreal"),20,27));
-        missions.add(new Mission(map.getDestinationByName("Vancouver"),map.getDestinationByName("Santa Fe"),13,28));
-        missions.add(new Mission(map.getDestinationByName("Winnipeg"),map.getDestinationByName("Houston"),12,29));
-        missions.add(new Mission(map.getDestinationByName("Winnipeg"),map.getDestinationByName("Little Rock"),11,30));
+        missions.add(new Mission(map.getDestinationByName("Boston"), map.getDestinationByName("Miami"), 12, 1));
+        missions.add(new Mission(map.getDestinationByName("Calgary"), map.getDestinationByName("Phoenix"), 13, 2));
+        missions.add(new Mission(map.getDestinationByName("Calgary"), map.getDestinationByName("Salt Lake City"), 7, 3));
+        missions.add(new Mission(map.getDestinationByName("Chicago"), map.getDestinationByName("New Orleans"), 7, 4));
+        missions.add(new Mission(map.getDestinationByName("Chicago"), map.getDestinationByName("Santa Fe"), 9, 5));
+        missions.add(new Mission(map.getDestinationByName("Dallas"), map.getDestinationByName("New York"), 11, 6));
+        missions.add(new Mission(map.getDestinationByName("Denver"), map.getDestinationByName("El Paso"), 4, 7));
+        missions.add(new Mission(map.getDestinationByName("Denver"), map.getDestinationByName("Pittsburgh"), 11, 8));
+        missions.add(new Mission(map.getDestinationByName("Duluth"), map.getDestinationByName("El Paso"), 10, 9));
+        missions.add(new Mission(map.getDestinationByName("Duluth"), map.getDestinationByName("Houston"), 8, 10));
+        missions.add(new Mission(map.getDestinationByName("Helena"), map.getDestinationByName("Los Angeles"), 8, 11));
+        missions.add(new Mission(map.getDestinationByName("Kansas City"), map.getDestinationByName("Houston"), 5, 12));
+        missions.add(new Mission(map.getDestinationByName("Los Angeles"), map.getDestinationByName("Chicago"), 16, 13));
+        missions.add(new Mission(map.getDestinationByName("Los Angeles"), map.getDestinationByName("Miami"), 20, 14));
+        missions.add(new Mission(map.getDestinationByName("Los Angeles"), map.getDestinationByName("New York"), 21, 15));
+        missions.add(new Mission(map.getDestinationByName("Montreal"), map.getDestinationByName("Atlanta"), 9, 16));
+        missions.add(new Mission(map.getDestinationByName("Montreal"), map.getDestinationByName("New Orleans"), 13, 17));
+        missions.add(new Mission(map.getDestinationByName("New York"), map.getDestinationByName("Atlanta"), 6, 18));
+        missions.add(new Mission(map.getDestinationByName("Portland"), map.getDestinationByName("Nashville"), 17, 19));
+        missions.add(new Mission(map.getDestinationByName("Portland"), map.getDestinationByName("Phoenix"), 11, 20));
+        missions.add(new Mission(map.getDestinationByName("San Francisco"), map.getDestinationByName("Atlanta"), 17, 21));
+        missions.add(new Mission(map.getDestinationByName("Sault St. Marie"), map.getDestinationByName("Nashville"), 8, 22));
+        missions.add(new Mission(map.getDestinationByName("Sault St. Marie"), map.getDestinationByName("Oklahoma City"), 9, 23));
+        missions.add(new Mission(map.getDestinationByName("Seattle"), map.getDestinationByName("Los Angeles"), 9, 24));
+        missions.add(new Mission(map.getDestinationByName("Seattle"), map.getDestinationByName("New York"), 22, 25));
+        missions.add(new Mission(map.getDestinationByName("Toronto"), map.getDestinationByName("Miami"), 10, 26));
+        missions.add(new Mission(map.getDestinationByName("Vancouver"), map.getDestinationByName("Montreal"), 20, 27));
+        missions.add(new Mission(map.getDestinationByName("Vancouver"), map.getDestinationByName("Santa Fe"), 13, 28));
+        missions.add(new Mission(map.getDestinationByName("Winnipeg"), map.getDestinationByName("Houston"), 12, 29));
+        missions.add(new Mission(map.getDestinationByName("Winnipeg"), map.getDestinationByName("Little Rock"), 11, 30));
 
 
         return missions;

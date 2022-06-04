@@ -5,7 +5,6 @@ import at.aau.se2.ticketToRide_server.server.Configuration_Constants;
 import at.aau.se2.ticketToRide_server.server.Lobby;
 import at.aau.se2.ticketToRide_server.server.Session;
 
-import javax.swing.*;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
@@ -193,7 +192,7 @@ public class Player implements Comparable {
 
     public String getMissions() {
         if (state != State.GAMING) return "getMissions:null";
-        StringBuilder builder = new StringBuilder("getMissions:");
+        StringBuilder builder = new StringBuilder("getMissions");
         for (Mission mission : missions) {
             builder.append(":").append(mission.getId());
         }
@@ -242,14 +241,14 @@ public class Player implements Comparable {
 
 
     public String drawMission() {
-        //TODO check game Model impl and then adapt
+        if (this.state != State.GAMING) return "drawMission:null";
         return game.drawMission(this);
     }
 
 
     public int chooseMissions(LinkedList<Integer> chosen) {
-        //TODO impl
-        return -1;
+        if (this.state != State.GAMING) return -1;
+        return game.chooseMissions(chosen, this);
     }
 
 
