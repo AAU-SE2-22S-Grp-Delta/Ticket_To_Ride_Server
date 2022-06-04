@@ -550,7 +550,7 @@ public class GameModel implements Runnable {
         int retVal = -1;
         synchronized (this) {
             int playerPosition = 0;
-            while (players.get(playerPosition++).compareTo(player) != 0) ; //find position in list
+            while (players.get(playerPosition).compareTo(player) != 0) playerPosition++; //find position in list
             if (waitForCoice[playerPosition]) {
                 int counter = chosen.size(); //to check if all missions was dealt by the game
                 LinkedList<Mission> toAdd = new LinkedList<>();
