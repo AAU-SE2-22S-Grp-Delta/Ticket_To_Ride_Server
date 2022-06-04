@@ -692,36 +692,37 @@ public class GameModel implements Runnable {
     private ArrayList<Mission> getMissions() {
         ArrayList<Mission> missions = new ArrayList<>();
 
-        missions.add(new Mission(map.getDestinationByName("Boston"), map.getDestinationByName("Miami"), 12));
-        missions.add(new Mission(map.getDestinationByName("Calgary"), map.getDestinationByName("Phoenix"), 13));
-        missions.add(new Mission(map.getDestinationByName("Calgary"), map.getDestinationByName("Salt Lake City"), 7));
-        missions.add(new Mission(map.getDestinationByName("Chicago"), map.getDestinationByName("New Orleans"), 7));
-        missions.add(new Mission(map.getDestinationByName("Chicago"), map.getDestinationByName("Santa Fe"), 9));
-        missions.add(new Mission(map.getDestinationByName("Dallas"), map.getDestinationByName("New York"), 11));
-        missions.add(new Mission(map.getDestinationByName("Denver"), map.getDestinationByName("El Paso"), 4));
-        missions.add(new Mission(map.getDestinationByName("Denver"), map.getDestinationByName("Pittsburgh"), 11));
-        missions.add(new Mission(map.getDestinationByName("Duluth"), map.getDestinationByName("El Paso"), 10));
-        missions.add(new Mission(map.getDestinationByName("Duluth"), map.getDestinationByName("Houston"), 8));
-        missions.add(new Mission(map.getDestinationByName("Helena"), map.getDestinationByName("Los Angeles"), 8));
-        missions.add(new Mission(map.getDestinationByName("Kansas City"), map.getDestinationByName("Houston"), 5));
-        missions.add(new Mission(map.getDestinationByName("Los Angeles"), map.getDestinationByName("Chicago"), 16));
-        missions.add(new Mission(map.getDestinationByName("Los Angeles"), map.getDestinationByName("Miami"), 20));
-        missions.add(new Mission(map.getDestinationByName("Los Angeles"), map.getDestinationByName("New York"), 21));
-        missions.add(new Mission(map.getDestinationByName("Montreal"), map.getDestinationByName("Atlanta"), 9));
-        missions.add(new Mission(map.getDestinationByName("Montreal"), map.getDestinationByName("New Orleans"), 13));
-        missions.add(new Mission(map.getDestinationByName("New York"), map.getDestinationByName("Atlanta"), 6));
-        missions.add(new Mission(map.getDestinationByName("Portland"), map.getDestinationByName("Nashville"), 17));
-        missions.add(new Mission(map.getDestinationByName("Portland"), map.getDestinationByName("Phoenix"), 11));
-        missions.add(new Mission(map.getDestinationByName("San Francisco"), map.getDestinationByName("Atlanta"), 17));
-        missions.add(new Mission(map.getDestinationByName("Sault St. Marie"), map.getDestinationByName("Nashville"), 8));
-        missions.add(new Mission(map.getDestinationByName("Sault St. Marie"), map.getDestinationByName("Oklahoma City"), 9));
-        missions.add(new Mission(map.getDestinationByName("Seattle"), map.getDestinationByName("Los Angeles"), 9));
-        missions.add(new Mission(map.getDestinationByName("Seattle"), map.getDestinationByName("New York"), 22));
-        missions.add(new Mission(map.getDestinationByName("Toronto"), map.getDestinationByName("Miami"), 10));
-        missions.add(new Mission(map.getDestinationByName("Vancouver"), map.getDestinationByName("Montreal"), 20));
-        missions.add(new Mission(map.getDestinationByName("Vancouver"), map.getDestinationByName("Santa Fe"), 13));
-        missions.add(new Mission(map.getDestinationByName("Winnipeg"), map.getDestinationByName("Houston"), 12));
-        missions.add(new Mission(map.getDestinationByName("Winnipeg"), map.getDestinationByName("Little Rock"), 11));
+        missions.add(new Mission(map.getDestinationByName("Boston"),map.getDestinationByName("Miami"),12,1));
+        missions.add(new Mission(map.getDestinationByName("Calgary"),map.getDestinationByName("Phoenix"),13,2));
+        missions.add(new Mission(map.getDestinationByName("Calgary"),map.getDestinationByName("Salt Lake City"),7,3));
+        missions.add(new Mission(map.getDestinationByName("Chicago"),map.getDestinationByName("New Orleans"),7,4));
+        missions.add(new Mission(map.getDestinationByName("Chicago"),map.getDestinationByName("Santa Fe"),9,5));
+        missions.add(new Mission(map.getDestinationByName("Dallas"),map.getDestinationByName("New York"),11,6));
+        missions.add(new Mission(map.getDestinationByName("Denver"),map.getDestinationByName("El Paso"),4,7));
+        missions.add(new Mission(map.getDestinationByName("Denver"),map.getDestinationByName("Pittsburgh"),11,8));
+        missions.add(new Mission(map.getDestinationByName("Duluth"),map.getDestinationByName("El Paso"),10,9));
+        missions.add(new Mission(map.getDestinationByName("Duluth"),map.getDestinationByName("Houston"),8,10));
+        missions.add(new Mission(map.getDestinationByName("Helena"),map.getDestinationByName("Los Angeles"),8,11));
+        missions.add(new Mission(map.getDestinationByName("Kansas City"),map.getDestinationByName("Houston"),5,12));
+        missions.add(new Mission(map.getDestinationByName("Los Angeles"),map.getDestinationByName("Chicago"),16,13));
+        missions.add(new Mission(map.getDestinationByName("Los Angeles"),map.getDestinationByName("Miami"),20,14));
+        missions.add(new Mission(map.getDestinationByName("Los Angeles"),map.getDestinationByName("New York"),21,15));
+        missions.add(new Mission(map.getDestinationByName("Montreal"),map.getDestinationByName("Atlanta"),9,16));
+        missions.add(new Mission(map.getDestinationByName("Montreal"),map.getDestinationByName("New Orleans"),13,17));
+        missions.add(new Mission(map.getDestinationByName("New York"),map.getDestinationByName("Atlanta"),6,18));
+        missions.add(new Mission(map.getDestinationByName("Portland"),map.getDestinationByName("Nashville"),17,19));
+        missions.add(new Mission(map.getDestinationByName("Portland"),map.getDestinationByName("Phoenix"),11,20));
+        missions.add(new Mission(map.getDestinationByName("San Francisco"),map.getDestinationByName("Atlanta"),17,21));
+        missions.add(new Mission(map.getDestinationByName("Sault St. Marie"),map.getDestinationByName("Nashville"),8,22));
+        missions.add(new Mission(map.getDestinationByName("Sault St. Marie"),map.getDestinationByName("Oklahoma City"),9,23));
+        missions.add(new Mission(map.getDestinationByName("Seattle"),map.getDestinationByName("Los Angeles"),9,24));
+        missions.add(new Mission(map.getDestinationByName("Seattle"),map.getDestinationByName("New York"),22,25));
+        missions.add(new Mission(map.getDestinationByName("Toronto"),map.getDestinationByName("Miami"),10,26));
+        missions.add(new Mission(map.getDestinationByName("Vancouver"),map.getDestinationByName("Montreal"),20,27));
+        missions.add(new Mission(map.getDestinationByName("Vancouver"),map.getDestinationByName("Santa Fe"),13,28));
+        missions.add(new Mission(map.getDestinationByName("Winnipeg"),map.getDestinationByName("Houston"),12,29));
+        missions.add(new Mission(map.getDestinationByName("Winnipeg"),map.getDestinationByName("Little Rock"),11,30));
+
 
         return missions;
     }

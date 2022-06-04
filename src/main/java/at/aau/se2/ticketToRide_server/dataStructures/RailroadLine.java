@@ -5,6 +5,8 @@ package at.aau.se2.ticketToRide_server.dataStructures;
  * RailroadLine-class represents a single connection between two Destination-Objects
  */
 public class RailroadLine {
+
+
     //TODO exception-handling
     private Destination destination1;
     private Destination destination2;

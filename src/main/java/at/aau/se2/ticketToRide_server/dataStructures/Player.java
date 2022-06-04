@@ -413,7 +413,7 @@ public class Player implements Comparable {
     public void setPlayerColor(Color playerColor) {
         if (this.state == State.GAMING && this.playerColor != null) {
             if (Configuration_Constants.debug)
-                System.out.println("(DEBUG)\tCalled Player.getPlayerColor() while Player was in Game!");
+                System.out.println("(DEBUG)\tCalled Player.setPlayerColor() while Player was in Game!");
             return;
         }
         this.playerColor = playerColor;

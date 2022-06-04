@@ -1,15 +1,14 @@
 package at.aau.se2.ticketToRide_server.dataStructures;
 
 public class Mission {
-    private static int idCounter = 0;
 
-    int id;
     Destination destination1, destination2;
+    private int id;
     private int points;
     private boolean done;
 
-    public Mission(Destination destination1, Destination destination2, int points) {
-        this.id = idCounter++;
+    public Mission(Destination destination1, Destination destination2, int points, int id) {
+        this.id = id;
         this.destination1 = destination1;
         this.destination2 = destination2;
         this.points = points;
