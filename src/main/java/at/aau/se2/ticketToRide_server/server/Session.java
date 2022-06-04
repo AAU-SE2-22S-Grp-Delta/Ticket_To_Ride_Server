@@ -268,7 +268,7 @@ public class Session {
     }
 
 
-    private void drawMission() {
+    public void drawMission() {
         send(player.drawMission());
     }
 

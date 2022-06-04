@@ -130,10 +130,6 @@ public class Player implements Comparable {
         this.numStones = 45;
         this.handCards = new ArrayList<>();
         this.missions = new ArrayList<>();
-        if (game.addPlayer(this) < 0) {
-            if (Configuration_Constants.debug) System.out.println("(DEBUG)\t Game is full");
-            return -2;
-        }
         this.game = game;
         if (Configuration_Constants.verbose) System.out.println("(VERBOSE)\tPlayer joint game " + this.game.getName());
         return 0;
@@ -425,6 +421,11 @@ public class Player implements Comparable {
 
     public int getStones() {
         return this.numStones;
+    }
+
+
+    public void missionInit() {
+        session.drawMission();
     }
 
 

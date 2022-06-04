@@ -165,7 +165,10 @@ public class Lobby {
                 if (Configuration_Constants.debug) System.out.println("(DEBUG)\tLobby.joinGame() No game of name " + gameName);
             }
             else {
-                    game.addPlayer(player);
+                if (game.addPlayer(player) < 0) {
+                    if (Configuration_Constants.debug) System.out.println("(DEBUG)\t Game is full");
+                    game = null;
+                }
             }
             this.games.notify();
         }

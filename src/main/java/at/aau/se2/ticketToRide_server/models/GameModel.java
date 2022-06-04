@@ -158,6 +158,32 @@ public class GameModel implements Runnable {
 
     }
 
+
+    private void playersDrawingMissionsAtGameStart() {
+        for (this.activePlayer = 0; activePlayer < players.size(); activePlayer++) {
+            players.get(activePlayer).missionInit();
+            if (Configuration_Constants.verbose) System.out.println("(VERBOSE)\tPrompting player " + players.get(activePlayer).getName() + " to draw Mission");
+        }
+        activePlayer = 0;
+        synchronized (this) {
+            try {
+                boolean checkAllChosen;
+                do {
+                    this.wait();
+                    checkAllChosen = false;
+                    int check = 0;
+                    for (int i = 0; i < players.size(); i++) {
+                        if (!waitForCoice[i]) check++;
+                    }
+                    if (check==players.size()) checkAllChosen = true;
+                } while (!checkAllChosen);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            this.notify();
+        }
+    }
+
     //endregion
 
 
@@ -170,7 +196,7 @@ public class GameModel implements Runnable {
     public void run() {
         this.initOpenCards();
         initMissionChoosers();
-
+        playersDrawingMissionsAtGameStart();
 
         if (Configuration_Constants.verbose) System.out.println("(VERBOSE)\tGameModel.run() Game loop up");
         while (!checkIfOver()) {
@@ -493,21 +519,26 @@ public class GameModel implements Runnable {
     public String drawMission(Player player) {
         String response = "drawMission:null";
         synchronized (this) {
-            int playerPosition = 0;
-            while (players.get(playerPosition++).compareTo(player) != 0) ; //find position in list
-            if (missions.size() == 0) response = "drawMission:empty";
-            else if (set3s[playerPosition].isEmpty()) {
-                set3s[playerPosition] = new LinkedList<>();
-                for (int i = 0; !missions.isEmpty() && i < 3; i++) {
-                    set3s[playerPosition].add(missions.remove(0));
-                }
-
-                response = "drawMission";
-                for (Mission mission : set3s[playerPosition]) {
-                    response += ":" + mission.getId();
-                }
+            if (!players.get(activePlayer).equals(player)) {
+                if (Configuration_Constants.debug)
+                    System.out.println("(DEBUG)\tPlayer" + player.getName() + " was blocked trying to draw mission while players " + players.get(activePlayer) + "turn.");
             } else {
-                if (Configuration_Constants.debug) System.out.println("(DEBUG)\tGameModel.drawMission() called when player has to coose mission");
+                if (missions.size() == 0) response = "drawMission:empty";
+                else if (set3s[activePlayer].isEmpty()) {
+                    set3s[activePlayer] = new LinkedList<>();
+                    for (int i = 0; !missions.isEmpty() && i < 3; i++) {
+                        set3s[activePlayer].add(missions.remove(0));
+                    }
+
+                    response = "drawMission";
+                    for (Mission mission : set3s[activePlayer]) {
+                        response += ":" + mission.getId();
+                    }
+                    waitForCoice[activePlayer] = true;
+                } else {
+                    if (Configuration_Constants.debug)
+                        System.out.println("(DEBUG)\tGameModel.drawMission() called when player has to coose mission");
+                }
             }
             this.notify();
         }
@@ -518,26 +549,31 @@ public class GameModel implements Runnable {
     public int chooseMissions(LinkedList<Integer> chosen, Player player) {
         int retVal = -1;
         synchronized (this) {
-
-            int counter = chosen.size(); //to check if all missions was dealt by the game
             int playerPosition = 0;
-            LinkedList<Mission> toAdd = new LinkedList<>();
             while (players.get(playerPosition++).compareTo(player) != 0) ; //find position in list
-            for (int choice : chosen) {
-                for (Mission mission : set3s[playerPosition]) {
-                    if (mission.getId() == choice) {
-                        counter--;
-                        toAdd.add(mission);
+            if (waitForCoice[playerPosition]) {
+                int counter = chosen.size(); //to check if all missions was dealt by the game
+                LinkedList<Mission> toAdd = new LinkedList<>();
+                for (int choice : chosen) {
+                    for (Mission mission : set3s[playerPosition]) {
+                        if (mission.getId() == choice) {
+                            counter--;
+                            toAdd.add(mission);
+                        }
                     }
                 }
-            }
-            if (counter > 0) {
-                if (Configuration_Constants.debug) System.out.println("(DEBUG)\tGameModel.chooseMissions() illegal choice when called");
-            }
-            else {
-                for (Mission mission : toAdd) player.addMission(mission);
-                retVal = 0;
-                this.actionsLeft = 0;
+                if (counter > 0) {
+                    if (Configuration_Constants.debug)
+                        System.out.println("(DEBUG)\tGameModel.chooseMissions() illegal choice when called");
+                } else {
+                    for (Mission mission : toAdd) player.addMission(mission);
+                    retVal = 0;
+                    this.actionsLeft = 0;
+                    waitForCoice[playerPosition] = false;
+                }
+            } else {
+                if (Configuration_Constants.debug)
+                    System.out.println("(DEBUG)\tGameModel.chooseMissions() called when not waiting on Player " + player.getName());
             }
             this.notify();
         }
