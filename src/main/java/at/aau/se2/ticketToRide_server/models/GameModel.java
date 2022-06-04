@@ -316,8 +316,12 @@ public class GameModel implements Runnable {
         StringBuilder builder = new StringBuilder("getMap:");
         synchronized (this) {
             for (RailroadLine line : map.getRailroadLines()) {
-                builder.append(line.getDestination1()).append(":").append(line.getDestination2()).append(":").append(line.getOwner().getName());
-                if (line instanceof DoubleRailroadLine) builder.append(":").append(((DoubleRailroadLine) line).getOwner2());
+                Player owner = line.getOwner();
+                builder.append(line.getDestination1().getName()).append(":").append(line.getDestination2().getName()).append(":").append(owner==null?"null":owner.getName());
+                if (line instanceof DoubleRailroadLine) {
+                    Player owner2 = ((DoubleRailroadLine) line).getOwner2();
+                    builder.append(":").append(owner2==null?"null":owner2.getName());
+                }
                 builder.append(";");
             }
 
