@@ -192,8 +192,12 @@ public class Player implements Comparable {
 
 
     public String getMissions() {
-        //TODO impl
-        return null;
+        if (state != State.GAMING) return "getMissions:null";
+        StringBuilder builder = new StringBuilder("getMissions:");
+        for (Mission mission : missions) {
+            builder.append(":").append(mission.getId());
+        }
+        return builder.toString();
     }
 
 

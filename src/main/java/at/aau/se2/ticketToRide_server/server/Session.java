@@ -59,11 +59,12 @@ public class Session {
     private static final String REQUEST_GET_MAP = "getMap";
     private static final String REQUEST_GET_POINTS = "getPoints";
     private static final String REQUEST_GET_COLORS = "getColors";
+    private static final String REQUEST_GET_MISSIONS = "getMissions";
 
-    private static final String COMMAND_GET_CARD_STACK = "cardStack";
-    private static final String COMMAND_GET_CARD_OPEN = "cardOpen:" + REGEX_OPEN_CARD_ID;
+    private static final String COMMAND_DRAW_CARD_STACK = "cardStack";
+    private static final String COMMAND_DRAW_CARD_OPEN = "cardOpen:" + REGEX_OPEN_CARD_ID;
     private static final String COMMAND_BUILD_RAILROAD = "buildRailroad:" + REGEX_NAME + ":" + REGEX_NAME + ":" + REGEX_NAME;
-    private static final String COMMAND_GET_MISSION = "getMission";
+    private static final String COMMAND_DRAW_MISSION = "getMission";
     private static final String COMMAND_CHOOSE_MISSION = "chooseMission:" + REGEX_MISSION_ID;
     //----------------------------------------------
 
@@ -112,12 +113,13 @@ public class Session {
             else if (command.matches(REQUEST_GET_MAP)) this.getMap();
             else if (command.matches(REQUEST_GET_POINTS)) this.getPoints();
             else if (command.matches(REQUEST_GET_COLORS)) this.getColors();
+            else if (command.matches(REQUEST_GET_MISSIONS)) this.getMissions();
 
                 //----- IN GAME COMMANDS --------------------------------------------------------
-            else if (command.matches(COMMAND_GET_CARD_STACK)) this.drawCardStack();
-            else if (command.matches(COMMAND_GET_CARD_OPEN)) this.drawCardOpen(command);
+            else if (command.matches(COMMAND_DRAW_CARD_STACK)) this.drawCardStack();
+            else if (command.matches(COMMAND_DRAW_CARD_OPEN)) this.drawCardOpen(command);
             else if (command.matches(COMMAND_BUILD_RAILROAD)) this.buildRailroad(command);
-            else if (command.matches(COMMAND_GET_MISSION)) this.drawMission();
+            else if (command.matches(COMMAND_DRAW_MISSION)) this.drawMission();
             else if (command.matches(COMMAND_CHOOSE_MISSION)) this.chooseMission(command);
         }
     }
@@ -232,6 +234,11 @@ public class Session {
     }
 
 
+    private void getMissions() {
+        send(player.getMissions());
+    }
+
+
     //endregion
 
 
@@ -263,7 +270,7 @@ public class Session {
 
 
     private void drawMission() {
-        send(player.drawMission());
+        //TODO impl
     }
 
 

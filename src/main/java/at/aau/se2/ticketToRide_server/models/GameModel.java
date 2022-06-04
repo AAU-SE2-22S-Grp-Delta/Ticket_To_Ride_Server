@@ -183,11 +183,6 @@ public class GameModel implements Runnable {
             }
             return false;
         }
-        //check if each player has at least 2 wagons or, if there is a running countdown
-        //if a player has less than 2, each other player has one move left (start count down)
-        //if countdown is over, set state to OVER
-
-//        return false;
     }
 
     /**
