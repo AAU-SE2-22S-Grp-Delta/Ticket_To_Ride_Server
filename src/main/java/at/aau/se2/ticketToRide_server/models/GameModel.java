@@ -313,19 +313,14 @@ public class GameModel implements Runnable {
 
 
     public String getMap() {
-        StringBuilder builder = new StringBuilder();
+        StringBuilder builder = new StringBuilder("getMap:");
         synchronized (this) {
-            ArrayList<RailroadLine> railroadLines = new ArrayList<>(map.getRailroadLines());
-            for (int i = 0; i < railroadLines.size() - 1; i++) {
-                if (railroadLines.get(i) instanceof DoubleRailroadLine)
-                    builder.append(i).append(":").append(railroadLines.get(i).getOwner()).append(":").append(((DoubleRailroadLine) railroadLines.get(i)).getOwner2()).append(";");
-                else
-                    builder.append(i).append(":").append(railroadLines.get(i).getOwner()).append(";");
+            for (RailroadLine line : map.getRailroadLines()) {
+                builder.append(line.getDestination1()).append(":").append(line.getDestination2()).append(":").append(line.getOwner().getName());
+                if (line instanceof DoubleRailroadLine) builder.append(":").append(((DoubleRailroadLine) line).getOwner2());
+                builder.append(";");
             }
-            if (railroadLines.get(railroadLines.size() - 1) instanceof DoubleRailroadLine)
-                builder.append(railroadLines.size() - 1).append(":").append(railroadLines.get(railroadLines.size() - 1).getOwner()).append(":").append(((DoubleRailroadLine) railroadLines.get(railroadLines.size() - 1)).getOwner2()).append(";");
-            else
-                builder.append(railroadLines.size() - 1).append(":").append(railroadLines.get(railroadLines.size() - 1).getOwner()).append(";");
+
             this.notify();
         }
         return builder.toString();
