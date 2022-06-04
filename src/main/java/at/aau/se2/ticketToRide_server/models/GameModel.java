@@ -2,6 +2,7 @@ package at.aau.se2.ticketToRide_server.models;
 
 import at.aau.se2.ticketToRide_server.dataStructures.*;
 import at.aau.se2.ticketToRide_server.server.Configuration_Constants;
+import at.aau.se2.ticketToRide_server.server.Lobby;
 import org.w3c.dom.ls.LSOutput;
 
 import java.util.ArrayList;
@@ -162,7 +163,8 @@ public class GameModel implements Runnable {
     private void playersDrawingMissionsAtGameStart() {
         for (this.activePlayer = 0; activePlayer < players.size(); activePlayer++) {
             players.get(activePlayer).missionInit();
-            if (Configuration_Constants.verbose) System.out.println("(VERBOSE)\tPrompting player " + players.get(activePlayer).getName() + " to draw Mission");
+            if (Configuration_Constants.verbose)
+                System.out.println("(VERBOSE)\tPrompting player " + players.get(activePlayer).getName() + " to draw Mission");
         }
         activePlayer = 0;
         synchronized (this) {
@@ -175,7 +177,7 @@ public class GameModel implements Runnable {
                     for (int i = 0; i < players.size(); i++) {
                         if (!waitForCoice[i]) check++;
                     }
-                    if (check==players.size()) checkAllChosen = true;
+                    if (check == players.size()) checkAllChosen = true;
                 } while (!checkAllChosen);
             } catch (InterruptedException e) {
                 e.printStackTrace();
@@ -360,7 +362,7 @@ public class GameModel implements Runnable {
 
 
     public String getMap() {
-        StringBuilder builder = new StringBuilder("getMap:");
+        StringBuilder builder = new StringBuilder("getMap;");
         synchronized (this) {
             for (RailroadLine line : map.getRailroadLines()) {
                 Player owner = line.getOwner();
@@ -553,13 +555,13 @@ public class GameModel implements Runnable {
             while (players.get(playerPosition).compareTo(player) != 0) playerPosition++; //find position in list
             if (waitForCoice[playerPosition]) {
                 int counter = chosen.size(); //to check if all missions was dealt by the game
-                LinkedList<Mission> toAdd = new LinkedList<>();
+                LinkedList<Mission> toAdd = new LinkedList<>(), toDrop = new LinkedList<>();
                 for (int choice : chosen) {
                     for (Mission mission : set3s[playerPosition]) {
                         if (mission.getId() == choice) {
                             counter--;
                             toAdd.add(mission);
-                        }
+                        } else toDrop.add(mission);
                     }
                 }
                 if (counter > 0) {
@@ -571,6 +573,7 @@ public class GameModel implements Runnable {
                     this.actionsLeft = 0;
                     waitForCoice[playerPosition] = false;
                 }
+                dropMissions(toDrop);
             } else {
                 if (Configuration_Constants.debug)
                     System.out.println("(DEBUG)\tGameModel.chooseMissions() called when not waiting on Player " + player.getName());
@@ -581,9 +584,47 @@ public class GameModel implements Runnable {
     }
 
 
-    public int exitGame(Player player) {
-        //TODO impl
-        return -1;
+    private void dropMissions(LinkedList<Mission> backToStack) {
+        for (Mission mission : backToStack) {
+            missions.add(backToStack.remove());
+        }
+        Collections.shuffle(missions);
+    }
+
+
+    public void exitGame(Player player) {
+        synchronized (this) {
+            int playerPosition = 0;
+            while (players.get(playerPosition).compareTo(player) != 0) playerPosition++; //find position in list
+
+            if (playerPosition == activePlayer) {
+                actionsLeft = 0;
+            }
+
+            LinkedList<Mission>[] newSet3s = new LinkedList[players.size() - 1];
+            boolean[] newWaitForCoice = new boolean[players.size() - 1];
+
+            //this is cause game could wait for player to choose missions
+            if (state == State.RUNNING) {
+                int counterNew = 0, counterOld = 0;
+                for (Player p : this.players) {
+                    if (!p.equals(player)) {
+                        newSet3s[counterNew] = set3s[counterOld];
+                        newWaitForCoice[counterNew++] = waitForCoice[counterOld++];
+                    } else {
+                        if (waitForCoice[counterOld]) dropMissions(set3s[counterOld]);
+                        counterOld++;
+                    }
+                }
+                set3s = newSet3s;
+                waitForCoice = newWaitForCoice;
+            }
+
+            players.remove(playerPosition);
+            if (Configuration_Constants.verbose)
+                System.out.println("(VERBOSE)\t GameModel.exitGame() removed Player " + player.getName() + "from game " + name);
+            this.notify();
+        }
     }
 
 
@@ -835,7 +876,7 @@ public class GameModel implements Runnable {
         missions.add(new Mission(map.getDestinationByName("Winnipeg"), map.getDestinationByName("Houston"), 12, 29));
         missions.add(new Mission(map.getDestinationByName("Winnipeg"), map.getDestinationByName("Little Rock"), 11, 30));
 
-
+        Collections.shuffle(missions);
         return missions;
     }
 

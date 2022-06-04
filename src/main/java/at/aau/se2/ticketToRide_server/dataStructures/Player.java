@@ -207,7 +207,7 @@ public class Player implements Comparable {
 
 
 
-    //region ---------------------------------------- GAME COMMANDS -----------------------------------------------------
+    //region ----- GAME COMMANDS ---------------------------------------------------------------------------------------
 
 
     /**
@@ -316,8 +316,10 @@ public class Player implements Comparable {
 
 
     public int exitGame() {
-        //TODO impl
-        return -1;
+        if (this.state != State.GAMING) return -1;
+        game.exitGame(this);
+        this.state = State.LOBBY;
+        return 0;
     }
 
 

@@ -188,20 +188,6 @@ public class Lobby {
 
 
 
-
-
-
-
-
-    public ArrayList<Player> getPlayers() {
-        return players;
-    }
-
-    public ArrayList<GameModel> getGames() {
-        return games;
-    }
-
-
     private GameModel getGameByName(String name) {
         for(GameModel game : this.games) {
             if(name.equals(game.getName())) return game;
