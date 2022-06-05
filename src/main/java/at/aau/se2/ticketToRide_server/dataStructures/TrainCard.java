@@ -1,19 +1,22 @@
 package at.aau.se2.ticketToRide_server.dataStructures;
 
-public class TrainCard implements Comparable<Object> {
+public class TrainCard {
     public enum Type {
         PINK("pink"), BLUE("blue"), GREEN("green"), YELLOW("yellow"), RED("red"), WHITE("white"), ORANGE("orange"), BLACK("black"), LOCOMOTIVE("locomotive");
 
         private final String value;
 
+
         Type(String value) {
             this.value = value;
         }
+
 
         @Override
         public String toString() {
             return value;
         }
+
 
         public static Type getByString(String color) {
             switch (color) {
@@ -43,9 +46,11 @@ public class TrainCard implements Comparable<Object> {
 
     private final Type type;
 
+
     public TrainCard(Type type) {
         this.type = type;
     }
+
 
     public Type getType() {
         return type;
@@ -58,34 +63,25 @@ public class TrainCard implements Comparable<Object> {
     }
 
 
-    @Override
-    public int compareTo(Object o) {
-        if (o instanceof TrainCard) {
-            return ((TrainCard) o).type == this.type ? 0 : 1;
+    public static Type map_mapColor_to_TrainCardType(MapColor mapColor) {
+        switch (mapColor) {
+            case YELLOW:
+                return Type.YELLOW;
+            case ORANGE:
+                return Type.ORANGE;
+            case WHITE:
+                return Type.WHITE;
+            case BLACK:
+                return Type.BLACK;
+            case BLUE:
+                return Type.BLUE;
+            case GREEN:
+                return Type.GREEN;
+            case PINK:
+                return Type.PINK;
+            case RED:
+                return Type.RED;
         }
-
-        if (o instanceof MapColor) {
-            MapColor color = (MapColor) o;
-            switch (this.type) {
-                case PINK:
-                    return color == MapColor.PINK ? 0 : 1;
-                case BLUE:
-                    return color == MapColor.BLUE ? 0 : 1;
-                case GREEN:
-                    return color == MapColor.GREEN ? 0 : 1;
-                case YELLOW:
-                    return color == MapColor.YELLOW ? 0 : 1;
-                case RED:
-                    return color == MapColor.RED ? 0 : 1;
-                case WHITE:
-                    return color == MapColor.WHITE ? 0 : 1;
-                case ORANGE:
-                    return color == MapColor.ORANGE ? 0 : 1;
-                case BLACK:
-                    return color == MapColor.BLACK ? 0 : 1;
-            }
-        }
-
-        return -1;
+        return null;
     }
 }

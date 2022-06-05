@@ -254,14 +254,14 @@ public class Player implements Comparable {
         if (railroadLine instanceof DoubleRailroadLine) {
             DoubleRailroadLine doubleRailroadLine = (DoubleRailroadLine) railroadLine;
 
-            if (doubleRailroadLine.getColor() != c || (doubleRailroadLine.getColor() != c && doubleRailroadLine.getColor2() != c)) {
+            if ((doubleRailroadLine.getColor() != MapColor.GRAY && doubleRailroadLine.getColor2()!=MapColor.GRAY) || (doubleRailroadLine.getColor() != c && doubleRailroadLine.getColor2() !=c)) {
                 if (Configuration_Constants.debug)
                     System.out.println("(DEBUG)\t Player.buildRailroadLine() no Rail of such color! railroad from " + dest1 + " to " + dest2);
                 sendCommand("buildRailroad:null");
                 return;
             }
 
-            LinkedList<TrainCard> cards = getCardsToBuildRail(c, railroadLine.getDistance());
+            LinkedList<TrainCard> cards = getCardsToBuildRail(TrainCard.map_mapColor_to_TrainCardType(c), railroadLine.getDistance());
             if (cards == null) {
                 if (Configuration_Constants.debug)
                     System.out.println("(DEBUG)\t Player.buildRailroadLine() Player " + this.name + " not enough cards of color " + c + ". Railroad from " + dest1 + " to " + dest2);
@@ -272,9 +272,17 @@ public class Player implements Comparable {
             this.handCards.removeAll(cards);
             if (Configuration_Constants.verbose)
                 System.out.println("(DEBUG)\t Player.buildRailroadLine() Player " + this.name + " built railroad from " + dest1 + " to " + dest2);
+            return;
         }
 
-        LinkedList<TrainCard> cards = getCardsToBuildRail(c, railroadLine.getDistance());
+        if (railroadLine.getColor() != MapColor.GRAY && railroadLine.getColor() != c) {
+            if (Configuration_Constants.debug)
+                System.out.println("(DEBUG)\t Player.buildRailroadLine() no Rail of such color! railroad from " + dest1 + " to " + dest2);
+            sendCommand("buildRailroad:null");
+            return;
+        }
+
+        LinkedList<TrainCard> cards = getCardsToBuildRail(TrainCard.map_mapColor_to_TrainCardType(c), railroadLine.getDistance());
         if (cards == null) {
             if (Configuration_Constants.debug)
                 System.out.println("(DEBUG)\t Player.buildRailroadLine() Player " + this.name + " not enough cards of color " + c + ". Railroad from " + dest1 + " to " + dest2);
@@ -290,10 +298,10 @@ public class Player implements Comparable {
     }
 
 
-    private LinkedList<TrainCard> getCardsToBuildRail(MapColor color, int amount) {
+    private LinkedList<TrainCard> getCardsToBuildRail(TrainCard.Type cardType, int amount) {
         LinkedList<TrainCard> cards = new LinkedList<>();
         for (TrainCard card : this.handCards) {
-            if (card.equals(color)) cards.add(card);
+            if (card.getType() == cardType) cards.add(card);
             if (amount <= cards.size()) return cards;
         }
         for (TrainCard card : this.handCards) {
