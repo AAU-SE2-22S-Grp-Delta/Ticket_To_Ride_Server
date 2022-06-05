@@ -258,7 +258,9 @@ public class Session {
 
     private void drawCardOpen(String command) {
         String[] words = command.split(DELIMITER_COMMAND);
-        player.drawCardOpen(Integer.parseInt(words[1]));
+        if (player.drawCardOpen(Integer.parseInt(words[1])) < 0) {
+            send("openCard:null");
+        }
     }
 
 

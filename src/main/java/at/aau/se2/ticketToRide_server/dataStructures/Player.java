@@ -238,8 +238,8 @@ public class Player implements Comparable {
 
 
     public int drawCardOpen(int id) {
-        //TODO impl
-        return -1;
+        if (this.state != State.GAMING) return -1;
+        return game.drawOpenCard(this, id);
     }
 
 
