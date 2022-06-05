@@ -39,7 +39,7 @@ public class Player implements Comparable {
     private int numStones;
     private ArrayList<TrainCard> handCards;
     private ArrayList<Mission> missions;
-    private ArrayList<RailroadLine> ownsRailroads;
+    private final ArrayList<RailroadLine> ownsRailroads = new ArrayList<>();
     //todo completed missions
     int points = 0;
 
@@ -246,6 +246,15 @@ public class Player implements Comparable {
     public void buildRailroadLine(String dest1, String dest2, String color) {
         RailroadLine railroadLine = game.getRailroadLineByName(dest1, dest2);
         if (railroadLine == null) {
+            if (Configuration_Constants.debug)
+                System.out.println("(DEBUG)\t Player.buildRailroadLine() no Rail such railroad from " + dest1 + " to " + dest2);
+            sendCommand("buildRailroad:null");
+            return;
+        }
+
+        if (numStones < railroadLine.getDistance()) {
+            if (Configuration_Constants.debug)
+                System.out.println("(DEBUG)\t Player.buildRailroadLine() Player " + name + " has " + numStones + " stones but length is " + railroadLine.getDistance());
             sendCommand("buildRailroad:null");
             return;
         }
@@ -270,6 +279,9 @@ public class Player implements Comparable {
             }
             this.handCards.removeAll(cards);
             game.setRailRoadLineOwner(this, railroadLine, c, cards);
+            this.ownsRailroads.add(railroadLine);
+            this.points += getPointsForRoutes(railroadLine.getDistance());
+            this.numStones -= railroadLine.getDistance();
             if (Configuration_Constants.verbose)
                 System.out.println("(DEBUG)\t Player.buildRailroadLine() Player " + this.name + " built railroad from " + dest1 + " to " + dest2);
             return;
@@ -291,10 +303,12 @@ public class Player implements Comparable {
         }
         this.handCards.removeAll(cards);
         game.setRailRoadLineOwner(this, railroadLine, c, cards);
-        this.points = getPointsForRoutes(railroadLine.getDistance());
+        this.points += getPointsForRoutes(railroadLine.getDistance());
+        this.numStones -= railroadLine.getDistance();
+        this.ownsRailroads.add(railroadLine);
+
         if (Configuration_Constants.verbose)
             System.out.println("(DEBUG)\t Player.buildRailroadLine() Player " + this.name + " built railroad from " + dest1 + " to " + dest2);
-        return;
     }
 
 
