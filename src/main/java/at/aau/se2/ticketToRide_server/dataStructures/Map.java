@@ -51,4 +51,6 @@ public class Map {
         for (Destination destination : destinations) if (destination.getName().equals(name)) return destination;
         return null;
     }
+
+
 }

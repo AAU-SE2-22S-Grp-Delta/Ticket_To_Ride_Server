@@ -375,14 +375,19 @@ public class Player implements Comparable {
                     Destination currentDest = toProcess.remove(0);
                     for (RailroadLine line : this.ownsRailroads) {
                         if (line.getDestination1().equals(currentDest) && !visited.contains(line.getDestination2())) {
-                            if (line.getDestination2().equals(mission.destination2)) return;
+                            if (line.getDestination2().equals(mission.destination2)) {
+                                mission.setDone();
+                                return;
+                            }
                             toProcess.add(line.getDestination2());
                         } else if (line.getDestination2().equals(currentDest) && !visited.contains(line.getDestination1())) {
-                            if (line.getDestination1().equals(mission.destination2)) return;
+                            if (line.getDestination1().equals(mission.destination2)) {
+                                mission.setDone();
+                                return;
+                            }
                             toProcess.add(line.getDestination1());
                         }
                     }
-
                     visited.add(currentDest);
                 }
             }
