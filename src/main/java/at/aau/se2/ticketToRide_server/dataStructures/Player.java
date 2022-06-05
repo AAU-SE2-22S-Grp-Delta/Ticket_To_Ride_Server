@@ -13,28 +13,17 @@ import java.util.LinkedList;
  */
 public class Player implements Comparable {
 
-
-
-    public enum Command {
-        SYNC, //game model has changed -> prompts the client to synchronize
-        DO_MOVE //informs this that the game is waiting for the valid player to perform a move
-        ;
-
-    }
-
     public enum Color {
         RED(0), BLUE(1), GREEN(2), YELLOW(3), BLACK(4);
 
 
         Color(int i) {
         }
-
-
     }
 
 
     public enum State {
-        LOBBY, GAMING;
+        LOBBY, GAMING
     }
 
     //player management

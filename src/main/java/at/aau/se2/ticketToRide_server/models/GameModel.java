@@ -18,8 +18,8 @@ public class GameModel implements Runnable {
     private static int idCounter = 0;
 
     //meta
-    private int id;
-    private String name;
+    private final int id;
+    private final String name;
     private State state;
     private int colorCounter = 0;           //to assign colors to players
     private int actionsLeft;                //to manage a move
@@ -29,18 +29,18 @@ public class GameModel implements Runnable {
 
 
     //invisible
-    private ArrayList<Player> players;
-    private Player owner;
+    private final ArrayList<Player> players;
+    private final Player owner;
     private final ArrayList<TrainCard> trainCardsStack;
-    //todo Ablagestapel
-    private ArrayList<Mission> missions;
+
+    private final ArrayList<Mission> missions;
     private int activePlayer = 0;  //counts who is next
 
 
     //visible to all
     private final Map map = getMapInstance();
     private ArrayList<TrainCard> openCards = new ArrayList<>();
-    private HashMap<Player, Integer> longestConnectionsForEachPlayer = new HashMap<>();
+    private final HashMap<Player, Integer> longestConnectionsForEachPlayer = new HashMap<>();
 
 
     public GameModel(String name, Player owner) {
@@ -106,7 +106,7 @@ public class GameModel implements Runnable {
 
 
 
-    //region ------------------- REQUESTS FROM LOBBY -------------------------------
+    //region ------ REQUESTS FROM LOBBY --------------------------------------------------------------------------------
 
 
     public String listPlayersGame() {
@@ -122,7 +122,7 @@ public class GameModel implements Runnable {
     }
 
 
-    private String getGameState(String command) {
+    public String getState() {
         String state;
         synchronized (this) {
             state = this.state.toString();
@@ -634,28 +634,10 @@ public class GameModel implements Runnable {
 
 
     //region ------------------- GETTER SETTER TO_STRING ----------------------------
-    public static int getIdCounter() {
-        return idCounter;
-    }
-
-
-    public int getId() {
-        return id;
-    }
 
 
     public String getName() {
         return name;
-    }
-
-
-    public State getState() {
-        return state;
-    }
-
-
-    public ArrayList<Player> getPlayers() {
-        return players;
     }
 
 
@@ -666,8 +648,7 @@ public class GameModel implements Runnable {
 
     @Override
     public String toString() {
-        String toString = "GameModelid=" + id +
-                ", name='" + name +
+        String toString = "name='" + name +
                 ", state=" + state
                 + ", owner=" + owner.getName() + "\n"
                 + "\tPlayers:";

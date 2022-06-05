@@ -74,10 +74,9 @@ public class Lobby {
     private String getGameState(String gameName) {
         String gameState = "getGameState:noSuchGame";
         synchronized (this) {
-            for (GameModel game : this.games) {
+            for (GameModel game : games) {
                 if (game.getName().equals(gameName)) {
-                    gameState = game.listPlayersGame();
-                    break;
+                    gameState = "getGameState:" + game.getState();
                 }
             }
             this.notify();
