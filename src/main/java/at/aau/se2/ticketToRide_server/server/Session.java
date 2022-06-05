@@ -207,7 +207,7 @@ public class Session {
         StringBuilder builder = new StringBuilder();
         if (handCards.isEmpty()) builder.append("empty");
         else {
-            handCards.forEach(h -> builder.append(h.getType()).append(DELIMITER_COMMAND));
+            handCards.forEach(h -> builder.append(h.getType().toString()).append(DELIMITER_COMMAND));
         }
 
         send(REQUEST_GET_HAND_CARDS, builder.toString());
@@ -221,7 +221,7 @@ public class Session {
             ArrayList<TrainCard> openCards = gameModel.getOpenCards();
             if(openCards.size() == 0) builder.append("empty");
             else {
-                openCards.forEach(o -> builder.append(o.getType()).append(DELIMITER_COMMAND));
+                openCards.forEach(o -> builder.append(o.getType().toString()).append(DELIMITER_COMMAND));
             }
 
         }
@@ -240,9 +240,9 @@ public class Session {
             else {
                 for (int i = 0; i < railroadLines.size(); i++) {
                     if(railroadLines.get(i) instanceof DoubleRailroadLine)
-                        builder.append(i).append(DELIMITER_COMMAND).append(railroadLines.get(i).getOwner()).append(DELIMITER_COMMAND).append(((DoubleRailroadLine) railroadLines.get(i)).getOwner2()).append(DELIMITER_MULTI);
+                        builder.append(i).append(DELIMITER_COMMAND).append(railroadLines.get(i).getOwner().getName()).append(DELIMITER_COMMAND).append(((DoubleRailroadLine) railroadLines.get(i)).getOwner2().getName()).append(DELIMITER_MULTI);
                     else
-                        builder.append(i).append(DELIMITER_COMMAND).append(railroadLines.get(i).getOwner()).append(DELIMITER_MULTI);
+                        builder.append(i).append(DELIMITER_COMMAND).append(railroadLines.get(i).getOwner().getName()).append(DELIMITER_MULTI);
                 }
             }
         }
@@ -273,7 +273,7 @@ public class Session {
             ArrayList<Player> players = gameModel.getPlayers();
             if(players.size() == 0) builder.append("empty");
             else {
-                players.forEach(p -> builder.append(p.getName()).append(DELIMITER_COMMAND).append(p.getPlayerColor()).append(DELIMITER_COMMAND));
+                players.forEach(p -> builder.append(p.getName()).append(DELIMITER_COMMAND).append(p.getPlayerColor().toString()).append(DELIMITER_COMMAND));
             }
         }
         send(REQUEST_GET_COLORS, builder.toString());
