@@ -268,8 +268,8 @@ public class Player implements Comparable {
                 sendCommand("buildRailroad:null");
                 return;
             }
-            game.setRailRoadLineOwner(this, railroadLine, c, cards);
             this.handCards.removeAll(cards);
+            game.setRailRoadLineOwner(this, railroadLine, c, cards);
             if (Configuration_Constants.verbose)
                 System.out.println("(DEBUG)\t Player.buildRailroadLine() Player " + this.name + " built railroad from " + dest1 + " to " + dest2);
             return;
@@ -289,8 +289,8 @@ public class Player implements Comparable {
             sendCommand("buildRailroad:null");
             return;
         }
-        game.setRailRoadLineOwner(this, railroadLine, c, cards);
         this.handCards.removeAll(cards);
+        game.setRailRoadLineOwner(this, railroadLine, c, cards);
         this.points = getPointsForRoutes(railroadLine.getDistance());
         if (Configuration_Constants.verbose)
             System.out.println("(DEBUG)\t Player.buildRailroadLine() Player " + this.name + " built railroad from " + dest1 + " to " + dest2);
