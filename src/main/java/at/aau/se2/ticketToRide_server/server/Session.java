@@ -205,7 +205,7 @@ public class Session {
     private void getHandCards() {
         ArrayList<TrainCard> handCards = player.getHandCards();
         StringBuilder builder = new StringBuilder();
-        if (handCards.isEmpty()) builder.append("null");
+        if (handCards.isEmpty()) builder.append("empty");
         else {
             handCards.forEach(h -> builder.append(h.getType()).append(DELIMITER_COMMAND));
         }
@@ -219,35 +219,35 @@ public class Session {
         if(gameModel == null) builder.append("null");
         else {
             ArrayList<TrainCard> openCards = gameModel.getOpenCards();
-            if(openCards.size() == 0) builder.append("null");
+            if(openCards.size() == 0) builder.append("empty");
             else {
                 openCards.forEach(o -> builder.append(o.getType()).append(DELIMITER_COMMAND));
             }
 
         }
-        
+
         send(REQUEST_GET_OPEN_CARDS, builder.toString());
     }
 
-    private String getMap() {
+    private void getMap() {
         GameModel gameModel = player.getGame();
-        if(gameModel == null) return "null";
-
         StringBuilder builder = new StringBuilder();
-        Map map  = gameModel.getMap();
-        ArrayList<RailroadLine> railroadLines = new ArrayList<>(map.getRailroadLines());
-        for (int i = 0; i < railroadLines.size()-1; i++) {
-            if(railroadLines.get(i) instanceof DoubleRailroadLine)
-                builder.append(i).append(":").append(railroadLines.get(i).getOwner()).append(":").append(((DoubleRailroadLine) railroadLines.get(i)).getOwner2()).append(";");
-            else
-                builder.append(i).append(":").append(railroadLines.get(i).getOwner()).append(";");
+        if(gameModel == null) builder.append("null");
+        else {
+            Map map  = gameModel.getMap();
+            ArrayList<RailroadLine> railroadLines = new ArrayList<>(map.getRailroadLines());
+            if(railroadLines.size() == 0) builder.append("empty");
+            else {
+                for (int i = 0; i < railroadLines.size(); i++) {
+                    if(railroadLines.get(i) instanceof DoubleRailroadLine)
+                        builder.append(i).append(DELIMITER_COMMAND).append(railroadLines.get(i).getOwner()).append(DELIMITER_COMMAND).append(((DoubleRailroadLine) railroadLines.get(i)).getOwner2()).append(DELIMITER_MULTI);
+                    else
+                        builder.append(i).append(DELIMITER_COMMAND).append(railroadLines.get(i).getOwner()).append(DELIMITER_MULTI);
+                }
+            }
         }
-        if(railroadLines.get(railroadLines.size()-1) instanceof DoubleRailroadLine)
-            builder.append(railroadLines.size()-1).append(":").append(railroadLines.get(railroadLines.size()-1).getOwner()).append(":").append(((DoubleRailroadLine) railroadLines.get(railroadLines.size()-1)).getOwner2()).append(";");
-        else
-            builder.append(railroadLines.size()-1).append(":").append(railroadLines.get(railroadLines.size()-1).getOwner()).append(";");
 
-        return builder.toString();
+        send(REQUEST_GET_MAP, builder.toString());
     }
 
     private String getPoints() {
