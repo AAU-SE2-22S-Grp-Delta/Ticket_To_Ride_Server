@@ -235,14 +235,21 @@ public class Session {
         if(gameModel == null) builder.append("null");
         else {
             Map map  = gameModel.getMap();
-            ArrayList<RailroadLine> railroadLines = new ArrayList<>(map.getRailroadLines());
-            if(railroadLines.size() == 0) builder.append("empty");
+            if(map == null) builder.append("null");
             else {
-                for (int i = 0; i < railroadLines.size(); i++) {
-                    if(railroadLines.get(i) instanceof DoubleRailroadLine)
-                        builder.append(i).append(DELIMITER_COMMAND).append(railroadLines.get(i).getOwner().getName()).append(DELIMITER_COMMAND).append(((DoubleRailroadLine) railroadLines.get(i)).getOwner2().getName()).append(DELIMITER_MULTI);
-                    else
-                        builder.append(i).append(DELIMITER_COMMAND).append(railroadLines.get(i).getOwner().getName()).append(DELIMITER_MULTI);
+                ArrayList<RailroadLine> railroadLines = new ArrayList<>(map.getRailroadLines());
+                if (railroadLines.size() == 0) builder.append("empty");
+                else {
+                    for (int i = 0; i < railroadLines.size(); i++) {
+                        if (railroadLines.get(i) instanceof DoubleRailroadLine) {
+                            Player owner1 = railroadLines.get(i).getOwner();
+                            Player owner2 = ((DoubleRailroadLine) railroadLines.get(i)).getOwner2();
+                            builder.append(i).append(DELIMITER_COMMAND).append(owner1==null ? "null" : owner1.getName()).append(DELIMITER_COMMAND).append(owner2==null ? "null" : owner2.getName()).append(DELIMITER_MULTI);
+                        } else {
+                            Player owner1 = railroadLines.get(i).getOwner();
+                            builder.append(i).append(DELIMITER_COMMAND).append(owner1==null ? "null" : owner1.getName()).append(DELIMITER_MULTI);
+                        }
+                    }
                 }
             }
         }
@@ -273,7 +280,7 @@ public class Session {
             ArrayList<Player> players = gameModel.getPlayers();
             if(players.size() == 0) builder.append("empty");
             else {
-                players.forEach(p -> builder.append(p.getName()).append(DELIMITER_COMMAND).append(p.getPlayerColor().toString()).append(DELIMITER_COMMAND));
+                players.forEach(p -> builder.append(p.getName()).append(DELIMITER_COMMAND).append(p.getPlayerColor()==null ? "null": p.getPlayerColor().toString()).append(DELIMITER_COMMAND));
             }
         }
         send(REQUEST_GET_COLORS, builder.toString());
