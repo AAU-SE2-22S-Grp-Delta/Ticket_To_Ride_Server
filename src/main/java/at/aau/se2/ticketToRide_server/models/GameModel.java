@@ -39,7 +39,7 @@ public class GameModel implements Runnable {
 
     //visible to all
     private final Map map = getMapInstance();
-    private ArrayList<TrainCard> openCards = new ArrayList<>();
+    private TrainCard[] openCards = new TrainCard[5];
     private final HashMap<Player, Integer> longestConnectionsForEachPlayer = new HashMap<>();
 
 
@@ -138,9 +138,8 @@ public class GameModel implements Runnable {
 
     //TODO init visible cards
     private void initOpenCards() {
-        this.openCards = new ArrayList<>();
         for (int i = 0; i < 5; i++) {
-            this.openCards.add(this.trainCardsStack.remove(0));
+            this.openCards[i]=this.trainCardsStack.remove(0);
         }
     }
 
@@ -434,26 +433,30 @@ public class GameModel implements Runnable {
 
 
     public int drawOpenCard(Player player, int openCardId) {
+        int retVal=-1;
         synchronized (this) {
             if (!players.get(activePlayer).equals(player)) {
                 if (Configuration_Constants.verbose)
                     System.out.println("(VERBOSE)\t Player" + player.getName() + " was blocked trying pick open card while players " + players.get(activePlayer) + "turn.");
-                return -1;
             }
-
-            //TODO: check if the chosen card is a TrainCard (costs TrainCard = 3 => then turn is over)
-
-            if (actionsLeft == 2) {
-                //TODO: draw cards and call player.addHandCard(getCardfromStack(OpenCardID) or something
-                return actionsLeft -= 2;
-            }
-            ;
-            if (actionsLeft == 2 || actionsLeft == 1) {
-                return --actionsLeft;
+            else {
+                boolean locomotive = openCards[openCardId].getType() == TrainCard.Type.LOCOMOTIVE;
+                if (actionsLeft == 2 && locomotive) {
+                    player.addHandCard(openCards[openCardId]);
+                    openCards[openCardId] = drawCardFromStack();
+                    actionsLeft = 0;
+                } else if (actionsLeft == 1 && locomotive) {
+                    if (Configuration_Constants.debug)
+                        System.out.println("(DEBUG)\tGameModel.drawOpenCard() Player " + player.getName() + " tried to pick locomotive when actionsLeft=1");
+                } else {
+                    player.addHandCard(openCards[openCardId]);
+                    openCards[openCardId] = drawCardFromStack();
+                    actionsLeft--;
+                }
             }
             this.notify();
         }
-        throw new IllegalStateException("(FATAL) GameModel: No more moves left when called drawOpenCard");
+        return retVal;
     }
 
 
