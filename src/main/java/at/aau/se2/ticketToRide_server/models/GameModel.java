@@ -32,7 +32,7 @@ public class GameModel implements Runnable {
     private final ArrayList<Player> players;
     private final Player owner;
     private final ArrayList<TrainCard> trainCardsStack;
-
+    private final LinkedList<TrainCard> discardPile;
     private final ArrayList<Mission> missions;
     private int activePlayer = 0;  //counts who is next
 
@@ -43,16 +43,21 @@ public class GameModel implements Runnable {
     private final HashMap<Player, Integer> longestConnectionsForEachPlayer = new HashMap<>();
 
 
+
+
     public GameModel(String name, Player owner) {
         this.id = idCounter++;
         this.name = name;
         this.state = State.WAITING_FOR_PLAYERS;
         players = new ArrayList<>();
         this.trainCardsStack = getTrainCards();
-
+        discardPile = new LinkedList<>();
         this.missions = getMissions();
         this.owner = owner;
     }
+
+
+
 
     //region ----------------  WAITING FOR PLAYERS ---------------------------------------
 
@@ -69,7 +74,6 @@ public class GameModel implements Runnable {
         players.add(player);
         if (colorCounter > 4) {
             System.out.println("(FATAL) GameModel: colorCounter raised over 5, max value when executing addPlayer at this point should be 5. Execution crashed.");
-            exitGameCrashed();
         }
         switch (colorCounter++) {
             case 0:
@@ -92,14 +96,6 @@ public class GameModel implements Runnable {
         return 0;
     }
 
-
-    private void exitGameCrashed() {
-        this.state = State.CRASHED;
-        //TODO
-        //try to recover?
-        //endGame
-        //notify Players
-    }
 
     //endregion
 
@@ -468,13 +464,11 @@ public class GameModel implements Runnable {
                 if (Configuration_Constants.verbose)
                     System.out.println("(VERBOSE)\tGameModel.drawCardFromStack() Player" + player.getName() + " was blocked trying pick card from stack while players " + players.get(activePlayer) + "turn.");
             } else {
-                if (Configuration_Constants.verbose)
-                    System.out.println("(VERBOSE)\tGameModel.drawCardFromStack() drawing card...");
-                if (actionsLeft > 0 && trainCardsStack.size() > 0) {
-                    TrainCard card = trainCardsStack.remove(0);
+                TrainCard card = drawCardFromStack();
+                if (card != null) {
                     player.addHandCard(card);
-                    --actionsLeft;
                     retVal = 0;
+                    actionsLeft--;
                 }
             }
             this.notify();
@@ -483,7 +477,27 @@ public class GameModel implements Runnable {
     }
 
 
-    public int setRailRoadLineOwner(Player player, RailroadLine railroadLine, MapColor color) {
+    private TrainCard drawCardFromStack() {
+        TrainCard card = null;
+        synchronized (this) {
+            if (Configuration_Constants.verbose)
+                System.out.println("(VERBOSE)\tGameModel.drawCardFromStack() drawing card...");
+
+            if (trainCardsStack.isEmpty()) {
+                while (!discardPile.isEmpty()) trainCardsStack.add(discardPile.remove());
+                Collections.shuffle(trainCardsStack);
+            }
+
+            if (!trainCardsStack.isEmpty()) {
+                card = trainCardsStack.remove(0);
+            }
+            this.notify();
+        }
+        return card;
+    }
+
+
+    public int setRailRoadLineOwner(Player player, RailroadLine railroadLine, MapColor color, LinkedList<TrainCard> cardsToBuildRail) {
         int retVal = -1;
         synchronized (this) {
             if (!players.get(activePlayer).equals(player)) {
@@ -496,10 +510,14 @@ public class GameModel implements Runnable {
                 DoubleRailroadLine doubleRailroadLine = (DoubleRailroadLine) railroadLine;
                 if (doubleRailroadLine.getColor2().equals(color) && doubleRailroadLine.getOwner2() == null) {
                     doubleRailroadLine.setOwner2(player);
+                    this.actionsLeft = 0;
+                    returnCardsToDiscordPile(cardsToBuildRail);
                     retVal = 0;
                     if (Configuration_Constants.verbose)
                         System.out.println("(VERBOSE)\nGameModel.setRailRoadLineOwner() DoubleRailOwner=" + player.getName());
                 } else if (doubleRailroadLine.getColor().equals(color)) {
+                    this.actionsLeft = 0;
+                    returnCardsToDiscordPile(cardsToBuildRail);
                     doubleRailroadLine.setOwner(player);
                     retVal = 0;
                     if (Configuration_Constants.verbose)
@@ -507,6 +525,7 @@ public class GameModel implements Runnable {
                 }
             } else {
                 this.actionsLeft = 0;
+                returnCardsToDiscordPile(cardsToBuildRail);
                 railroadLine.setOwner(player);
                 retVal = 0;
                 if (Configuration_Constants.verbose)
@@ -518,6 +537,13 @@ public class GameModel implements Runnable {
     }
 
 
+    private void returnCardsToDiscordPile(LinkedList<TrainCard> cards) {
+        while (!cards.isEmpty()) {
+            discardPile.add(cards.remove());
+        }
+    }
+
+
     public String drawMission(Player player) {
         String response = "drawMission:null";
         synchronized (this) {
@@ -525,8 +551,8 @@ public class GameModel implements Runnable {
                 if (Configuration_Constants.debug)
                     System.out.println("(DEBUG)\tPlayer" + player.getName() + " was blocked trying to draw mission while players " + players.get(activePlayer) + "turn.");
             } else {
-                if (missions.size() == 0) response = "drawMission:empty";
-                else if (set3s[activePlayer].isEmpty()) {
+                if (missions.isEmpty()) response = "drawMission:empty";
+                else if (!waitForCoice[activePlayer]) {
                     set3s[activePlayer] = new LinkedList<>();
                     for (int i = 0; !missions.isEmpty() && i < 3; i++) {
                         set3s[activePlayer].add(missions.remove(0));
@@ -586,7 +612,7 @@ public class GameModel implements Runnable {
 
     private void dropMissions(LinkedList<Mission> backToStack) {
         for (Mission mission : backToStack) {
-            missions.add(backToStack.remove());
+            missions.add(mission);
         }
         Collections.shuffle(missions);
     }
