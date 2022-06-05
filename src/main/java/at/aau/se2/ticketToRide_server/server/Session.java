@@ -265,20 +265,18 @@ public class Session {
         send(REQUEST_GET_POINTS, builder.toString());
     }
 
-    private String getColors() {
+    private void getColors() {
         GameModel gameModel = player.getGame();
-        if(gameModel == null) return "null";
-
         StringBuilder builder = new StringBuilder();
-        ArrayList<Player> players = gameModel.getPlayers();
-        for (int i = 0; i < players.size()-1; i++) {
-            Player player = players.get(i);
-            builder.append(player.getName()).append(":").append(player.getPlayerColor().toString()).append(":");
+        if(gameModel == null) builder.append("null");
+        else {
+            ArrayList<Player> players = gameModel.getPlayers();
+            if(players.size() == 0) builder.append("empty");
+            else {
+                players.forEach(p -> builder.append(p.getName()).append(DELIMITER_COMMAND).append(p.getPlayerColor()).append(DELIMITER_COMMAND));
+            }
         }
-        Player lastplayer = players.get(players.size()-1);
-        builder.append(lastplayer.getName()).append(":").append(lastplayer.getPlayerColor().toString());
-
-        return builder.toString();
+        send(REQUEST_GET_COLORS, builder.toString());
     }
 
 
