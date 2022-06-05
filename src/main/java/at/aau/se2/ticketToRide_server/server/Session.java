@@ -250,20 +250,19 @@ public class Session {
         send(REQUEST_GET_MAP, builder.toString());
     }
 
-    private String getPoints() {
+    private void getPoints() {
         GameModel gameModel = player.getGame();
-        if(gameModel == null) return "null";
-
         StringBuilder builder = new StringBuilder();
-        ArrayList<Player> players = gameModel.getPlayers();
-        for (int i = 0; i < players.size()-1; i++) {
-            Player player = players.get(i);
-            builder.append(player.getName()).append(":").append(player.getPoints()).append(":");
+        if(gameModel == null) builder.append("null");
+        else {
+            ArrayList<Player> players = gameModel.getPlayers();
+            if(players.size() == 0) builder.append("empty");
+            else {
+                players.forEach(p -> builder.append(p.getName()).append(DELIMITER_COMMAND).append(p.getPoints()).append(DELIMITER_COMMAND));
+            }
         }
-        Player lastPlayer = players.get(players.size()-1);
-        builder.append(lastPlayer.getName()).append(":").append(lastPlayer.getPoints());
 
-        return builder.toString();
+        send(REQUEST_GET_POINTS, builder.toString());
     }
 
     private String getColors() {
