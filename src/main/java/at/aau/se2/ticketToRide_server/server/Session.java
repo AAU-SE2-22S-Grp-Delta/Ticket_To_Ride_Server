@@ -202,19 +202,14 @@ public class Session {
 
     //----- IN GAME REQUESTS --------------------------------------------------------
 
-    private String getHandCards() {
+    private void getHandCards() {
         ArrayList<TrainCard> handCards = player.getHandCards();
-        if (handCards.isEmpty()) return "null";
-
         StringBuilder builder = new StringBuilder();
-        for (int i = 0; i < handCards.size()-1; i++) {
-            TrainCard handCard = handCards.get(i);
-            builder.append(handCard.getType().toString()).append(":");
+        if (handCards.isEmpty()) builder.append("null");
+        else {
+            handCards.forEach(h -> builder.append(h.getType()).append(DELIMITER_COMMAND));
         }
-        TrainCard lastHandCard = handCards.get(handCards.size()-1);
-        builder.append(lastHandCard.getType().toString());
-
-        return builder.toString();
+        send(REQUEST_GET_HAND_CARDS, builder.toString());
     }
 
     private String getOpenCards() {
