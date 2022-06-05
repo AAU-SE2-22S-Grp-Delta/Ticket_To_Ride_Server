@@ -209,23 +209,24 @@ public class Session {
         else {
             handCards.forEach(h -> builder.append(h.getType()).append(DELIMITER_COMMAND));
         }
+
         send(REQUEST_GET_HAND_CARDS, builder.toString());
     }
 
-    private String getOpenCards() {
+    private void getOpenCards() {
         GameModel gameModel = player.getGame();
-        if(gameModel == null) return "null";
-
-        ArrayList<TrainCard> openCards = gameModel.getOpenCards();
         StringBuilder builder = new StringBuilder();
-        for (int i = 0; i < openCards.size()-1; i++) {
-            TrainCard openCard = openCards.get(i);
-            builder.append(openCard.getType().toString()).append(":");
-        }
-        TrainCard lastOpenCard = openCards.get(openCards.size()-1);
-        builder.append(lastOpenCard.getType().toString());
+        if(gameModel == null) builder.append("null");
+        else {
+            ArrayList<TrainCard> openCards = gameModel.getOpenCards();
+            if(openCards.size() == 0) builder.append("null");
+            else {
+                openCards.forEach(o -> builder.append(o.getType()).append(DELIMITER_COMMAND));
+            }
 
-        return builder.toString();
+        }
+        
+        send(REQUEST_GET_OPEN_CARDS, builder.toString());
     }
 
     private String getMap() {
