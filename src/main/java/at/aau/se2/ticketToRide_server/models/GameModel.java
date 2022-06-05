@@ -26,6 +26,7 @@ public class GameModel implements Runnable {
     private int countdown = -1;             //for the last moves before end
     private LinkedList<Mission>[] set3s;    //when player has to choose missions, the options are temp in here
     private boolean[] waitForCoice;         //when player has to choose missions, the game will remember to wait for the coice
+    boolean stateChanged = false;
 
 
     //invisible
@@ -247,6 +248,7 @@ public class GameModel implements Runnable {
             try {
                 synchronized (this) {
                     actionCall();
+                    stateChanged = false;
                     if (Configuration_Constants.verbose)
                         System.out.println("(VERBOSE)\tGameModel.move() called and waiting for action");
                     this.wait(); //Waits until a action is done
@@ -276,6 +278,7 @@ public class GameModel implements Runnable {
      * Notifies all players that the game model has changed
      */
     private void sync() {
+        if (!stateChanged) return;
         for (Player p : this.players) {
             p.sync();
         }
@@ -439,11 +442,16 @@ public class GameModel implements Runnable {
                 if (Configuration_Constants.verbose)
                     System.out.println("(VERBOSE)\t Player" + player.getName() + " was blocked trying pick open card while players " + players.get(activePlayer) + "turn.");
             }
+            else if (openCardId<0 || openCardId>4) {
+                if (Configuration_Constants.verbose)
+                    System.out.println("(VERBOSE)\t Player" + player.getName() + " tried to pick card out of range: openCardId=" + openCardId);
+            }
             else {
                 boolean locomotive = openCards[openCardId].getType() == TrainCard.Type.LOCOMOTIVE;
                 if (actionsLeft == 2 && locomotive) {
                     player.addHandCard(openCards[openCardId]);
                     openCards[openCardId] = drawCardFromStack();
+                    stateChanged = true;
                     actionsLeft = 0;
                 } else if (actionsLeft == 1 && locomotive) {
                     if (Configuration_Constants.debug)
@@ -451,6 +459,7 @@ public class GameModel implements Runnable {
                 } else {
                     player.addHandCard(openCards[openCardId]);
                     openCards[openCardId] = drawCardFromStack();
+                    stateChanged = true;
                     actionsLeft--;
                 }
             }
@@ -515,6 +524,7 @@ public class GameModel implements Runnable {
                     doubleRailroadLine.setOwner2(player);
                     this.actionsLeft = 0;
                     returnCardsToDiscordPile(cardsToBuildRail);
+                    stateChanged = true;
                     retVal = 0;
                     if (Configuration_Constants.verbose)
                         System.out.println("(VERBOSE)\nGameModel.setRailRoadLineOwner() DoubleRailOwner=" + player.getName());
@@ -522,6 +532,7 @@ public class GameModel implements Runnable {
                     this.actionsLeft = 0;
                     returnCardsToDiscordPile(cardsToBuildRail);
                     doubleRailroadLine.setOwner(player);
+                    stateChanged = true;
                     retVal = 0;
                     if (Configuration_Constants.verbose)
                         System.out.println("(VERBOSE)\nGameModel.setRailRoadLineOwner() DoubleRailOwner=" + player.getName());
@@ -530,6 +541,7 @@ public class GameModel implements Runnable {
                 this.actionsLeft = 0;
                 returnCardsToDiscordPile(cardsToBuildRail);
                 railroadLine.setOwner(player);
+                stateChanged = true;
                 retVal = 0;
                 if (Configuration_Constants.verbose)
                     System.out.println("(VERBOSE)\nGameModel.setRailRoadLineOwner() RailOwner=" + player.getName());
@@ -614,9 +626,7 @@ public class GameModel implements Runnable {
 
 
     private void dropMissions(LinkedList<Mission> backToStack) {
-        for (Mission mission : backToStack) {
-            missions.add(mission);
-        }
+        missions.addAll(backToStack);
         Collections.shuffle(missions);
     }
 
