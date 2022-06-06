@@ -6,6 +6,7 @@ import at.aau.se2.ticketToRide_server.server.Lobby;
 import at.aau.se2.ticketToRide_server.server.Session;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedList;
 
 /**
@@ -418,6 +419,7 @@ public class Player implements Comparable {
             System.out.println("(VERBOSE)\tPlayer.addHandCard() Card=" + card.getType().toString());
         if (card == null) throw new IllegalArgumentException("card is Null!");
         this.handCards.add(card);
+        Collections.sort(handCards);
     }
 
 

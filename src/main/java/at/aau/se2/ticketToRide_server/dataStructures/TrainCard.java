@@ -1,11 +1,15 @@
 package at.aau.se2.ticketToRide_server.dataStructures;
 
-public class TrainCard {
+import java.util.Comparator;
+
+public class TrainCard implements Comparable{
+
+
     public enum Type {
         PINK("pink"), BLUE("blue"), GREEN("green"), YELLOW("yellow"), RED("red"), WHITE("white"), ORANGE("orange"), BLACK("black"), LOCOMOTIVE("locomotive");
 
-        private final String value;
 
+        private final String value;
 
         Type(String value) {
             this.value = value;
@@ -42,10 +46,10 @@ public class TrainCard {
                     return null;
             }
         }
+
+
     }
-
     private final Type type;
-
 
     public TrainCard(Type type) {
         this.type = type;
@@ -83,5 +87,27 @@ public class TrainCard {
                 return Type.RED;
         }
         return null;
+    }
+
+
+    @Override
+    public int compareTo(Object o) {
+        if (!(o instanceof TrainCard)) return -100;
+        return Integer.compare(mapCardToInt((TrainCard) o), mapCardToInt(this));
+    }
+
+    private int mapCardToInt(TrainCard card) {
+        switch (card.type) {
+            case LOCOMOTIVE: return 1;
+            case RED: return 2;
+            case GREEN: return 3;
+            case BLUE: return 4;
+            case ORANGE: return 5;
+            case BLACK: return 6;
+            case WHITE: return 7;
+            case PINK: return 8;
+            case YELLOW: return 9;
+        }
+        return -1;
     }
 }
