@@ -497,6 +497,7 @@ public class GameModel implements Runnable {
 
             if (trainCardsStack.isEmpty()) {
                 while (!discardPile.isEmpty()) trainCardsStack.add(discardPile.remove());
+                if (trainCardsStack.isEmpty()) actionsLeft = 0; //deadlock possible -> this is reset
                 Collections.shuffle(trainCardsStack);
             }
 

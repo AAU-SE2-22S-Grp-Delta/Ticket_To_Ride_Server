@@ -264,7 +264,7 @@ public class Player implements Comparable {
         if (railroadLine instanceof DoubleRailroadLine) {
             DoubleRailroadLine doubleRailroadLine = (DoubleRailroadLine) railroadLine;
 
-            if ((doubleRailroadLine.getColor() != MapColor.GRAY && doubleRailroadLine.getColor2() != MapColor.GRAY) || (doubleRailroadLine.getColor() != c && doubleRailroadLine.getColor2() != c)) {
+            if (doubleRailroadLine.getColor() != MapColor.GRAY && doubleRailroadLine.getColor2() != MapColor.GRAY && doubleRailroadLine.getColor() != c && doubleRailroadLine.getColor2() != c) {
                 if (Configuration_Constants.debug)
                     System.out.println("(DEBUG)\t Player.buildRailroadLine() no Rail of such color! railroad from " + dest1 + " to " + dest2);
                 sendCommand("buildRailroad:null");
