@@ -37,7 +37,7 @@ public class Session {
     private static final String DELIMITER_VALUE = ",";
 
     private static final String REGEX_NULL = "null";
-    private static final String REGEX_NAME = "[^//W]+";
+    private static final String REGEX_NAME = "[^;:]+";
     private static final String REGEX_OPEN_CARD_ID = "[01234]";
 
     private static final String COMMAND_ENTER_LOBBY = "enterLobby:" + REGEX_NAME;

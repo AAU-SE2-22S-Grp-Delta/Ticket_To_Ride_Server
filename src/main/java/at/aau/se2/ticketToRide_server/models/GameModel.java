@@ -495,13 +495,17 @@ public class GameModel implements Runnable {
             if (Configuration_Constants.verbose)
                 System.out.println("(VERBOSE)\tGameModel.drawCardFromStack() drawing card...");
 
+            boolean abort = false;
             if (trainCardsStack.isEmpty()) {
                 while (!discardPile.isEmpty()) trainCardsStack.add(discardPile.remove());
-                if (trainCardsStack.isEmpty()) actionsLeft = 0; //deadlock possible -> this is reset
+                if (trainCardsStack.isEmpty()) {
+                    actionsLeft = 0; //deadlock possible -> this is reset
+                    abort = true;
+                }
                 Collections.shuffle(trainCardsStack);
             }
 
-            if (!trainCardsStack.isEmpty()) {
+            if (!trainCardsStack.isEmpty()&&!abort) {
                 card = trainCardsStack.remove(0);
             }
             this.notify();
