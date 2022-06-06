@@ -266,7 +266,7 @@ public class Session {
 
     private void buildRailroad(String command) {
         String[] words = command.split(":");
-        player.buildRailroadLine(words[1], words[2], words[3]);
+        if (player.buildRailroadLine(words[1], words[2], words[3])<0) send("buildRailroad:null");
     }
 
 

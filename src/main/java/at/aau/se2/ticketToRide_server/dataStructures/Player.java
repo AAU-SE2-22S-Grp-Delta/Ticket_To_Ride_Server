@@ -244,20 +244,14 @@ public class Player implements Comparable {
     }
 
 
-    public void buildRailroadLine(String dest1, String dest2, String color) {
-        RailroadLine railroadLine = game.getRailroadLineByName(dest1, dest2);
-        if (railroadLine == null) {
-            if (Configuration_Constants.debug)
-                System.out.println("(DEBUG)\t Player.buildRailroadLine() no Rail such railroad from " + dest1 + " to " + dest2);
-            sendCommand("buildRailroad:null");
-            return;
-        }
+    public int buildRailroadLine(String dest1, String dest2, String color) {
+        if (state != State.GAMING) return -1;
 
-        if (numStones < railroadLine.getDistance()) {
+        RailroadLine railroadLine = game.getRailroadLineByName(dest1, dest2);
+        if (railroadLine == null || numStones < railroadLine.getDistance()) {
             if (Configuration_Constants.debug)
-                System.out.println("(DEBUG)\t Player.buildRailroadLine() Player " + name + " has " + numStones + " stones but length is " + railroadLine.getDistance());
-            sendCommand("buildRailroad:null");
-            return;
+                System.out.println("(DEBUG)\t Player.buildRailroadLine() Error while trying " + dest1 + " to " + dest2);
+            return -1;
         }
 
         MapColor c = MapColor.getByString(color);
@@ -267,51 +261,32 @@ public class Player implements Comparable {
             if (doubleRailroadLine.getColor() != MapColor.GRAY && doubleRailroadLine.getColor2() != MapColor.GRAY && doubleRailroadLine.getColor() != c && doubleRailroadLine.getColor2() != c) {
                 if (Configuration_Constants.debug)
                     System.out.println("(DEBUG)\t Player.buildRailroadLine() no Rail of such color! railroad from " + dest1 + " to " + dest2);
-                sendCommand("buildRailroad:null");
-                return;
+                return -1;
             }
-
-            LinkedList<TrainCard> cards = getCardsToBuildRail(TrainCard.map_mapColor_to_TrainCardType(c), railroadLine.getDistance());
-            if (cards == null) {
-                if (Configuration_Constants.debug)
-                    System.out.println("(DEBUG)\t Player.buildRailroadLine() Player " + this.name + " not enough cards of color " + c + ". Railroad from " + dest1 + " to " + dest2);
-                sendCommand("buildRailroad:null");
-                return;
-            }
-            this.handCards.removeAll(cards);
-            game.setRailRoadLineOwner(this, railroadLine, c, cards);
-            this.ownsRailroads.add(railroadLine);
-            this.points += getPointsForRoutes(railroadLine.getDistance());
-            this.numStones -= railroadLine.getDistance();
-            checkIfMissionsCompleted();
-            if (Configuration_Constants.verbose)
-                System.out.println("(VERBOSE)\t Player.buildRailroadLine() Player " + this.name + " built railroad from " + dest1 + " to " + dest2);
-            return;
         }
-
-        if (railroadLine.getColor() != MapColor.GRAY && railroadLine.getColor() != c) {
+        else if (railroadLine.getColor() != MapColor.GRAY && railroadLine.getColor() != c) {
             if (Configuration_Constants.debug)
                 System.out.println("(DEBUG)\t Player.buildRailroadLine() no Rail of such color! railroad from " + dest1 + " to " + dest2);
-            sendCommand("buildRailroad:null");
-            return;
+            return -1;
         }
 
         LinkedList<TrainCard> cards = getCardsToBuildRail(TrainCard.map_mapColor_to_TrainCardType(c), railroadLine.getDistance());
         if (cards == null) {
             if (Configuration_Constants.debug)
                 System.out.println("(DEBUG)\t Player.buildRailroadLine() Player " + this.name + " not enough cards of color " + c + ". Railroad from " + dest1 + " to " + dest2);
-            sendCommand("buildRailroad:null");
-            return;
+            return -1;
         }
-        this.handCards.removeAll(cards);
-        game.setRailRoadLineOwner(this, railroadLine, c, cards);
-        this.points += getPointsForRoutes(railroadLine.getDistance());
-        this.numStones -= railroadLine.getDistance();
-        this.ownsRailroads.add(railroadLine);
-        checkIfMissionsCompleted();
-
-        if (Configuration_Constants.verbose)
-            System.out.println("(DEBUG)\t Player.buildRailroadLine() Player " + this.name + " built railroad from " + dest1 + " to " + dest2);
+        if (game.setRailRoadLineOwner(this, railroadLine, c, cards)==0) {
+            this.handCards.removeAll(cards);
+            this.points += getPointsForRoutes(railroadLine.getDistance());
+            this.numStones -= railroadLine.getDistance();
+            this.ownsRailroads.add(railroadLine);
+            checkIfMissionsCompleted();
+            if (Configuration_Constants.verbose)
+                System.out.println("(DEBUG)\t Player.buildRailroadLine() Player " + this.name + " built railroad from " + dest1 + " to " + dest2);
+            return 0;
+        }
+        else return -1;
     }
 
 

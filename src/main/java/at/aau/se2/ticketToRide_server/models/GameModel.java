@@ -140,7 +140,7 @@ public class GameModel implements Runnable {
     //TODO init visible cards
     private void initOpenCards() {
         for (int i = 0; i < 5; i++) {
-            this.openCards[i]=this.trainCardsStack.remove(0);
+            this.openCards[i] = this.trainCardsStack.remove(0);
         }
     }
 
@@ -436,17 +436,15 @@ public class GameModel implements Runnable {
 
 
     public int drawOpenCard(Player player, int openCardId) {
-        int retVal=-1;
+        int retVal = -1;
         synchronized (this) {
             if (!players.get(activePlayer).equals(player)) {
                 if (Configuration_Constants.verbose)
                     System.out.println("(VERBOSE)\t Player" + player.getName() + " was blocked trying pick open card while players " + players.get(activePlayer) + "turn.");
-            }
-            else if (openCardId<0 || openCardId>4) {
+            } else if (openCardId < 0 || openCardId > 4) {
                 if (Configuration_Constants.verbose)
                     System.out.println("(VERBOSE)\t Player" + player.getName() + " tried to pick card out of range: openCardId=" + openCardId);
-            }
-            else {
+            } else {
                 boolean locomotive = openCards[openCardId].getType() == TrainCard.Type.LOCOMOTIVE;
                 if (actionsLeft == 2 && locomotive) {
                     player.addHandCard(openCards[openCardId]);
@@ -505,7 +503,7 @@ public class GameModel implements Runnable {
                 Collections.shuffle(trainCardsStack);
             }
 
-            if (!trainCardsStack.isEmpty()&&!abort) {
+            if (!trainCardsStack.isEmpty() && !abort) {
                 card = trainCardsStack.remove(0);
             }
             this.notify();
@@ -520,32 +518,22 @@ public class GameModel implements Runnable {
             if (!players.get(activePlayer).equals(player)) {
                 if (Configuration_Constants.debug)
                     System.out.println("(DEBUG)\tPlayer" + player.getName() + " was blocked trying to build road while players " + players.get(activePlayer) + "turn.");
-            } else if (railroadLine.getOwner() != null) {
-                if (Configuration_Constants.debug)
-                    System.out.println("(DEBUG)\tGameModel.setRailRoadLineOwner() Rail has owner named " + railroadLine.getOwner().getName() + ". Can't set owner to " + player.getName());
-            } else if (railroadLine instanceof DoubleRailroadLine) {
+            }
+
+            if ((railroadLine.getColor() == MapColor.GRAY || railroadLine.getColor() == color) && railroadLine.getOwner() == null){
+                railroadLine.setOwner(player);
+                retVal = 0;
+            }
+            else if (railroadLine instanceof DoubleRailroadLine) {
                 DoubleRailroadLine doubleRailroadLine = (DoubleRailroadLine) railroadLine;
-                if (doubleRailroadLine.getColor2().equals(color) && doubleRailroadLine.getOwner2() == null) {
+                if ((doubleRailroadLine.getColor2()==MapColor.GRAY||doubleRailroadLine.getColor2()==color)&&doubleRailroadLine.getOwner2()==null) {
                     doubleRailroadLine.setOwner2(player);
-                    this.actionsLeft = 0;
-                    returnCardsToDiscordPile(cardsToBuildRail);
-                    stateChanged = true;
-                    retVal = 0;
-                    if (Configuration_Constants.verbose)
-                        System.out.println("(VERBOSE)\nGameModel.setRailRoadLineOwner() DoubleRailOwner=" + player.getName());
-                } else if (doubleRailroadLine.getColor().equals(color)) {
-                    this.actionsLeft = 0;
-                    returnCardsToDiscordPile(cardsToBuildRail);
-                    doubleRailroadLine.setOwner(player);
-                    stateChanged = true;
-                    retVal = 0;
-                    if (Configuration_Constants.verbose)
-                        System.out.println("(VERBOSE)\nGameModel.setRailRoadLineOwner() DoubleRailOwner=" + player.getName());
+                    retVal=0;
                 }
-            } else {
+            }
+            if (retVal == 0) {
                 this.actionsLeft = 0;
                 returnCardsToDiscordPile(cardsToBuildRail);
-                railroadLine.setOwner(player);
                 stateChanged = true;
                 retVal = 0;
                 if (Configuration_Constants.verbose)
@@ -558,8 +546,8 @@ public class GameModel implements Runnable {
 
 
     private void returnCardsToDiscordPile(LinkedList<TrainCard> cards) {
-        while (!cards.isEmpty()) {
-            discardPile.add(cards.remove());
+        for (TrainCard card : cards) {
+            discardPile.add(card);
         }
     }
 
