@@ -202,11 +202,13 @@ public class Session {
 
     //----- IN GAME REQUESTS --------------------------------------------------------
 
+    //TODO Ask about Format
     private void getHandCards() {
         ArrayList<TrainCard> handCards = player.getHandCards();
         StringBuilder builder = new StringBuilder();
         if (handCards.isEmpty()) builder.append("empty");
         else {
+            //Format getHandCards:card1:card2:
             handCards.forEach(h -> builder.append(h.getType().toString()).append(DELIMITER_COMMAND));
         }
 
@@ -221,6 +223,7 @@ public class Session {
             ArrayList<TrainCard> openCards = gameModel.getOpenCards();
             if(openCards.size() == 0) builder.append("empty");
             else {
+                //Format getOpenCards:card1:card2:
                 openCards.forEach(o -> builder.append(o.getType().toString()).append(DELIMITER_COMMAND));
             }
 
@@ -241,13 +244,14 @@ public class Session {
                 if (railroadLines.size() == 0) builder.append("empty");
                 else {
                     for (int i = 0; i < railroadLines.size(); i++) {
+                        //Format getMap:1:Player1:Player2;2:Player3;3:Player2:Player3;
                         if (railroadLines.get(i) instanceof DoubleRailroadLine) {
                             Player owner1 = railroadLines.get(i).getOwner();
                             Player owner2 = ((DoubleRailroadLine) railroadLines.get(i)).getOwner2();
-                            builder.append(i).append(DELIMITER_VALUE).append(owner1==null ? "null" : owner1.getName()).append(DELIMITER_VALUE).append(owner2==null ? "null" : owner2.getName()).append(DELIMITER_MULTI);
+                            builder.append(i).append(DELIMITER_COMMAND).append(owner1==null ? "null" : owner1.getName()).append(DELIMITER_COMMAND).append(owner2==null ? "null" : owner2.getName()).append(DELIMITER_MULTI);
                         } else {
                             Player owner1 = railroadLines.get(i).getOwner();
-                            builder.append(i).append(DELIMITER_VALUE).append(owner1==null ? "null" : owner1.getName()).append(DELIMITER_MULTI);
+                            builder.append(i).append(DELIMITER_COMMAND).append(owner1==null ? "null" : owner1.getName()).append(DELIMITER_MULTI);
                         }
                     }
                 }
@@ -265,7 +269,8 @@ public class Session {
             ArrayList<Player> players = gameModel.getPlayers();
             if(players.size() == 0) builder.append("empty");
             else {
-                players.forEach(p -> builder.append(p.getName()).append(DELIMITER_VALUE).append(p.getPoints()).append(DELIMITER_MULTI));
+                //Format getPoints:Player1:10:Player2:30:
+                players.forEach(p -> builder.append(p.getName()).append(DELIMITER_COMMAND).append(p.getPoints()).append(DELIMITER_COMMAND));
             }
         }
 
@@ -280,7 +285,8 @@ public class Session {
             ArrayList<Player> players = gameModel.getPlayers();
             if(players.size() == 0) builder.append("empty");
             else {
-                players.forEach(p -> builder.append(p.getName()).append(DELIMITER_VALUE).append(p.getPlayerColor()==null ? "null": p.getPlayerColor().toString()).append(DELIMITER_MULTI));
+                //Format getColors:Player1:Blue:Player2:Green:
+                players.forEach(p -> builder.append(p.getName()).append(DELIMITER_COMMAND).append(p.getPlayerColor()==null ? "null": p.getPlayerColor().toString()).append(DELIMITER_COMMAND));
             }
         }
         send(REQUEST_GET_COLORS, builder.toString());
