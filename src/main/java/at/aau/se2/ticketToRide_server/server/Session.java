@@ -265,7 +265,7 @@ public class Session {
             ArrayList<Player> players = gameModel.getPlayers();
             if(players.size() == 0) builder.append("empty");
             else {
-                players.forEach(p -> builder.append(p.getName()).append(DELIMITER_COMMAND).append(p.getPoints()).append(DELIMITER_COMMAND));
+                players.forEach(p -> builder.append(p.getName()).append(DELIMITER_COMMAND).append(p.getPoints()).append(DELIMITER_MULTI));
             }
         }
 
@@ -280,7 +280,7 @@ public class Session {
             ArrayList<Player> players = gameModel.getPlayers();
             if(players.size() == 0) builder.append("empty");
             else {
-                players.forEach(p -> builder.append(p.getName()).append(DELIMITER_COMMAND).append(p.getPlayerColor()==null ? "null": p.getPlayerColor().toString()).append(DELIMITER_COMMAND));
+                players.forEach(p -> builder.append(p.getName()).append(DELIMITER_COMMAND).append(p.getPlayerColor()==null ? "null": p.getPlayerColor().toString()).append(DELIMITER_MULTI));
             }
         }
         send(REQUEST_GET_COLORS, builder.toString());
