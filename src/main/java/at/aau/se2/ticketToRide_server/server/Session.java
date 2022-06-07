@@ -244,10 +244,10 @@ public class Session {
                         if (railroadLines.get(i) instanceof DoubleRailroadLine) {
                             Player owner1 = railroadLines.get(i).getOwner();
                             Player owner2 = ((DoubleRailroadLine) railroadLines.get(i)).getOwner2();
-                            builder.append(i).append(DELIMITER_COMMAND).append(owner1==null ? "null" : owner1.getName()).append(DELIMITER_COMMAND).append(owner2==null ? "null" : owner2.getName()).append(DELIMITER_MULTI);
+                            builder.append(i).append(DELIMITER_VALUE).append(owner1==null ? "null" : owner1.getName()).append(DELIMITER_VALUE).append(owner2==null ? "null" : owner2.getName()).append(DELIMITER_MULTI);
                         } else {
                             Player owner1 = railroadLines.get(i).getOwner();
-                            builder.append(i).append(DELIMITER_COMMAND).append(owner1==null ? "null" : owner1.getName()).append(DELIMITER_MULTI);
+                            builder.append(i).append(DELIMITER_VALUE).append(owner1==null ? "null" : owner1.getName()).append(DELIMITER_MULTI);
                         }
                     }
                 }
@@ -265,7 +265,7 @@ public class Session {
             ArrayList<Player> players = gameModel.getPlayers();
             if(players.size() == 0) builder.append("empty");
             else {
-                players.forEach(p -> builder.append(p.getName()).append(DELIMITER_COMMAND).append(p.getPoints()).append(DELIMITER_MULTI));
+                players.forEach(p -> builder.append(p.getName()).append(DELIMITER_VALUE).append(p.getPoints()).append(DELIMITER_MULTI));
             }
         }
 
@@ -280,7 +280,7 @@ public class Session {
             ArrayList<Player> players = gameModel.getPlayers();
             if(players.size() == 0) builder.append("empty");
             else {
-                players.forEach(p -> builder.append(p.getName()).append(DELIMITER_COMMAND).append(p.getPlayerColor()==null ? "null": p.getPlayerColor().toString()).append(DELIMITER_MULTI));
+                players.forEach(p -> builder.append(p.getName()).append(DELIMITER_VALUE).append(p.getPlayerColor()==null ? "null": p.getPlayerColor().toString()).append(DELIMITER_MULTI));
             }
         }
         send(REQUEST_GET_COLORS, builder.toString());
