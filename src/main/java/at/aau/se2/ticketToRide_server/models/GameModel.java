@@ -1,14 +1,13 @@
 package at.aau.se2.ticketToRide_server.models;
 
 import at.aau.se2.ticketToRide_server.dataStructures.*;
+import at.aau.se2.ticketToRide_server.dataStructures.Map;
 import at.aau.se2.ticketToRide_server.server.Configuration_Constants;
 import at.aau.se2.ticketToRide_server.server.Lobby;
+import jdk.jshell.spi.ExecutionControl;
 import org.w3c.dom.ls.LSOutput;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedList;
+import java.util.*;
 
 enum State {
     WAITING_FOR_PLAYERS, RUNNING, OVER, CRASHED
@@ -397,6 +396,18 @@ public class GameModel implements Runnable {
             this.notify();
         }
         return builder.toString();
+    }
+
+
+    public String cheatMissions() {
+        StringBuilder builder = new StringBuilder("cheatMissions");
+        synchronized (this) {
+            //TODO impl Method
+//            0. befehlsformat und was kommt zurück
+//            befehl vom client 		cheatMission
+//            server schickt zurück		cheatMission:[playerName1],[mission1], .... , [missionN]:....:[playerNameN],[mission1], .... , [missionN]
+        }
+        return null;
     }
 
 

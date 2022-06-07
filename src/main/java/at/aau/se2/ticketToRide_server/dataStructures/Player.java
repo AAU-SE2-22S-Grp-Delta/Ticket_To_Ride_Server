@@ -177,12 +177,18 @@ public class Player implements Comparable {
 
 
     public String getMissions() {
-        if (state != State.GAMING) return "getMissions:null";
-        StringBuilder builder = new StringBuilder("getMissions");
-        for (Mission mission : missions) {
-            builder.append(":").append(mission.getId());
+        String retVal = "getMissions:null";
+        if (state != State.GAMING) return retVal;
+        synchronized (missions) {
+
+            StringBuilder builder = new StringBuilder("getMissions");
+            for (Mission mission : missions) {
+                builder.append(":").append(mission.getId());
+            }
+            retVal= builder.toString();
+            missions.notify();
         }
-        return builder.toString();
+        return retVal;
     }
 
 
@@ -341,32 +347,35 @@ public class Player implements Comparable {
 
 
     private void checkIfMissionsCompleted() {
-        for (Mission mission : missions) {
-            if (!mission.isDone()) {
-                LinkedList<Destination> visited = new LinkedList<>();
-                LinkedList<Destination> toProcess = new LinkedList<>();
+        synchronized (missions) {
+            for (Mission mission : missions) {
+                if (!mission.isDone()) {
+                    LinkedList<Destination> visited = new LinkedList<>();
+                    LinkedList<Destination> toProcess = new LinkedList<>();
 
-                toProcess.add(mission.getDestination1());
-                while (toProcess.size() > 0) {
-                    Destination currentDest = toProcess.remove(0);
-                    for (RailroadLine line : this.ownsRailroads) {
-                        if (line.getDestination1().equals(currentDest) && !visited.contains(line.getDestination2())) {
-                            if (line.getDestination2().equals(mission.destination2)) {
-                                mission.setDone();
-                                return;
+                    toProcess.add(mission.getDestination1());
+                    while (toProcess.size() > 0) {
+                        Destination currentDest = toProcess.remove(0);
+                        for (RailroadLine line : this.ownsRailroads) {
+                            if (line.getDestination1().equals(currentDest) && !visited.contains(line.getDestination2())) {
+                                if (line.getDestination2().equals(mission.destination2)) {
+                                    mission.setDone();
+                                    return;
+                                }
+                                toProcess.add(line.getDestination2());
+                            } else if (line.getDestination2().equals(currentDest) && !visited.contains(line.getDestination1())) {
+                                if (line.getDestination1().equals(mission.destination2)) {
+                                    mission.setDone();
+                                    return;
+                                }
+                                toProcess.add(line.getDestination1());
                             }
-                            toProcess.add(line.getDestination2());
-                        } else if (line.getDestination2().equals(currentDest) && !visited.contains(line.getDestination1())) {
-                            if (line.getDestination1().equals(mission.destination2)) {
-                                mission.setDone();
-                                return;
-                            }
-                            toProcess.add(line.getDestination1());
                         }
+                        visited.add(currentDest);
                     }
-                    visited.add(currentDest);
                 }
             }
+            missions.notify();
         }
     }
 
@@ -399,12 +408,15 @@ public class Player implements Comparable {
 
 
     public void addMission(Mission mission) {
-        if (this.state != State.GAMING) {
-            if (Configuration_Constants.debug)
-                System.out.println("(DEBUG\tPlayer: Tried to add mission while player " + name + "wasn't in a game.");
-            throw new IllegalStateException("Player is not in Game!");
+        synchronized (mission) {
+            if (this.state != State.GAMING) {
+                if (Configuration_Constants.debug)
+                    System.out.println("(DEBUG\tPlayer: Tried to add mission while player " + name + "wasn't in a game.");
+                throw new IllegalStateException("Player is not in Game!");
+            }
+            this.missions.add(mission);
+            this.notify();
         }
-        this.missions.add(mission);
     }
 
 
@@ -428,6 +440,16 @@ public class Player implements Comparable {
     }
 
 
+    public void getPlayerMissions() {
+        synchronized (missions) {
+
+            //TODO: implement Method @PHIL
+
+            this.notify();
+        }
+    }
+
+
     //endregion
 
 
@@ -438,15 +460,17 @@ public class Player implements Comparable {
 
     public void calculatePointsAtGameEnd() {
         //TODO call this method at the end of the game
+        synchronized (missions) {
+            //Punkte von Zielkarten dazuzählen und abziehen
+            for (Mission mission : this.missions) {
+                if (mission.isDone()) points = mission.getPoints();
+                else points -= mission.getPoints();
+            }
 
-        //Punkte von Zielkarten dazuzählen und abziehen
-        for (Mission mission : this.missions) {
-            if (mission.isDone()) points = mission.getPoints();
-            else points -= mission.getPoints();
+            //Zusatzpunkte für längste Strecke
+            if (game.hasLongestRailroad(this)) points += 10;
+            notify();
         }
-
-        //Zusatzpunkte für längste Strecke
-        if (game.hasLongestRailroad(this)) points += 10;
     }
 
 
