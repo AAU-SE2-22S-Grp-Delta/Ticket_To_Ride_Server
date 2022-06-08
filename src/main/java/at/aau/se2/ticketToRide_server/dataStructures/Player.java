@@ -422,7 +422,7 @@ public class Player implements Comparable {
                 throw new IllegalStateException("Player is not in Game!");
             }
             this.missions.add(mission);
-            this.notify();
+            mission.notify();
         }
     }
 

@@ -239,7 +239,9 @@ public class Session {
         send(player.getMissions());
     }
 
-    private void cheatMission() { send(player.cheatMission()); }
+    private void cheatMission() {
+        send(player.cheatMission());
+    }
 
 
     //endregion
