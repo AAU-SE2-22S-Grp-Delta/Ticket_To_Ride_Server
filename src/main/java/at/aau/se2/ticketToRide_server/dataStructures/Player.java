@@ -447,16 +447,6 @@ public class Player implements Comparable {
     }
 
 
-    public void getPlayerMissions() {
-        synchronized (missions) {
-
-            //TODO: implement Method @PHIL
-
-            this.notify();
-        }
-    }
-
-
     //endregion
 
 
