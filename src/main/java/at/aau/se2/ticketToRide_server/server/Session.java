@@ -65,6 +65,7 @@ public class Session {
     private static final String COMMAND_BUILD_RAILROAD = "buildRailroad:" + REGEX_NAME + ":" + REGEX_NAME + ":" + REGEX_NAME;
     private static final String COMMAND_DRAW_MISSION = "drawMission";
     private static final String COMMAND_CHOOSE_MISSION = "chooseMission:?(\\d\\d?)?(:\\d\\d?){0,2}";
+    private static final String COMMAND_CHEAT_MISSION = "cheatMission";
     //----------------------------------------------
 
 
@@ -120,6 +121,7 @@ public class Session {
             else if (command.matches(COMMAND_BUILD_RAILROAD)) this.buildRailroad(command);
             else if (command.matches(COMMAND_DRAW_MISSION)) this.drawMission();
             else if (command.matches(COMMAND_CHOOSE_MISSION)) this.chooseMission(command);
+            // else if (command.matches(COMMAND_CHEAT_MISSION))
         }
     }
 
