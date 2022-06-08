@@ -403,11 +403,24 @@ public class GameModel implements Runnable {
         StringBuilder builder = new StringBuilder("cheatMissions");
         synchronized (this) {
             //TODO impl Method
+            for (Player player: this.players)
+            {
+                String missions = player.getMissions();
+                String[] splitMissions = missions.split(":");
+                builder.append(player.getName());
+
+                for(String mission : splitMissions)
+                {
+                    builder.append(",").append(mission);
+                }
+                builder.append(":");
+            }
+            this.notify();
 //            0. befehlsformat und was kommt zurück
 //            befehl vom client 		cheatMission
 //            server schickt zurück		cheatMission:[playerName1],[mission1], .... , [missionN]:....:[playerNameN],[mission1], .... , [missionN]
         }
-        return null;
+        return builder.toString();
     }
 
 
