@@ -399,26 +399,29 @@ public class GameModel implements Runnable {
     }
 
 
-    public String cheatMissions() {
-        StringBuilder builder = new StringBuilder("cheatMissions");
+    public String cheatMission() {
+        StringBuilder builder = new StringBuilder("cheatMission");
         synchronized (this) {
-            //TODO impl Method
             for (Player player: this.players)
             {
                 String missions = player.getMissions();
                 String[] splitMissions = missions.split(":");
-                builder.append(player.getName());
+                builder.append(":").append(player.getName()).append(",");
 
-                for(String mission : splitMissions)
+                for(int i = 1; i < splitMissions.length;i++)
                 {
-                    builder.append(",").append(mission);
+                    if(i == splitMissions.length-1) {
+                        builder.append(splitMissions[i]);
+                    }
+                    else {
+                        builder.append(splitMissions[i]).append(",");
+                    }
                 }
-                builder.append(":");
             }
             this.notify();
 //            0. befehlsformat und was kommt zurück
-//            befehl vom client 		cheatMission
-//            server schickt zurück		cheatMission:[playerName1],[mission1], .... , [missionN]:....:[playerNameN],[mission1], .... , [missionN]
+//            Befehl vom Client 		cheatMission
+//            Server schickt zurück		cheatMission:[playerName1],[mission1], .... , [missionN]:....:[playerNameN],[mission1], .... , [missionN]
         }
         return builder.toString();
     }

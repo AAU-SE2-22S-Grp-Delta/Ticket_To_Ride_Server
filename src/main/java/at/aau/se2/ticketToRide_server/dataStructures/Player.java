@@ -195,7 +195,7 @@ public class Player implements Comparable {
         if( state != State.GAMING) {
             return "cheatMission:null";
         }
-        return game.cheatMissions();
+        return game.cheatMission();
     }
 
 
