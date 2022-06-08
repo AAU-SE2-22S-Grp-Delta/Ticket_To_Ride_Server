@@ -114,6 +114,7 @@ public class Session {
             else if (command.matches(REQUEST_GET_POINTS)) this.getPoints();
             else if (command.matches(REQUEST_GET_COLORS)) this.getColors();
             else if (command.matches(REQUEST_GET_MISSIONS)) this.getMissions();
+            else if (command.matches(COMMAND_CHEAT_MISSION)) this.cheatMission();
 
                 //----- IN GAME COMMANDS --------------------------------------------------------
             else if (command.matches(COMMAND_DRAW_CARD_STACK)) this.drawCardStack();
@@ -121,7 +122,6 @@ public class Session {
             else if (command.matches(COMMAND_BUILD_RAILROAD)) this.buildRailroad(command);
             else if (command.matches(COMMAND_DRAW_MISSION)) this.drawMission();
             else if (command.matches(COMMAND_CHOOSE_MISSION)) this.chooseMission(command);
-            // else if (command.matches(COMMAND_CHEAT_MISSION))
         }
     }
 
@@ -238,6 +238,8 @@ public class Session {
     private void getMissions() {
         send(player.getMissions());
     }
+
+    private void cheatMission() { send(player.cheatMission()); }
 
 
     //endregion

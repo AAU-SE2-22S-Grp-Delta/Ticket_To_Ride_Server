@@ -191,6 +191,13 @@ public class Player implements Comparable {
         return retVal;
     }
 
+    public String cheatMission() {
+        if( state != State.GAMING) {
+            return "cheatMission:null";
+        }
+        return game.cheatMissions();
+    }
+
 
     public String getNumStones() {
         if (state != State.GAMING) return "getNumStones:null";
