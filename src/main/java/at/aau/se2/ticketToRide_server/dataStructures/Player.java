@@ -517,6 +517,12 @@ public class Player implements Comparable {
         sendCommand("sync");
     }
 
+    /**
+     * prompts the client, that a player has cheated
+     */
+    public void cheat() {
+        sendCommand("cheat");
+    }
 
     /**
      * Notifies this player that this is player [name]'s turn

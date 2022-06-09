@@ -423,7 +423,17 @@ public class GameModel implements Runnable {
 //            Befehl vom Client 		cheatMission
 //            Server schickt zurück		cheatMission:[playerName1],[mission1], .... , [missionN]:....:[playerNameN],[mission1], .... , [missionN]
         }
+        cheat();
         return builder.toString();
+    }
+
+    /**
+     * Notifies all players, that a player has cheated
+     */
+    private void cheat() {
+        for (Player p : this.players) {
+            p.cheat();
+        }
     }
 
 
