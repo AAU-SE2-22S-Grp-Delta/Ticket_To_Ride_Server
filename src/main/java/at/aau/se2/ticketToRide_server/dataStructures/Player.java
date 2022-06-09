@@ -144,9 +144,9 @@ public class Player implements Comparable {
         if (this.state != State.GAMING) {
             return "getHandCards:null";
         }
-        StringBuilder handCards = new StringBuilder("getHandCards");
+        StringBuilder handCards = new StringBuilder("getHandCards:");
         for (TrainCard card : this.handCards) {
-            handCards.append(":").append(card.getType().toString());
+            handCards.append(card.getType().toString()).append(".");
         }
         return handCards.toString();
     }

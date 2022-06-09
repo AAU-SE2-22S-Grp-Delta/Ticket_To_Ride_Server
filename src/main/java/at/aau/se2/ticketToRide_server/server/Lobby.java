@@ -29,26 +29,26 @@ public class Lobby {
 
     //region ----------------------------------- LOBBY REQUESTS ------------------------------------------------------
 
-
+    //Format listPlayersLobby:Player1.Player2.
     public String listPlayersLobby() {
-        StringBuilder builder = new StringBuilder("listPlayersLobby");
+        StringBuilder builder = new StringBuilder("listPlayersLobby:");
 
         synchronized (players) {
             for (Player player : this.players) {
-                builder.append(":").append(player.getName());
+                builder.append(player.getName()).append(".");
             }
            players.notify();
         }
         return builder.toString();
     }
 
-
+    //Format listGames:Game1.Game2.
     public String listGames() {
-        StringBuilder builder = new StringBuilder("listGames");
+        StringBuilder builder = new StringBuilder("listGames:");
 
         synchronized (this) {
             for (GameModel game: this.games) {
-                builder.append(":").append(game.getName());
+                builder.append(game.getName()).append(".");
             }
             this.notify();
         }

@@ -105,13 +105,13 @@ public class GameModel implements Runnable {
 
     //region ------ REQUESTS FROM LOBBY --------------------------------------------------------------------------------
 
-
+    //Format listPlayersGame:Player1.Player2.
     public String listPlayersGame() {
-        StringBuilder builder = new StringBuilder("listPlayersGame");
+        StringBuilder builder = new StringBuilder("listPlayersGame:");
 
         synchronized (this) {
             for (Player player : this.players) {
-                builder.append(":").append(player.getName());
+                builder.append(player.getName()).append(".");
             }
             this.notify();
         }
@@ -346,19 +346,19 @@ public class GameModel implements Runnable {
 
     //region ----- GAME REQUESTS ---------------------------------------------------------------------------------------
 
-
+    //Format getOpenCards:Card1.Card2.
     public String getOpenCards() {
-        StringBuilder builder = new StringBuilder("getOpenCards");
+        StringBuilder builder = new StringBuilder("getOpenCards:");
         synchronized (this) {
             for (TrainCard card : this.openCards) {
-                builder.append(":").append(card);
+                builder.append(card).append(".");
             }
             this.notify();
         }
         return builder.toString();
     }
 
-
+    //Format getMap:Line1,Line2,Owner1,Owner2.Line3,Line4,Owner3.
     public String getMap() {
         StringBuilder builder = new StringBuilder("getMap:");
         synchronized (this) {
@@ -369,7 +369,7 @@ public class GameModel implements Runnable {
                     Player owner2 = ((DoubleRailroadLine) line).getOwner2();
                     builder.append(",").append(owner2 == null ? "null" : owner2.getName());
                 }
-                builder.append(":");
+                builder.append(".");
             }
 
             this.notify();
@@ -378,21 +378,22 @@ public class GameModel implements Runnable {
     }
 
 
+    //Format getColors:Player1Green.Player2Blue.
     public String getColors() {
-        StringBuilder builder = new StringBuilder("getColors");
+        StringBuilder builder = new StringBuilder("getColors:");
         for (Player player : this.players) {
-            builder.append(player.getName()).append(player.getPlayerColor().toString());
+            builder.append(player.getName()).append(player.getPlayerColor().toString()).append(".");
         }
 
         return builder.toString();
     }
 
-
+    //Format getPoints:Player120.Player215.
     public String getPoints() {
-        StringBuilder builder = new StringBuilder("getColors");
+        StringBuilder builder = new StringBuilder("getPoints:");
         synchronized (this) {
             for (Player player : this.players) {
-                builder.append(player.getName()).append(player.getPlayerPoints());
+                builder.append(player.getName()).append(player.getPlayerPoints()).append(".");
             }
             this.notify();
         }
