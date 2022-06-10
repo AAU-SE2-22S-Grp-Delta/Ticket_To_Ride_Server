@@ -455,7 +455,7 @@ public class Player implements Comparable {
     //region ------------------------------------- ENDING GAME METHODS -------------------------------------------------
 
 
-    public void calculatePointsAtGameEnd() {
+    public int calculatePointsAtGameEnd(int additionalPoints) {
         //TODO call this method at the end of the game
         synchronized (missions) {
             //Punkte von Zielkarten dazuzählen und abziehen
@@ -465,9 +465,10 @@ public class Player implements Comparable {
             }
 
             //Zusatzpunkte für längste Strecke
-            if (game.hasLongestRailroad(this)) points += 10;
+            points += additionalPoints;
             notify();
         }
+        return points;
     }
 
 
@@ -478,7 +479,7 @@ public class Player implements Comparable {
             connectedRailroadLength.add(findRailroadLine(railroadLine));
         }
 
-        //Find longest connection
+        //Find the longest connection
         int longestConnection = 0;
         for (Integer counter : connectedRailroadLength) {
             if (counter > longestConnection) longestConnection = counter;

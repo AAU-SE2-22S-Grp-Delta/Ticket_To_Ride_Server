@@ -3,21 +3,17 @@ package at.aau.se2.ticketToRide_server.models;
 import at.aau.se2.ticketToRide_server.dataStructures.*;
 import at.aau.se2.ticketToRide_server.dataStructures.Map;
 import at.aau.se2.ticketToRide_server.server.Configuration_Constants;
-import at.aau.se2.ticketToRide_server.server.Lobby;
-import jdk.jshell.spi.ExecutionControl;
-import org.w3c.dom.ls.LSOutput;
 
 import java.util.*;
 
 enum State {
-    WAITING_FOR_PLAYERS, RUNNING, OVER, CRASHED
+    WAITING_FOR_PLAYERS, RUNNING, OVER
 }
 
 public class GameModel implements Runnable {
     private static int idCounter = 0;
 
     //meta
-    private final int id;
     private final String name;
     private State state;
     private int colorCounter = 0;           //to assign colors to players
@@ -26,6 +22,8 @@ public class GameModel implements Runnable {
     private LinkedList<Mission>[] set3s;    //when player has to choose missions, the options are temp in here
     private boolean[] waitForCoice;         //when player has to choose missions, the game will remember to wait for the coice
     boolean stateChanged = false;
+    private Player winner;
+    private int[] pointsAtEnd;
 
 
     //invisible
@@ -40,13 +38,11 @@ public class GameModel implements Runnable {
     //visible to all
     private final Map map = getMapInstance();
     private TrainCard[] openCards = new TrainCard[5];
-    private final HashMap<Player, Integer> longestConnectionsForEachPlayer = new HashMap<>();
 
 
 
 
     public GameModel(String name, Player owner) {
-        this.id = idCounter++;
         this.name = name;
         this.state = State.WAITING_FOR_PLAYERS;
         players = new ArrayList<>();
@@ -103,6 +99,7 @@ public class GameModel implements Runnable {
 
 
     //region ------ REQUESTS FROM LOBBY --------------------------------------------------------------------------------
+
 
     //Format listPlayersGame:Player1.Player2.
     public String listPlayersGame() {
@@ -202,7 +199,11 @@ public class GameModel implements Runnable {
             activePlayer = ++activePlayer % players.size();
         }
         if (Configuration_Constants.verbose) System.out.println("(VERBOSE)\tGameModel.run() Game loop broke");
-        //TODO ending game methods
+        synchronized (this) {
+            calculatePointsAndFindWinner();
+            this.notify();
+        }
+
     }
 
 
@@ -308,33 +309,41 @@ public class GameModel implements Runnable {
 
 
 
-    //region -------------------------------- END GAME METHODS ---------------------------------------------------------
+    //region ----- END GAME METHODS ------------------------------------------------------------------------------------
 
 
-    private void calculatePoints() {
+    private void calculatePointsAndFindWinner() {
+        Player longest = findPlayerWithLongestConnection();
+        int counter = 0;
+        this.pointsAtEnd = new int[players.size()];
         for (Player player : this.players) {
-            player.calculatePointsAtGameEnd();
+            int additionalPoints = 0;
+            if (longest != null && player.getName().equals(longest.getName())) additionalPoints = 10;
+            pointsAtEnd[counter++] = player.calculatePointsAtGameEnd(additionalPoints);
+        }
+
+        int max = 0;
+        for (int i = 0; i < pointsAtEnd.length; i++) {
+            if (pointsAtEnd[i] > max) winner = players.get(i);
+            else if (pointsAtEnd[i] == max) winner = null;
         }
     }
 
 
-    public boolean hasLongestRailroad(Player player) {
-        getLongestConnectionFromEachPlayer();
+    private Player findPlayerWithLongestConnection() {
+        Player player = null;
+        int[] longestForEach = new int[players.size()];
+        int max = 0;
         for (Player p : this.players) {
-            if (p.equals(player)) continue;
-            if (this.longestConnectionsForEachPlayer.get(player) <= this.longestConnectionsForEachPlayer.get(p)) {
-                return false;
+            int current = p.findLongestConnection();
+            if (current > max) {
+                max = current;
+                player = p;
+            } else if (current == max) {
+                player = null;
             }
         }
-        return true;
-    }
-
-
-    private void getLongestConnectionFromEachPlayer() {
-        //TODO call this method
-        for (Player p : this.players) {
-            this.longestConnectionsForEachPlayer.put(p, p.findLongestConnection());
-        }
+        return player;
     }
 
 
@@ -344,6 +353,7 @@ public class GameModel implements Runnable {
 
 
     //region ----- GAME REQUESTS ---------------------------------------------------------------------------------------
+
 
     //Format getOpenCards:Card1.Card2.
     public String getOpenCards() {
@@ -356,6 +366,7 @@ public class GameModel implements Runnable {
         }
         return builder.toString();
     }
+
 
     //Format getMap:Line1,Line2,Owner1,Owner2.Line3,Line4,Owner3.
     public String getMap() {
@@ -387,6 +398,7 @@ public class GameModel implements Runnable {
         return builder.toString();
     }
 
+
     //Format getPoints:Player120.Player215.
     public String getPoints() {
         StringBuilder builder = new StringBuilder("getPoints:");
@@ -403,18 +415,15 @@ public class GameModel implements Runnable {
     public String cheatMission() {
         StringBuilder builder = new StringBuilder("cheatMission");
         synchronized (this) {
-            for (Player player: this.players)
-            {
+            for (Player player : this.players) {
                 String missions = player.getMissions();
                 String[] splitMissions = missions.split(":");
                 builder.append(":").append(player.getName()).append(",");
 
-                for(int i = 1; i < splitMissions.length;i++)
-                {
-                    if(i == splitMissions.length-1) {
+                for (int i = 1; i < splitMissions.length; i++) {
+                    if (i == splitMissions.length - 1) {
                         builder.append(splitMissions[i]);
-                    }
-                    else {
+                    } else {
                         builder.append(splitMissions[i]).append(",");
                     }
                 }
@@ -427,6 +436,7 @@ public class GameModel implements Runnable {
         cheat();
         return builder.toString();
     }
+
 
     /**
      * Notifies all players, that a player has cheated
@@ -558,15 +568,14 @@ public class GameModel implements Runnable {
                     System.out.println("(DEBUG)\tPlayer" + player.getName() + " was blocked trying to build road while players " + players.get(activePlayer) + "turn.");
             }
 
-            if ((railroadLine.getColor() == MapColor.GRAY || railroadLine.getColor() == color) && railroadLine.getOwner() == null){
+            if ((railroadLine.getColor() == MapColor.GRAY || railroadLine.getColor() == color) && railroadLine.getOwner() == null) {
                 railroadLine.setOwner(player);
                 retVal = 0;
-            }
-            else if (railroadLine instanceof DoubleRailroadLine) {
+            } else if (railroadLine instanceof DoubleRailroadLine) {
                 DoubleRailroadLine doubleRailroadLine = (DoubleRailroadLine) railroadLine;
-                if ((doubleRailroadLine.getColor2()==MapColor.GRAY||doubleRailroadLine.getColor2()==color)&&doubleRailroadLine.getOwner2()==null) {
+                if ((doubleRailroadLine.getColor2() == MapColor.GRAY || doubleRailroadLine.getColor2() == color) && doubleRailroadLine.getOwner2() == null) {
                     doubleRailroadLine.setOwner2(player);
-                    retVal=0;
+                    retVal = 0;
                 }
             }
             if (retVal == 0) {
