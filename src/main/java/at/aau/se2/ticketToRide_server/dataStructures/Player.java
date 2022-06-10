@@ -195,7 +195,7 @@ public class Player implements Comparable {
         if( state != State.GAMING) {
             return "cheatMission:null";
         }
-        return game.cheatMissions();
+        return game.cheatMission();
     }
 
 
@@ -447,16 +447,6 @@ public class Player implements Comparable {
     }
 
 
-    public void getPlayerMissions() {
-        synchronized (missions) {
-
-            //TODO: implement Method @PHIL
-
-            this.notify();
-        }
-    }
-
-
     //endregion
 
 
@@ -527,6 +517,12 @@ public class Player implements Comparable {
         sendCommand("sync");
     }
 
+    /**
+     * prompts the client, that a player has cheated
+     */
+    public void cheat() {
+        sendCommand("cheat");
+    }
 
     /**
      * Notifies this player that this is player [name]'s turn
