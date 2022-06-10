@@ -201,9 +201,10 @@ public class GameModel implements Runnable {
         if (Configuration_Constants.verbose) System.out.println("(VERBOSE)\tGameModel.run() Game loop broke");
         synchronized (this) {
             calculatePointsAndFindWinner();
+            for (Player player : players) player.gameOver();
+            this.state = State.OVER;
             this.notify();
         }
-
     }
 
 
@@ -399,7 +400,13 @@ public class GameModel implements Runnable {
     }
 
 
-    //Format getPoints:Player120.Player215.
+    //Format
+
+
+    /**
+     * Returns the Points of all players in a String representation
+     * @return format = getPoints:Player120.Player215.
+     */
     public String getPoints() {
         StringBuilder builder = new StringBuilder("getPoints:");
         synchronized (this) {
@@ -451,6 +458,18 @@ public class GameModel implements Runnable {
     //endregion
 
 
+    /**
+     * sends the name of the winner to the client, if the game is over
+     * the winner is the player with the most points, if there are two
+     * players who have the same number of points, there is no winner
+     * there is still the option to request the points
+     * @return getWinner:[nameWinner] or getWinner:none on success, getWinner:null if the game isn't over yet
+     */
+    public String getWinner() {
+        if (this.state != State.OVER) return "getWinner:null";
+        if (winner == null) return "getWinner:none";
+        return winner.getName();
+    }
 
 
     //region ----- GAME COMMANDS ---------------------------------------------------------------------------------------

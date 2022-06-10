@@ -59,6 +59,7 @@ public class Session {
     private static final String REQUEST_GET_POINTS = "getPoints";
     private static final String REQUEST_GET_COLORS = "getColors";
     private static final String REQUEST_GET_MISSIONS = "getMissions";
+    private static final String REQUEST_GET_WINNER = "getWinner";
 
     private static final String COMMAND_DRAW_CARD_STACK = "cardStack";
     private static final String COMMAND_DRAW_CARD_OPEN = "cardOpen:" + REGEX_OPEN_CARD_ID;
@@ -115,6 +116,7 @@ public class Session {
             else if (command.matches(REQUEST_GET_COLORS)) this.getColors();
             else if (command.matches(REQUEST_GET_MISSIONS)) this.getMissions();
             else if (command.matches(COMMAND_CHEAT_MISSION)) this.cheatMission();
+            else if (command.matches(REQUEST_GET_WINNER)) this.getWinner();
 
                 //----- IN GAME COMMANDS --------------------------------------------------------
             else if (command.matches(COMMAND_DRAW_CARD_STACK)) this.drawCardStack();
@@ -239,8 +241,14 @@ public class Session {
         send(player.getMissions());
     }
 
+
     private void cheatMission() {
         send(player.cheatMission());
+    }
+
+
+    private void getWinner() {
+        send(player.getWinner());
     }
 
 

@@ -137,7 +137,7 @@ public class Player implements Comparable {
 
 
 
-    //region ------------------------------------ GAME REQUESTS --------------------------------------------------------
+    //region ----- GAME REQUESTS ---------------------------------------------------------------------------------------
 
 
     public String getHandCards() {
@@ -167,6 +167,7 @@ public class Player implements Comparable {
     /**
      * Sends the points of all players in a string representation
      * to the client
+     *
      * @return format: getPoints:Player120.Player215. on success | getPoints:null on fail
      */
     public String getPoints() {
@@ -190,17 +191,24 @@ public class Player implements Comparable {
             for (Mission mission : missions) {
                 builder.append(":").append(mission.getId());
             }
-            retVal= builder.toString();
+            retVal = builder.toString();
             missions.notify();
         }
         return retVal;
     }
 
+
     public String cheatMission() {
-        if( state != State.GAMING) {
+        if (state != State.GAMING) {
             return "cheatMission:null";
         }
         return game.cheatMission();
+    }
+
+
+    public String getWinner() {
+        if (state != State.GAMING) return "getWinner:null";
+        return game.getWinner();
     }
 
 
@@ -281,8 +289,7 @@ public class Player implements Comparable {
                     System.out.println("(DEBUG)\t Player.buildRailroadLine() no Rail of such color! railroad from " + dest1 + " to " + dest2);
                 return -1;
             }
-        }
-        else if (railroadLine.getColor() != MapColor.GRAY && railroadLine.getColor() != c) {
+        } else if (railroadLine.getColor() != MapColor.GRAY && railroadLine.getColor() != c) {
             if (Configuration_Constants.debug)
                 System.out.println("(DEBUG)\t Player.buildRailroadLine() no Rail of such color! railroad from " + dest1 + " to " + dest2);
             return -1;
@@ -294,7 +301,7 @@ public class Player implements Comparable {
                 System.out.println("(DEBUG)\t Player.buildRailroadLine() Player " + this.name + " not enough cards of color " + c + ". Railroad from " + dest1 + " to " + dest2);
             return -1;
         }
-        if (game.setRailRoadLineOwner(this, railroadLine, c, cards)==0) {
+        if (game.setRailRoadLineOwner(this, railroadLine, c, cards) == 0) {
             this.handCards.removeAll(cards);
             this.points += getPointsForRoutes(railroadLine.getDistance());
             this.numStones -= railroadLine.getDistance();
@@ -303,8 +310,7 @@ public class Player implements Comparable {
             if (Configuration_Constants.verbose)
                 System.out.println("(DEBUG)\t Player.buildRailroadLine() Player " + this.name + " built railroad from " + dest1 + " to " + dest2);
             return 0;
-        }
-        else return -1;
+        } else return -1;
     }
 
 
