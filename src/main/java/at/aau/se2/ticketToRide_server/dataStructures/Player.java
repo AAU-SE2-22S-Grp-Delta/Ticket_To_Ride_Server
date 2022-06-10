@@ -164,6 +164,11 @@ public class Player implements Comparable {
     }
 
 
+    /**
+     * Sends the points of all players in a string representation
+     * to the client
+     * @return format: getPoints:Player120.Player215. on success | getPoints:null on fail
+     */
     public String getPoints() {
         if (state != State.GAMING) return "getPoints:null";
         return game.getPoints();
@@ -518,12 +523,14 @@ public class Player implements Comparable {
         sendCommand("sync");
     }
 
+
     /**
      * prompts the client, that a player has cheated
      */
     public void cheat() {
         sendCommand("cheat");
     }
+
 
     /**
      * Notifies this player that this is player [name]'s turn
@@ -533,13 +540,13 @@ public class Player implements Comparable {
     }
 
 
-    /**
-     * informs this client that the game is waiting for the valid player to perform a move
-     */
+    public void gameOver() {
+        sendCommand("gameOver");
+    }
 
 
-    private int sendCommand(String command) {
-        return session.send(command);
+    private void sendCommand(String command) {
+        session.send(command);
     }
 
 
