@@ -330,8 +330,9 @@ public class Player implements Comparable {
 
     public int exitGame() {
         if (this.state != State.GAMING) return -1;
-        game.exitGame(this);
+        game.exitGame(this, handCards);
         this.state = State.LOBBY;
+        this.game = null;
         return 0;
     }
 

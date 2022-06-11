@@ -3,6 +3,7 @@ package at.aau.se2.ticketToRide_server.models;
 import at.aau.se2.ticketToRide_server.dataStructures.*;
 import at.aau.se2.ticketToRide_server.dataStructures.Map;
 import at.aau.se2.ticketToRide_server.server.Configuration_Constants;
+import at.aau.se2.ticketToRide_server.server.Lobby;
 
 import java.util.*;
 
@@ -16,11 +17,11 @@ public class GameModel implements Runnable {
     //meta
     private final String name;
     private State state;
-    private int colorCounter = 0;           //to assign colors to players
-    private int actionsLeft;                //to manage a move
-    private int countdown = -1;             //for the last moves before end
-    private LinkedList<Mission>[] set3s;    //when player has to choose missions, the options are temp in here
-    private boolean[] waitForCoice;         //when player has to choose missions, the game will remember to wait for the coice
+    private int colorCounter = 0;                                       //to assign colors to players
+    private int actionsLeft;                                            //to manage a move
+    private int countdown = -1;                                         //for the last moves before end
+    private LinkedList<Mission>[] set3s;                                //when player has to choose missions, the options are temp in here
+    private boolean[] waitForCoice;                                     //when player has to choose missions, the game will remember to wait for the coice
     boolean stateChanged = false;
     private Player winner;
     private int[] pointsAtEnd;
@@ -28,7 +29,7 @@ public class GameModel implements Runnable {
 
     //invisible
     private final ArrayList<Player> players;
-    private final Player owner;
+    private Player owner;
     private final ArrayList<TrainCard> trainCardsStack;
     private final LinkedList<TrainCard> discardPile;
     private final ArrayList<Mission> missions;
@@ -405,6 +406,7 @@ public class GameModel implements Runnable {
 
     /**
      * Returns the Points of all players in a String representation
+     *
      * @return format = getPoints:Player120.Player215.
      */
     public String getPoints() {
@@ -463,6 +465,7 @@ public class GameModel implements Runnable {
      * the winner is the player with the most points, if there are two
      * players who have the same number of points, there is no winner
      * there is still the option to request the points
+     *
      * @return getWinner:[nameWinner] or getWinner:none on success, getWinner:null if the game isn't over yet
      */
     public String getWinner() {
@@ -690,8 +693,10 @@ public class GameModel implements Runnable {
     }
 
 
-    public void exitGame(Player player) {
+    public void exitGame(Player player, ArrayList<TrainCard> handCards) {
         synchronized (this) {
+
+            this.discardPile.addAll(handCards);
             int playerPosition = 0;
             while (players.get(playerPosition).compareTo(player) != 0) playerPosition++; //find position in list
 
@@ -721,6 +726,12 @@ public class GameModel implements Runnable {
             players.remove(playerPosition);
             if (Configuration_Constants.verbose)
                 System.out.println("(VERBOSE)\t GameModel.exitGame() removed Player " + player.getName() + "from game " + name);
+
+            if (this.players.size() == 0) Lobby.getInstance().removeGame(this);
+            if (player == this.owner &&players.size()>0) {
+                this.owner = players.get(0);
+            }
+
             this.notify();
         }
     }

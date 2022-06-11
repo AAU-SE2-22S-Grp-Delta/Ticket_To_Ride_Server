@@ -193,4 +193,9 @@ public class Lobby {
         }
         return null;
     }
+
+
+    public void removeGame(GameModel game) {
+        this.games.remove(game);
+    }
 }
