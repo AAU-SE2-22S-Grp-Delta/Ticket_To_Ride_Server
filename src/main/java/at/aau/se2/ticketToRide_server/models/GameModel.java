@@ -398,7 +398,11 @@ public class GameModel implements Runnable {
         return builder.toString();
     }
 
-
+    /**
+     * Format:
+     * command from client:  cheatMission
+     * server send back:	   cheatMission:[playerName1],[mission1], .... , [missionN]:....:[playerNameN],[mission1], .... , [missionN]
+     */
     public String cheatMission() {
         StringBuilder builder = new StringBuilder("cheatMission");
         synchronized (this) {
@@ -419,9 +423,6 @@ public class GameModel implements Runnable {
                 }
             }
             this.notify();
-//            0. befehlsformat und was kommt zurück
-//            Befehl vom Client 		cheatMission
-//            Server schickt zurück		cheatMission:[playerName1],[mission1], .... , [missionN]:....:[playerNameN],[mission1], .... , [missionN]
         }
         cheat();
         return builder.toString();
@@ -435,7 +436,6 @@ public class GameModel implements Runnable {
             p.cheat();
         }
     }
-
 
     //endregion
 
