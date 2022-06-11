@@ -520,6 +520,7 @@ public class GameModel implements Runnable {
                     player.addHandCard(openCards[openCardId]);
                     openCards[openCardId] = drawCardFromStack();
                     stateChanged = true;
+                    retVal = 0;
                     actionsLeft = 0;
                 } else if (actionsLeft == 1 && locomotive) {
                     if (Configuration_Constants.debug)
@@ -528,6 +529,7 @@ public class GameModel implements Runnable {
                     player.addHandCard(openCards[openCardId]);
                     openCards[openCardId] = drawCardFromStack();
                     stateChanged = true;
+                    retVal = 0;
                     actionsLeft--;
                 }
             }
