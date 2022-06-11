@@ -1,11 +1,12 @@
 package at.aau.se2.ticketToRide_server;
-import at.aau.se2.ticketToRide_server.dataStructures.*;
-import at.aau.se2.ticketToRide_server.server.Session;
-import org.junit.jupiter.api.BeforeAll;
+
+import at.aau.se2.ticketToRide_server.dataStructures.MapColor;
+import at.aau.se2.ticketToRide_server.dataStructures.TrainCard;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class TrainCardTests
 {

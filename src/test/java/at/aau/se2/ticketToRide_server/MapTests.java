@@ -4,14 +4,13 @@ import at.aau.se2.ticketToRide_server.dataStructures.Destination;
 import at.aau.se2.ticketToRide_server.dataStructures.Map;
 import at.aau.se2.ticketToRide_server.dataStructures.MapColor;
 import at.aau.se2.ticketToRide_server.dataStructures.RailroadLine;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
 import java.util.HashSet;
 import java.util.Set;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class MapTests
 {
