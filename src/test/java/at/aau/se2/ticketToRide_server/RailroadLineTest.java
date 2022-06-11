@@ -3,21 +3,22 @@ package at.aau.se2.ticketToRide_server;
 import at.aau.se2.ticketToRide_server.dataStructures.Destination;
 import at.aau.se2.ticketToRide_server.dataStructures.MapColor;
 import at.aau.se2.ticketToRide_server.dataStructures.RailroadLine;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 public class RailroadLineTest {
-    Destination dest1;
-    Destination dest2;
-    Destination dest3;
-    Destination dest4;
-    RailroadLine r1;
-    RailroadLine r2;
+    static Destination dest1;
+    static Destination dest2;
+    static Destination dest3;
+    static Destination dest4;
+    static RailroadLine r1;
+    static RailroadLine r2;
 
-    @BeforeEach
-    public void init() {
+    @BeforeAll
+    public static void init() {
         dest1 = new Destination("testdest1");
         dest2 = new Destination("testdest2");
         dest3 = new Destination("testdest3");

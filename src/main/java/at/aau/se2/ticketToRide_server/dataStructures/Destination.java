@@ -30,7 +30,11 @@ public class Destination {
     public void setName(String name) {
         if (name == null) throw new IllegalArgumentException("name is null");
         if (name.length() == 0) throw new IllegalArgumentException("name.length is 0");
-        if (names.contains(name)) System.out.println("Name already taken");
+        if (names.contains(name))
+        {
+            System.out.println("Name already taken");
+            throw new IllegalArgumentException();
+        }
         names.remove(this.name);
         names.add(name);
         this.name = name;
