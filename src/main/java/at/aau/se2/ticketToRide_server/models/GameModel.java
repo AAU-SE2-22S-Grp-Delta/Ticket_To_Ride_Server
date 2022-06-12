@@ -549,6 +549,7 @@ public class GameModel implements Runnable {
                 TrainCard card = drawCardFromStack();
                 if (card != null) {
                     player.addHandCard(card);
+                    stateChanged = true;
                     retVal = 0;
                     actionsLeft--;
                 }
