@@ -12,7 +12,7 @@ import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class MapTests
+class MapTests
 {
     static Set destSet = new HashSet<Destination>();
     static Set roadSet = new HashSet<RailroadLine>();
