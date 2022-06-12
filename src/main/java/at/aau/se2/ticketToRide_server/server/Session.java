@@ -233,7 +233,7 @@ public class Session {
 
 
     private void getColors() {
-        send(player.getPoints());
+        send(player.getColors());
     }
 
 
