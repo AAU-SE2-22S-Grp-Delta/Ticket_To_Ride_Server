@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class MissionTests
+class MissionTests
 {
     static Destination dest1;
     static Destination dest2;

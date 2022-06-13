@@ -40,6 +40,6 @@ class DestinationTest {
 
     @Test
     void testSetNameTaken() {
-        assertThrows(IllegalArgumentException.class, () -> dest1.setName("DestinationTest2"));
+        assertThrows(IllegalArgumentException.class, () -> dest1.setName(null));
     }
 }
