@@ -381,7 +381,9 @@ public class GameModel implements Runnable {
                     Player owner2 = ((DoubleRailroadLine) line).getOwner2();
                     builder.append(",").append(owner2 == null ? "null" : owner2.getName());
                 }
+                builder.append(".");
             }
+
             this.notify();
         }
         return builder.toString();

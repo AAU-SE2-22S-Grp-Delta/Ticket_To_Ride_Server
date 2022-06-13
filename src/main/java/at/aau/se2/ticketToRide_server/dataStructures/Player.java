@@ -192,7 +192,7 @@ public class Player implements Comparable {
                 builder.append(":").append(mission.getId());
             }
             retVal = builder.toString();
-            missions.notify();
+            missions.notifyAll();
         }
         return retVal;
     }
@@ -394,7 +394,7 @@ public class Player implements Comparable {
                     }
                 }
             }
-            missions.notify();
+            missions.notifyAll();
         }
     }
 
@@ -434,7 +434,7 @@ public class Player implements Comparable {
                 throw new IllegalStateException("Player is not in Game!");
             }
             this.missions.add(mission);
-            mission.notify();
+            mission.notifyAll();
         }
     }
 
@@ -478,7 +478,7 @@ public class Player implements Comparable {
 
             //Zusatzpunkte für längste Strecke
             points += additionalPoints;
-            notify();
+            notifyAll();
         }
         return points;
     }

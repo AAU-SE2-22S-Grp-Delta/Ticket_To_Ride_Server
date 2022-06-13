@@ -37,7 +37,7 @@ public class Lobby {
             for (Player player : this.players) {
                 builder.append(player.getName()).append(".");
             }
-           players.notify();
+           players.notifyAll();
         }
         return builder.toString();
     }
@@ -50,7 +50,7 @@ public class Lobby {
             for (GameModel game: this.games) {
                 builder.append(game.getName()).append(".");
             }
-            this.notify();
+            this.notifyAll();
         }
         return builder.toString();
     }
@@ -65,7 +65,7 @@ public class Lobby {
                     break;
                 }
             }
-            this.notify();
+            this.notifyAll();
         }
         return playersList;
     }
@@ -79,7 +79,7 @@ public class Lobby {
                     gameState = "getGameState:" + game.getState();
                 }
             }
-            this.notify();
+            this.notifyAll();
         }
         return gameState;
     }
@@ -114,7 +114,7 @@ public class Lobby {
                 player = new Player(name, session);
                 players.add(player);
             }
-            players.notify();
+            players.notifyAll();
         }
         return player;
     }
@@ -145,7 +145,7 @@ public class Lobby {
                 if (Configuration_Constants.verbose)
                     System.out.println("(VERBOSE)\t Lobby.createGame() game of gameName " + gameName + " created");
             }
-            games.notify();
+            games.notifyAll();
         }
         return game;
     }
@@ -169,7 +169,7 @@ public class Lobby {
                     game = null;
                 }
             }
-            this.games.notify();
+            this.games.notifyAll();
         }
         return game;
     }
