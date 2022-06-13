@@ -266,7 +266,7 @@ public class Session {
 
 
     private void drawCardStack() {
-        if (player.drawCardStack()<0) send("getCardStack:null)");
+        send(player.drawCardStack());
     }
 
 
