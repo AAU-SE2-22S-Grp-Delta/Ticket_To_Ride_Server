@@ -251,11 +251,8 @@ public class Player implements Comparable {
     }
 
 
-    public int drawCardStack() {
-        if (this.state != State.GAMING) {
-            sendCommand("cardStack:null");
-            return -1;
-        }
+    public String drawCardStack() {
+        if (this.state != State.GAMING) return "cardStack:null";
         return game.drawCardFromStack(this);
     }
 

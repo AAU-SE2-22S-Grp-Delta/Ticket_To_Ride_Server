@@ -539,8 +539,8 @@ public class GameModel implements Runnable {
     }
 
 
-    public int drawCardFromStack(Player player) {
-        int retVal = -1;
+    public String drawCardFromStack(Player player) {
+        String response = "cardStack:null";
         synchronized (this) {
             if (!players.get(activePlayer).equals(player)) {
                 if (Configuration_Constants.verbose)
@@ -550,13 +550,13 @@ public class GameModel implements Runnable {
                 if (card != null) {
                     player.addHandCard(card);
                     stateChanged = true;
-                    retVal = 0;
+                    response = "cardStack:" + card.getType().toString();
                     actionsLeft--;
                 }
             }
             this.notify();
         }
-        return retVal;
+        return response;
     }
 
 
