@@ -53,6 +53,14 @@ public class Player implements Comparable {
     }
 
 
+    private Player() {
+        this.name = "dummy";
+    }
+
+    public static Player getDummy() {
+        return new Player();
+    }
+
     //region ----------------------------------- LOBBY REQUESTS ------------------------------------------------------
 
 

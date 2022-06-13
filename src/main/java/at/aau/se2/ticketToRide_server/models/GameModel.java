@@ -931,6 +931,15 @@ public class GameModel implements Runnable {
         map.addRailroadLine(new DoubleRailroadLine(kansascity, denver, MapColor.BLACK, 4, MapColor.ORANGE));
         map.addRailroadLine(new RailroadLine(denver, phoenix, MapColor.WHITE, 5));
 
+        if (!Configuration_Constants.doubleRails) {
+            Player dummy = Player.getDummy();
+            for (RailroadLine rail : map.getRailroadLines()) {
+                if (rail instanceof DoubleRailroadLine) {
+                    ((DoubleRailroadLine) rail).setOwner2(dummy);
+                }
+            }
+        }
+
         return map;
     }
 
