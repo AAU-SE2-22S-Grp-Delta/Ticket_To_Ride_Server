@@ -6,6 +6,10 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
@@ -66,32 +70,32 @@ public class PlayerTests
     @Test
     void testListPlayersLobby()
     {
-        assertEquals("listPlayersLobby:testPlayer", p1.listPlayersLobby());
+        assertEquals("listPlayersLobby:testPlayer.", p1.listPlayersLobby());
     }
 
     @Test
     void testListGames()
     {
-        assertEquals("listGames:testGame", p1.listGames());
+        assertEquals("listGames:testGame.", p1.listGames());
     }
 
     @Test
     void testListPlayersGame()
     {
-        assertEquals("listPlayersGame:testPlayer", p1.listPlayersGame("testGame"));
+        assertEquals("listPlayersGame:testPlayer.", p1.listPlayersGame("testGame"));
     }
 
     @Test
     void testGetGameState()
     {
-        assertEquals("listPlayersGame:testPlayer", p1.getGameState("testGame"));
+        assertEquals("listPlayersGame:testPlayer.", p1.getGameState("testGame"));
     }
 
     @Test
     void testGetHandCards()
     {
         assertEquals("getHandCards:null", p3.getHandCards());
-        assertEquals("getHandCards", p1.getHandCards());
+        assertEquals("getHandCards:", p1.getHandCards());
     }
 
 
@@ -100,7 +104,7 @@ public class PlayerTests
     {
         assertEquals("openHandCard:null", p3.getOpenCards());
         String[] s = p1.getOpenCards().split(":");
-        assertEquals(6, s.length);
+        assertEquals(2, s.length);
     }
 
     @Test
@@ -121,8 +125,7 @@ public class PlayerTests
     void testGetColors()
     {
         assertEquals("getColor:null", p3.getColors());
-        //doppelpunkt trennung?
-        assertEquals("getColorstestPlayerRED", p1.getColors());
+        assertEquals("getColors:testPlayerRED.", p1.getColors());
     }
 
     @Test
@@ -148,17 +151,31 @@ public class PlayerTests
     }
 
     @Test
-    void testDrawCardStack()
+    void drawFromStack()
     {
-        assertEquals(-1, p3.drawCardStack());
-        assertEquals(0, p1.drawCardStack());
+        assertEquals("cardStack:null", p3.drawCardStack());
+        p2.drawCardStack();
+        String[] s = p2.getHandCards().split(":");
+        assertEquals(2, s.length);
     }
-
 
     @Test
-    void testChooseMission()
+    void drawMission()
     {
-
+        //?????
+        assertEquals("drawMission:null", p3.drawMission());
+        p1.drawMission();
+        p1.chooseMissions(new LinkedList<>(List.of(1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30)));
+        System.out.println(p1.getMissions());
     }
+
+//    @Test
+//    void drawOpen()
+//    {
+//        assertEquals(-1, p3.drawCardOpen(2));
+//        assertEquals(0, p2.drawCardOpen(3));
+//    }
+
+
 
 }
