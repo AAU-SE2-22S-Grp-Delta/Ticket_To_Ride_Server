@@ -7,41 +7,39 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class DestinationTest {
+class DestinationTest {
     static Destination dest1;
     static Destination dest2;
 
     @BeforeAll
-    public static void init() {
-        dest1 = new Destination("testdest1");
-        dest2 = new Destination("testdest2");
+    static void init() {
+        dest1 = new Destination("DestinationTest1");
+        dest2 = new Destination("DestinationTest2");
     }
 
     @Test
-    public void testSetNameNull() {
+    void testSetNameNull() {
         assertThrows(IllegalArgumentException.class, () -> dest1.setName(null));
     }
 
     @Test
-    public void testSetNameEmpty() {
+    void testSetNameEmpty() {
         assertThrows(IllegalArgumentException.class, () -> dest1.setName(""));
     }
 
     @Test
-    public void testGetters() {
-        assertEquals("testdest1", dest1.getName());
+    void testGetters() {
+        assertEquals("DestinationTest1", dest1.getName());
     }
 
     @Test
-    public void testSetName()
-    {
-        dest1.setName("testdestupdate1");
-        assertEquals("testdestupdate1", dest1.getName());    }
+    void testSetName() {
+        dest1.setName("DestinationTestUpdate1");
+        assertEquals("DestinationTestUpdate1", dest1.getName());
+    }
 
     @Test
-    void testSetNameTaken()
-    {
-        assertThrows(IllegalArgumentException.class, () -> dest1.setName("testdest2"));
+    void testSetNameTaken() {
+        assertThrows(IllegalArgumentException.class, () -> dest1.setName(null));
     }
 }
-

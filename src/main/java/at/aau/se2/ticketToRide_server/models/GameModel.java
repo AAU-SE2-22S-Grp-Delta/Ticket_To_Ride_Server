@@ -1,37 +1,35 @@
 package at.aau.se2.ticketToRide_server.models;
 
 import at.aau.se2.ticketToRide_server.dataStructures.*;
+import at.aau.se2.ticketToRide_server.dataStructures.Map;
 import at.aau.se2.ticketToRide_server.server.Configuration_Constants;
 import at.aau.se2.ticketToRide_server.server.Lobby;
-import org.w3c.dom.ls.LSOutput;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedList;
+import java.util.*;
 
 enum State {
-    WAITING_FOR_PLAYERS, RUNNING, OVER, CRASHED
+    WAITING_FOR_PLAYERS, RUNNING, OVER
 }
 
 public class GameModel implements Runnable {
     private static int idCounter = 0;
 
     //meta
-    private final int id;
     private final String name;
     private State state;
-    private int colorCounter = 0;           //to assign colors to players
-    private int actionsLeft;                //to manage a move
-    private int countdown = -1;             //for the last moves before end
-    private LinkedList<Mission>[] set3s;    //when player has to choose missions, the options are temp in here
-    private boolean[] waitForCoice;         //when player has to choose missions, the game will remember to wait for the coice
+    private int colorCounter = 0;                                       //to assign colors to players
+    private int actionsLeft;                                            //to manage a move
+    private int countdown = -1;                                         //for the last moves before end
+    private LinkedList<Mission>[] set3s;                                //when player has to choose missions, the options are temp in here
+    private boolean[] waitForCoice;                                     //when player has to choose missions, the game will remember to wait for the coice
     boolean stateChanged = false;
+    private Player winner;
+    private int[] pointsAtEnd;
 
 
     //invisible
     private final ArrayList<Player> players;
-    private final Player owner;
+    private Player owner;
     private final ArrayList<TrainCard> trainCardsStack;
     private final LinkedList<TrainCard> discardPile;
     private final ArrayList<Mission> missions;
@@ -41,13 +39,11 @@ public class GameModel implements Runnable {
     //visible to all
     private final Map map = getMapInstance();
     private TrainCard[] openCards = new TrainCard[5];
-    private final HashMap<Player, Integer> longestConnectionsForEachPlayer = new HashMap<>();
 
 
 
 
     public GameModel(String name, Player owner) {
-        this.id = idCounter++;
         this.name = name;
         this.state = State.WAITING_FOR_PLAYERS;
         players = new ArrayList<>();
@@ -106,12 +102,13 @@ public class GameModel implements Runnable {
     //region ------ REQUESTS FROM LOBBY --------------------------------------------------------------------------------
 
 
+    //Format listPlayersGame:Player1.Player2.
     public String listPlayersGame() {
-        StringBuilder builder = new StringBuilder("listPlayersGame");
+        StringBuilder builder = new StringBuilder("listPlayersGame:");
 
         synchronized (this) {
             for (Player player : this.players) {
-                builder.append(":").append(player.getName());
+                builder.append(player.getName()).append(".");
             }
             this.notify();
         }
@@ -203,7 +200,12 @@ public class GameModel implements Runnable {
             activePlayer = ++activePlayer % players.size();
         }
         if (Configuration_Constants.verbose) System.out.println("(VERBOSE)\tGameModel.run() Game loop broke");
-        //TODO ending game methods
+        synchronized (this) {
+            calculatePointsAndFindWinner();
+            for (Player player : players) player.gameOver();
+            this.state = State.OVER;
+            this.notify();
+        }
     }
 
 
@@ -309,33 +311,41 @@ public class GameModel implements Runnable {
 
 
 
-    //region -------------------------------- END GAME METHODS ---------------------------------------------------------
+    //region ----- END GAME METHODS ------------------------------------------------------------------------------------
 
 
-    private void calculatePoints() {
+    private void calculatePointsAndFindWinner() {
+        Player longest = findPlayerWithLongestConnection();
+        int counter = 0;
+        this.pointsAtEnd = new int[players.size()];
         for (Player player : this.players) {
-            player.calculatePointsAtGameEnd();
+            int additionalPoints = 0;
+            if (longest != null && player.getName().equals(longest.getName())) additionalPoints = 10;
+            pointsAtEnd[counter++] = player.calculatePointsAtGameEnd(additionalPoints);
+        }
+
+        int max = 0;
+        for (int i = 0; i < pointsAtEnd.length; i++) {
+            if (pointsAtEnd[i] > max) winner = players.get(i);
+            else if (pointsAtEnd[i] == max) winner = null;
         }
     }
 
 
-    public boolean hasLongestRailroad(Player player) {
-        getLongestConnectionFromEachPlayer();
+    private Player findPlayerWithLongestConnection() {
+        Player player = null;
+        int[] longestForEach = new int[players.size()];
+        int max = 0;
         for (Player p : this.players) {
-            if (p.equals(player)) continue;
-            if (this.longestConnectionsForEachPlayer.get(player) <= this.longestConnectionsForEachPlayer.get(p)) {
-                return false;
+            int current = p.findLongestConnection();
+            if (current > max) {
+                max = current;
+                player = p;
+            } else if (current == max) {
+                player = null;
             }
         }
-        return true;
-    }
-
-
-    private void getLongestConnectionFromEachPlayer() {
-        //TODO call this method
-        for (Player p : this.players) {
-            this.longestConnectionsForEachPlayer.put(p, p.findLongestConnection());
-        }
+        return player;
     }
 
 
@@ -347,11 +357,12 @@ public class GameModel implements Runnable {
     //region ----- GAME REQUESTS ---------------------------------------------------------------------------------------
 
 
+    //Format getOpenCards:Card1.Card2.
     public String getOpenCards() {
-        StringBuilder builder = new StringBuilder("getOpenCards");
+        StringBuilder builder = new StringBuilder("getOpenCards:");
         synchronized (this) {
             for (TrainCard card : this.openCards) {
-                builder.append(":").append(card);
+                builder.append(card).append(".");
             }
             this.notify();
         }
@@ -359,6 +370,7 @@ public class GameModel implements Runnable {
     }
 
 
+    //Format getMap:Line1,Line2,Owner1,Owner2.Line3,Line4,Owner3.
     public String getMap() {
         StringBuilder builder = new StringBuilder("getMap:");
         synchronized (this) {
@@ -369,7 +381,7 @@ public class GameModel implements Runnable {
                     Player owner2 = ((DoubleRailroadLine) line).getOwner2();
                     builder.append(",").append(owner2 == null ? "null" : owner2.getName());
                 }
-                builder.append(":");
+                builder.append(".");
             }
 
             this.notify();
@@ -378,31 +390,89 @@ public class GameModel implements Runnable {
     }
 
 
+    //Format getColors:Player1Green.Player2Blue.
     public String getColors() {
-        StringBuilder builder = new StringBuilder("getColors");
+        StringBuilder builder = new StringBuilder("getColors:");
         for (Player player : this.players) {
-            builder.append(player.getName()).append(player.getPlayerColor().toString());
+            builder.append(player.getName()).append(player.getPlayerColor().toString()).append(".");
         }
 
         return builder.toString();
     }
 
 
+    //Format
+
+
+    /**
+     * Returns the Points of all players in a String representation
+     *
+     * @return format = getPoints:Player120.Player215.
+     */
     public String getPoints() {
-        StringBuilder builder = new StringBuilder("getColors");
+        StringBuilder builder = new StringBuilder("getPoints:");
         synchronized (this) {
             for (Player player : this.players) {
-                builder.append(player.getName()).append(player.getPlayerPoints());
+                builder.append(player.getName()).append(player.getPlayerPoints()).append(".");
             }
             this.notify();
         }
         return builder.toString();
+    }
+
+
+    public String cheatMission() {
+        StringBuilder builder = new StringBuilder("cheatMission");
+        synchronized (this) {
+            for (Player player : this.players) {
+                String missions = player.getMissions();
+                String[] splitMissions = missions.split(":");
+                builder.append(":").append(player.getName()).append(",");
+
+                for (int i = 1; i < splitMissions.length; i++) {
+                    if (i == splitMissions.length - 1) {
+                        builder.append(splitMissions[i]);
+                    } else {
+                        builder.append(splitMissions[i]).append(",");
+                    }
+                }
+            }
+            this.notify();
+//            0. befehlsformat und was kommt zurück
+//            Befehl vom Client 		cheatMission
+//            Server schickt zurück		cheatMission:[playerName1],[mission1], .... , [missionN]:....:[playerNameN],[mission1], .... , [missionN]
+        }
+        cheat();
+        return builder.toString();
+    }
+
+
+    /**
+     * Notifies all players, that a player has cheated
+     */
+    private void cheat() {
+        for (Player p : this.players) {
+            p.cheat();
+        }
     }
 
 
     //endregion
 
 
+    /**
+     * sends the name of the winner to the client, if the game is over
+     * the winner is the player with the most points, if there are two
+     * players who have the same number of points, there is no winner
+     * there is still the option to request the points
+     *
+     * @return getWinner:[nameWinner] or getWinner:none on success, getWinner:null if the game isn't over yet
+     */
+    public String getWinner() {
+        if (this.state != State.OVER) return "getWinner:null";
+        if (winner == null) return "getWinner:none";
+        return winner.getName();
+    }
 
 
     //region ----- GAME COMMANDS ---------------------------------------------------------------------------------------
@@ -450,6 +520,7 @@ public class GameModel implements Runnable {
                     player.addHandCard(openCards[openCardId]);
                     openCards[openCardId] = drawCardFromStack();
                     stateChanged = true;
+                    retVal = 0;
                     actionsLeft = 0;
                 } else if (actionsLeft == 1 && locomotive) {
                     if (Configuration_Constants.debug)
@@ -458,6 +529,7 @@ public class GameModel implements Runnable {
                     player.addHandCard(openCards[openCardId]);
                     openCards[openCardId] = drawCardFromStack();
                     stateChanged = true;
+                    retVal = 0;
                     actionsLeft--;
                 }
             }
@@ -467,8 +539,8 @@ public class GameModel implements Runnable {
     }
 
 
-    public int drawCardFromStack(Player player) {
-        int retVal = -1;
+    public String drawCardFromStack(Player player) {
+        String response = "cardStack:null";
         synchronized (this) {
             if (!players.get(activePlayer).equals(player)) {
                 if (Configuration_Constants.verbose)
@@ -477,13 +549,14 @@ public class GameModel implements Runnable {
                 TrainCard card = drawCardFromStack();
                 if (card != null) {
                     player.addHandCard(card);
-                    retVal = 0;
+                    stateChanged = true;
+                    response = "cardStack:" + card.getType().toString();
                     actionsLeft--;
                 }
             }
             this.notify();
         }
-        return retVal;
+        return response;
     }
 
 
@@ -520,15 +593,14 @@ public class GameModel implements Runnable {
                     System.out.println("(DEBUG)\tPlayer" + player.getName() + " was blocked trying to build road while players " + players.get(activePlayer) + "turn.");
             }
 
-            if ((railroadLine.getColor() == MapColor.GRAY || railroadLine.getColor() == color) && railroadLine.getOwner() == null){
+            if ((railroadLine.getColor() == MapColor.GRAY || railroadLine.getColor() == color) && railroadLine.getOwner() == null) {
                 railroadLine.setOwner(player);
                 retVal = 0;
-            }
-            else if (railroadLine instanceof DoubleRailroadLine) {
+            } else if (railroadLine instanceof DoubleRailroadLine) {
                 DoubleRailroadLine doubleRailroadLine = (DoubleRailroadLine) railroadLine;
-                if ((doubleRailroadLine.getColor2()==MapColor.GRAY||doubleRailroadLine.getColor2()==color)&&doubleRailroadLine.getOwner2()==null) {
+                if ((doubleRailroadLine.getColor2() == MapColor.GRAY || doubleRailroadLine.getColor2() == color) && doubleRailroadLine.getOwner2() == null) {
                     doubleRailroadLine.setOwner2(player);
-                    retVal=0;
+                    retVal = 0;
                 }
             }
             if (retVal == 0) {
@@ -624,8 +696,10 @@ public class GameModel implements Runnable {
     }
 
 
-    public void exitGame(Player player) {
+    public void exitGame(Player player, ArrayList<TrainCard> handCards) {
         synchronized (this) {
+
+            this.discardPile.addAll(handCards);
             int playerPosition = 0;
             while (players.get(playerPosition).compareTo(player) != 0) playerPosition++; //find position in list
 
@@ -655,6 +729,12 @@ public class GameModel implements Runnable {
             players.remove(playerPosition);
             if (Configuration_Constants.verbose)
                 System.out.println("(VERBOSE)\t GameModel.exitGame() removed Player " + player.getName() + "from game " + name);
+
+            if (this.players.size() == 0) Lobby.getInstance().removeGame(this);
+            if (player == this.owner &&players.size()>0) {
+                this.owner = players.get(0);
+            }
+
             this.notify();
         }
     }
@@ -850,6 +930,15 @@ public class GameModel implements Runnable {
         map.addRailroadLine(new DoubleRailroadLine(kansascity, omaha, MapColor.GRAY, 1, MapColor.GRAY));
         map.addRailroadLine(new DoubleRailroadLine(kansascity, denver, MapColor.BLACK, 4, MapColor.ORANGE));
         map.addRailroadLine(new RailroadLine(denver, phoenix, MapColor.WHITE, 5));
+
+        if (!Configuration_Constants.doubleRails) {
+            Player dummy = Player.getDummy();
+            for (RailroadLine rail : map.getRailroadLines()) {
+                if (rail instanceof DoubleRailroadLine) {
+                    ((DoubleRailroadLine) rail).setOwner2(dummy);
+                }
+            }
+        }
 
         return map;
     }

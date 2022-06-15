@@ -29,28 +29,28 @@ public class Lobby {
 
     //region ----------------------------------- LOBBY REQUESTS ------------------------------------------------------
 
-
+    //Format listPlayersLobby:Player1.Player2.
     public String listPlayersLobby() {
-        StringBuilder builder = new StringBuilder("listPlayersLobby");
+        StringBuilder builder = new StringBuilder("listPlayersLobby:");
 
         synchronized (players) {
             for (Player player : this.players) {
-                builder.append(":").append(player.getName());
+                builder.append(player.getName()).append(".");
             }
-           players.notify();
+           players.notifyAll();
         }
         return builder.toString();
     }
 
-
+    //Format listGames:Game1.Game2.
     public String listGames() {
-        StringBuilder builder = new StringBuilder("listGames");
+        StringBuilder builder = new StringBuilder("listGames:");
 
         synchronized (this) {
             for (GameModel game: this.games) {
-                builder.append(":").append(game.getName());
+                builder.append(game.getName()).append(".");
             }
-            this.notify();
+            this.notifyAll();
         }
         return builder.toString();
     }
@@ -65,7 +65,7 @@ public class Lobby {
                     break;
                 }
             }
-            this.notify();
+            this.notifyAll();
         }
         return playersList;
     }
@@ -79,7 +79,7 @@ public class Lobby {
                     gameState = "getGameState:" + game.getState();
                 }
             }
-            this.notify();
+            this.notifyAll();
         }
         return gameState;
     }
@@ -114,7 +114,7 @@ public class Lobby {
                 player = new Player(name, session);
                 players.add(player);
             }
-            players.notify();
+            players.notifyAll();
         }
         return player;
     }
@@ -145,7 +145,7 @@ public class Lobby {
                 if (Configuration_Constants.verbose)
                     System.out.println("(VERBOSE)\t Lobby.createGame() game of gameName " + gameName + " created");
             }
-            games.notify();
+            games.notifyAll();
         }
         return game;
     }
@@ -169,7 +169,7 @@ public class Lobby {
                     game = null;
                 }
             }
-            this.games.notify();
+            this.games.notifyAll();
         }
         return game;
     }
@@ -192,5 +192,10 @@ public class Lobby {
             if(name.equals(game.getName())) return game;
         }
         return null;
+    }
+
+
+    public void removeGame(GameModel game) {
+        this.games.remove(game);
     }
 }

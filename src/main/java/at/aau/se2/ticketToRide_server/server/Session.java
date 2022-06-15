@@ -59,12 +59,14 @@ public class Session {
     private static final String REQUEST_GET_POINTS = "getPoints";
     private static final String REQUEST_GET_COLORS = "getColors";
     private static final String REQUEST_GET_MISSIONS = "getMissions";
+    private static final String REQUEST_GET_WINNER = "getWinner";
 
     private static final String COMMAND_DRAW_CARD_STACK = "cardStack";
     private static final String COMMAND_DRAW_CARD_OPEN = "cardOpen:" + REGEX_OPEN_CARD_ID;
     private static final String COMMAND_BUILD_RAILROAD = "buildRailroad:" + REGEX_NAME + ":" + REGEX_NAME + ":" + REGEX_NAME;
     private static final String COMMAND_DRAW_MISSION = "drawMission";
     private static final String COMMAND_CHOOSE_MISSION = "chooseMission:?(\\d\\d?)?(:\\d\\d?){0,2}";
+    private static final String COMMAND_CHEAT_MISSION = "cheatMission";
     //----------------------------------------------
 
 
@@ -113,6 +115,8 @@ public class Session {
             else if (command.matches(REQUEST_GET_POINTS)) this.getPoints();
             else if (command.matches(REQUEST_GET_COLORS)) this.getColors();
             else if (command.matches(REQUEST_GET_MISSIONS)) this.getMissions();
+            else if (command.matches(COMMAND_CHEAT_MISSION)) this.cheatMission();
+            else if (command.matches(REQUEST_GET_WINNER)) this.getWinner();
 
                 //----- IN GAME COMMANDS --------------------------------------------------------
             else if (command.matches(COMMAND_DRAW_CARD_STACK)) this.drawCardStack();
@@ -229,12 +233,22 @@ public class Session {
 
 
     private void getColors() {
-        send(player.getPoints());
+        send(player.getColors());
     }
 
 
     private void getMissions() {
         send(player.getMissions());
+    }
+
+
+    private void cheatMission() {
+        send(player.cheatMission());
+    }
+
+
+    private void getWinner() {
+        send(player.getWinner());
     }
 
 
@@ -252,7 +266,7 @@ public class Session {
 
 
     private void drawCardStack() {
-        if (player.drawCardStack()<0) send("getCardStack:null)");
+        send(player.drawCardStack());
     }
 
 

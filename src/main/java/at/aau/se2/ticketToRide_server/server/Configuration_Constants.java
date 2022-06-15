@@ -4,4 +4,5 @@ public class Configuration_Constants {
     public static boolean verbose = true;
     public static boolean debug = true;
     public static boolean echo = true;
+    public static boolean doubleRails = false;
 }
