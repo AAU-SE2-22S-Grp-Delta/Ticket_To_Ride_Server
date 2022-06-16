@@ -1,6 +1,6 @@
 package at.aau.se2.ticketToRide_server;
 
-import at.aau.se2.ticketToRide_server.dataStructures.Player;
+import at.aau.se2.ticketToRide_server.data_structures.Player;
 import at.aau.se2.ticketToRide_server.server.Session;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;

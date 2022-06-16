@@ -1,6 +1,6 @@
 package at.aau.se2.ticketToRide_server.server;
 
-import at.aau.se2.ticketToRide_server.dataStructures.Player;
+import at.aau.se2.ticketToRide_server.data_structures.Player;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;

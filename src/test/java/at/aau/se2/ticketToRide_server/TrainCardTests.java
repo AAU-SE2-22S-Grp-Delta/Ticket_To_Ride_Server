@@ -1,7 +1,7 @@
 package at.aau.se2.ticketToRide_server;
 
-import at.aau.se2.ticketToRide_server.dataStructures.MapColor;
-import at.aau.se2.ticketToRide_server.dataStructures.TrainCard;
+import at.aau.se2.ticketToRide_server.data_structures.MapColor;
+import at.aau.se2.ticketToRide_server.data_structures.TrainCard;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

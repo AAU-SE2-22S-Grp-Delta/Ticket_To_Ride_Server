@@ -1,7 +1,7 @@
 package at.aau.se2.ticketToRide_server.models;
 
-import at.aau.se2.ticketToRide_server.dataStructures.*;
-import at.aau.se2.ticketToRide_server.dataStructures.Map;
+import at.aau.se2.ticketToRide_server.data_structures.*;
+import at.aau.se2.ticketToRide_server.data_structures.Map;
 import at.aau.se2.ticketToRide_server.server.Configuration_Constants;
 import at.aau.se2.ticketToRide_server.server.Lobby;
 

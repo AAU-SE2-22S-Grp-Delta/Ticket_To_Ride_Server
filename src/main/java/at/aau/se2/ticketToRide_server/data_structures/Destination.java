@@ -1,4 +1,4 @@
-package at.aau.se2.ticketToRide_server.dataStructures;
+package at.aau.se2.ticketToRide_server.data_structures;
 
 
 

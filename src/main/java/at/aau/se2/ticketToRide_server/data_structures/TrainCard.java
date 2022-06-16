@@ -1,6 +1,4 @@
-package at.aau.se2.ticketToRide_server.dataStructures;
-
-import java.util.Comparator;
+package at.aau.se2.ticketToRide_server.data_structures;
 
 public class TrainCard implements Comparable{
 

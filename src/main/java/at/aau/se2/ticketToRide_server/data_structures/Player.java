@@ -1,4 +1,4 @@
-package at.aau.se2.ticketToRide_server.dataStructures;
+package at.aau.se2.ticketToRide_server.data_structures;
 
 import at.aau.se2.ticketToRide_server.models.GameModel;
 import at.aau.se2.ticketToRide_server.server.Configuration_Constants;
