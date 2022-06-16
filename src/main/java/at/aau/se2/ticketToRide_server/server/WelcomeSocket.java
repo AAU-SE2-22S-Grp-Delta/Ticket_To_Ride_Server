@@ -16,15 +16,16 @@ public class WelcomeSocket implements Runnable {
 
     private void launchWelcomeSocket() {
         try {
-            ServerSocket welcomeSocket = new ServerSocket(8001);
-            System.out.println("Server running on port 8001");
+            try (ServerSocket welcomeSocket = new ServerSocket(8001)) {
+                System.out.println("Server running on port 8001");
 
-            while (active) {
-                if (Configuration_Constants.verbose) System.out.println("(VERBOSE)\tWelcomeSocket: waiting for connection... ");
-                Socket connection = welcomeSocket.accept();
-                if (Configuration_Constants.verbose)System.out.println("(VERBOSE)\tWelcomeSocket: connection requested");
-                Session session = new Session(connection);
-                if (Configuration_Constants.verbose)System.out.println("(VERBOSE)\tWelcomeSocket: launched session");
+                while (active) {
+                    if (Configuration_Constants.verbose) System.out.println("(VERBOSE)\tWelcomeSocket: waiting for connection... ");
+                    Socket connection = welcomeSocket.accept();
+                    if (Configuration_Constants.verbose) System.out.println("(VERBOSE)\tWelcomeSocket: connection requested");
+                    Session session = new Session(connection);
+                    if (Configuration_Constants.verbose) System.out.println("(VERBOSE)\tWelcomeSocket: launched session");
+                }
             }
         } catch (Exception e) {
             System.out.println(e.getMessage());
