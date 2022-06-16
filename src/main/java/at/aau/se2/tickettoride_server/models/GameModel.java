@@ -340,7 +340,6 @@ public class GameModel implements Runnable {
 
     private Player findPlayerWithLongestConnection() {
         Player player = null;
-        int[] longestForEach = new int[players.size()];
         int max = 0;
         for (Player p : this.players) {
             int current = p.findLongestConnection();
