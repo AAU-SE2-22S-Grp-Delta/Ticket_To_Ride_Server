@@ -217,7 +217,7 @@ public class GameModel implements Runnable {
      * @return true on over
      */
     private boolean checkIfOver() {
-        if(players.size() == 0 ){
+        if (players.isEmpty()) {
             state = State.OVER;
             return true;
         }
