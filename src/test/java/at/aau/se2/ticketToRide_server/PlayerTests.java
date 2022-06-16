@@ -190,7 +190,7 @@ class PlayerTests
         p4.addHandCard(new TrainCard(TrainCard.Type.LOCOMOTIVE));
         p4.addHandCard(new TrainCard(TrainCard.Type.LOCOMOTIVE));
         assertEquals(0, p4.buildRailroadLine("Vancouver", "Calgary", "gray"));
-       // assertEquals(3, p4.findLongestConnection());
+
     }
 
     @Test
@@ -206,6 +206,21 @@ class PlayerTests
     void testSetRROwnerNotEnoughCards()
     {
         assertEquals(-1, p4.buildRailroadLine("Vancouver", "Calgary", "gray"));
+    }
+
+    @Test
+    void testGetLongest()
+    {
+        if (!p4.isActive())
+            p1.drawCardOpen(3);
+        p4.addHandCard(new TrainCard(TrainCard.Type.LOCOMOTIVE));
+        p4.addHandCard(new TrainCard(TrainCard.Type.LOCOMOTIVE));
+        p4.addHandCard(new TrainCard(TrainCard.Type.LOCOMOTIVE));
+        p4.addHandCard(new TrainCard(TrainCard.Type.LOCOMOTIVE));
+        p4.addHandCard(new TrainCard(TrainCard.Type.LOCOMOTIVE));
+        p4.addHandCard(new TrainCard(TrainCard.Type.LOCOMOTIVE));
+        assertEquals(0, p4.buildRailroadLine("Calgary", "Winnipeg", "white"));
+        assertEquals(1, p4.findLongestConnection());
     }
 
 }
