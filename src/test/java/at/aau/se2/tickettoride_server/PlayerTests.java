@@ -2,9 +2,11 @@ package at.aau.se2.tickettoride_server;
 
 import at.aau.se2.tickettoride_server.datastructures.*;
 import at.aau.se2.tickettoride_server.server.Session;
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 import org.mockito.Mockito;
 
 import java.util.Arrays;
@@ -13,6 +15,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class PlayerTests
 {
     static Session mockedSession = Mockito.mock(Session.class);
@@ -31,24 +34,28 @@ class PlayerTests
     }
 
     @Test
+    @Order(1)
     void testGetStones()
     {
         assertEquals(45, p1.getStones());
     }
 
     @Test
+    @Order(2)
     void testGetName()
     {
         assertEquals("testPlayer", p1.getName());
     }
 
     @Test
+    @Order(3)
     void testGetId()
     {
         assertEquals(0, p1.getId());
     }
 
     @Test
+    @Order(4)
     void testPlayerPoints()
     {
         p1.setPoints(10);
@@ -59,12 +66,14 @@ class PlayerTests
     }
 
     @Test
+    @Order(5)
     void testGetState()
     {
         assertEquals(Player.State.LOBBY, p3.getState());
     }
 
     @Test
+    @Order(6)
     void testJoinGame()
     {
         assertEquals(-1, p1.joinGame("testGame"));
@@ -72,18 +81,21 @@ class PlayerTests
     }
 
     @Test
+    @Order(7)
     void testListPlayersLobby()
     {
         assertEquals("listPlayersLobby:testPlayer.", p1.listPlayersLobby());
     }
 
     @Test
+    @Order(8)
     void testListGames()
     {
         assertEquals("listGames:testGame.", p1.listGames());
     }
 
     @Test
+    @Order(9)
     void testListPlayersGame()
     {
         String[] s = p1.listPlayersGame("testGame").split(":");
@@ -93,6 +105,7 @@ class PlayerTests
 
 
     @Test
+    @Order(10)
     void testGetHandCards()
     {
         assertEquals("getHandCards:null", p3.getHandCards());
@@ -101,6 +114,7 @@ class PlayerTests
     }
 
     @Test
+    @Order(11)
     void testGetOpenCards()
     {
         assertEquals("openHandCard:null", p3.getOpenCards());
@@ -109,6 +123,7 @@ class PlayerTests
     }
 
     @Test
+    @Order(12)
     void testGetMap()
     {
         assertEquals("getMap:null", p3.getMap());
@@ -116,6 +131,7 @@ class PlayerTests
     }
 
     @Test
+    @Order(13)
     void testGetPoints()
     {
         //assertEquals("getPoints:0", p1.getPoints()); ERROR IN MODEL
@@ -123,6 +139,7 @@ class PlayerTests
     }
 
     @Test
+    @Order(14)
     void testGetColors()
     {
         assertEquals("getColor:null", p3.getColors());
@@ -132,6 +149,7 @@ class PlayerTests
     }
 
     @Test
+    @Order(15)
     void testGetMissions()
     {
         assertEquals("getMissions:null", p3.getMissions());
@@ -139,6 +157,7 @@ class PlayerTests
     }
 
     @Test
+    @Order(16)
     void testGetNumStones()
     {
         assertEquals("getNumStones:null", p3.getNumStones());
@@ -146,6 +165,7 @@ class PlayerTests
     }
 
     @Test
+    @Order(17)
     void testStartGame()
     {
         assertEquals(-1, p3.startGame());
@@ -153,6 +173,7 @@ class PlayerTests
     }
 
     @Test
+    @Order(18)
     void drawFromStack()
     {
         assertEquals("cardStack:null", p3.drawCardStack());
@@ -165,6 +186,7 @@ class PlayerTests
     }
 
     @Test
+    @Order(19)
     void drawMission()
     {
         //?????
@@ -175,6 +197,7 @@ class PlayerTests
     }
 
     @Test
+    @Order(20)
     void drawOpen()
     {
         assertEquals(-1, p3.drawCardOpen(2));
@@ -185,6 +208,7 @@ class PlayerTests
     }
 
     @Test
+    @Order(21)
     void testSetRROwner()
     {
         p4.addHandCard(new TrainCard(TrainCard.Type.LOCOMOTIVE));
@@ -195,6 +219,7 @@ class PlayerTests
     }
 
     @Test
+    @Order(22)
     void testSetRROwnerNotExists()
     {
         p4.addHandCard(new TrainCard(TrainCard.Type.LOCOMOTIVE));
@@ -204,12 +229,14 @@ class PlayerTests
     }
 
     @Test
+    @Order(23)
     void testSetRROwnerNotEnoughCards()
     {
         assertEquals(-1, p4.buildRailroadLine("Vancouver", "Calgary", "gray"));
     }
 
     @Test
+    @Order(24)
     void testGetLongest()
     {
         if (!p4.isActive())
@@ -225,6 +252,7 @@ class PlayerTests
     }
 
     @Test
+    @Order(25)
     void missionTests()
     {
         //can't really test this as missions are always random
@@ -253,9 +281,9 @@ class PlayerTests
         assertEquals("getMissions", p1.getMissions());
     }
 
-    @AfterAll
     @Test
-    static void endGame()
+    @Order(999)
+    void endGame()
     {
         p4.exitGame();
         p1.exitGame();
