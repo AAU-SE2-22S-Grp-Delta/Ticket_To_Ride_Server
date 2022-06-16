@@ -68,6 +68,12 @@ public class RailroadLine {
     }
 
     @Override
+    public int hashCode()
+    {
+        return super.hashCode();
+    }
+
+    @Override
     public boolean equals(Object obj) {
         if (!(obj instanceof RailroadLine) ) return false;
         RailroadLine other = (RailroadLine) obj;
