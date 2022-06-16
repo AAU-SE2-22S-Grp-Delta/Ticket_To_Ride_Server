@@ -3,9 +3,10 @@ package at.aau.se2.tickettoride_server.datastructures;
 public enum MapColor {
     BLUE("blue"), GREEN("green"), YELLOW("yellow"), RED("red"), WHITE("white"), ORANGE("orange"), GRAY("gray"), BLACK("black"), PINK("pink");
 
-    private String value;
+    private final String value;
 
     MapColor(String value) {
+        this.value = value;
     }
 
     @Override
