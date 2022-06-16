@@ -415,10 +415,10 @@ public class Player implements Comparable<Object> {
             Logger.debug("Player: Tried to add HandCard while player " + name + "wasn't in a game.");
             throw new IllegalStateException("Player is not in Game!");
         }
-        Logger.verbose("Player.addHandCard() Card=" + card.getType().toString());
         if (card == null) throw new IllegalArgumentException("card is Null!");
+        Logger.verbose("Player.addHandCard() Card=" + card.getType().toString());
         this.handCards.add(card);
-        Collections.sort(handCards);
+        Collections.sort(this.handCards);
     }
 
 
