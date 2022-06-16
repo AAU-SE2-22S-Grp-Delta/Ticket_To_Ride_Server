@@ -3,10 +3,12 @@ package at.aau.se2.ticketToRide_server;
 import at.aau.se2.ticketToRide_server.datastructures.*;
 import at.aau.se2.ticketToRide_server.models.GameModel;
 import at.aau.se2.ticketToRide_server.server.Session;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -92,14 +94,6 @@ class PlayerTests
 
 
     @Test
-    void testGetHandCards()
-    {
-        assertEquals("getHandCards:null", p3.getHandCards());
-        String[] s = p1.getHandCards().split(":");
-        assertEquals(1, s.length);
-    }
-
-    @Test
     void testGetOpenCards()
     {
         assertEquals("openHandCard:null", p3.getOpenCards());
@@ -164,16 +158,6 @@ class PlayerTests
     }
 
     @Test
-    void drawMission()
-    {
-        //?????
-        assertEquals("drawMission:null", p3.drawMission());
-        p1.drawMission();
-        p1.chooseMissions(new LinkedList<>(List.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30)));
-        System.out.println(p1.getMissions());
-    }
-
-    @Test
     void drawOpen()
     {
         assertEquals(-1, p3.drawCardOpen(2));
@@ -223,4 +207,40 @@ class PlayerTests
         assertEquals(1, p4.findLongestConnection());
     }
 
+    @Test
+    void missionTests()
+    {
+        //can't really test this as missions are always random
+
+        if (p4.isActive())
+        {
+            p4.drawMission();
+            p4.chooseMissions(new LinkedList<>(Arrays.asList(1, 2, 3)));
+        }
+        else
+        {
+            p1.drawMission();
+            p1.chooseMissions(new LinkedList<>(Arrays.asList(1, 2, 3)));
+        }
+        if (p4.isActive())
+        {
+            p4.drawMission();
+            p4.chooseMissions(new LinkedList<>(Arrays.asList(1, 2, 3)));
+        }
+        else
+        {
+            p1.drawMission();
+            p4.chooseMissions(new LinkedList<>(Arrays.asList(1, 2, 3)));
+        }
+
+        assertEquals("getMissions", p1.getMissions());
+    }
+
+    @AfterAll
+    @Test
+    static void endGame()
+    {
+        p4.exitGame();
+        p1.exitGame();
+    }
 }

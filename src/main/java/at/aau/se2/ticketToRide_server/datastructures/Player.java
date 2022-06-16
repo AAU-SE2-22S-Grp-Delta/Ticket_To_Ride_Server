@@ -45,7 +45,8 @@ public class Player implements Comparable {
     int points = 0;
 
 
-    public Player(String name, Session session) {
+    public Player(String name, Session session)
+    {
         this.id = id++;
         setName(name);
         this.state = State.LOBBY;
@@ -53,33 +54,39 @@ public class Player implements Comparable {
     }
 
 
-    private Player() {
+    private Player()
+    {
         this.name = "dummy";
     }
 
-    public static Player getDummy() {
+    public static Player getDummy()
+    {
         return new Player();
     }
 
     //region ----------------------------------- LOBBY REQUESTS ------------------------------------------------------
 
 
-    public String listPlayersLobby() {
+    public String listPlayersLobby()
+    {
         return Lobby.getInstance().listPlayersLobby();
     }
 
 
-    public String listGames() {
+    public String listGames()
+    {
         return Lobby.getInstance().listGames();
     }
 
 
-    public String listPlayersGame(String gameName) {
+    public String listPlayersGame(String gameName)
+    {
         return Lobby.getInstance().listPlayersGame(gameName);
     }
 
 
-    public String getGameState(String gameName) {
+    public String getGameState(String gameName)
+    {
         return Lobby.getInstance().listPlayersGame(gameName);
     }
 
@@ -87,19 +94,19 @@ public class Player implements Comparable {
     //endregion
 
 
-
-
     //region ----------------------------------- LOBBY ACTIONS -------------------------------------------------------
 
 
-    public static Player enterLobby(String name, Session session) {
+    public static Player enterLobby(String name, Session session)
+    {
         Player player = Lobby.getInstance().enterLobby(name, session);
         if (player == null) return null;
         return player;
     }
 
 
-    public int createGame(String gameName) {
+    public int createGame(String gameName)
+    {
         GameModel game = Lobby.getInstance().createGame(gameName, this);
         if (game == null) return -1;
         return this.joinGame(gameName);
@@ -112,15 +119,18 @@ public class Player implements Comparable {
      * @param gameName the name of the game
      * @return 0 on success, -1 on fail
      */
-    public int joinGame(String gameName) {
-        if (state.equals(State.GAMING)) {
+    public int joinGame(String gameName)
+    {
+        if (state.equals(State.GAMING))
+        {
             if (Configuration_Constants.debug)
                 System.out.println("(DEBUG)\t Player.joinGame() called while Player " + name + " was in game " + this.game.getName());
             return -1;
         }
 
         GameModel game = Lobby.getInstance().joinGame(gameName, this);
-        if (game == null) {
+        if (game == null)
+        {
             return -1;
         }
 
@@ -134,7 +144,8 @@ public class Player implements Comparable {
     }
 
 
-    public int leave() {
+    public int leave()
+    {
         //TODO impl
         return -1;
     }
@@ -143,30 +154,33 @@ public class Player implements Comparable {
     //endregion
 
 
-
-
     //region ----- GAME REQUESTS ---------------------------------------------------------------------------------------
 
 
-    public String getHandCards() {
-        if (this.state != State.GAMING) {
+    public String getHandCards()
+    {
+        if (this.state != State.GAMING)
+        {
             return "getHandCards:null";
         }
         StringBuilder handCards = new StringBuilder("getHandCards:");
-        for (TrainCard card : this.handCards) {
+        for (TrainCard card : this.handCards)
+        {
             handCards.append(card.getType().toString()).append(".");
         }
         return handCards.toString();
     }
 
 
-    public String getOpenCards() {
+    public String getOpenCards()
+    {
         if (state != State.GAMING) return "openHandCard:null";
         return game.getOpenCards();
     }
 
 
-    public String getMap() {
+    public String getMap()
+    {
         if (state != State.GAMING) return "getMap:null";
         return game.getMap();
     }
@@ -178,25 +192,30 @@ public class Player implements Comparable {
      *
      * @return format: getPoints:Player120.Player215. on success | getPoints:null on fail
      */
-    public String getPoints() {
+    public String getPoints()
+    {
         if (state != State.GAMING) return "getPoints:null";
         return game.getPoints();
     }
 
 
-    public String getColors() {
+    public String getColors()
+    {
         if (state != State.GAMING) return "getColor:null";
         return game.getColors();
     }
 
 
-    public String getMissions() {
+    public String getMissions()
+    {
         String retVal = "getMissions:null";
         if (state != State.GAMING) return retVal;
-        synchronized (missions) {
+        synchronized (missions)
+        {
 
             StringBuilder builder = new StringBuilder("getMissions");
-            for (Mission mission : missions) {
+            for (Mission mission : missions)
+            {
                 builder.append(":").append(mission.getId());
             }
             retVal = builder.toString();
@@ -206,29 +225,31 @@ public class Player implements Comparable {
     }
 
 
-    public String cheatMission() {
-        if (state != State.GAMING) {
+    public String cheatMission()
+    {
+        if (state != State.GAMING)
+        {
             return "cheatMission:null";
         }
         return game.cheatMission();
     }
 
 
-    public String getWinner() {
+    public String getWinner()
+    {
         if (state != State.GAMING) return "getWinner:null";
         return game.getWinner();
     }
 
 
-    public String getNumStones() {
+    public String getNumStones()
+    {
         if (state != State.GAMING) return "getNumStones:null";
         return "getNumStones:" + ((Integer) numStones).toString();
     }
 
 
     //endregion
-
-
 
 
     //region ----- GAME COMMANDS ---------------------------------------------------------------------------------------
@@ -240,8 +261,10 @@ public class Player implements Comparable {
      *
      * @return 0 on success, -1 on fail
      */
-    public int startGame() {
-        if (state != State.GAMING) {
+    public int startGame()
+    {
+        if (state != State.GAMING)
+        {
             if (Configuration_Constants.debug)
                 System.out.println("(DEBUG)\t Player.startGame() called while not in game");
             return -1;
@@ -251,62 +274,74 @@ public class Player implements Comparable {
     }
 
 
-    public String drawCardStack() {
+    public String drawCardStack()
+    {
         if (this.state != State.GAMING) return "cardStack:null";
         return game.drawCardFromStack(this);
     }
 
 
-    public String drawMission() {
+    public String drawMission()
+    {
         if (this.state != State.GAMING) return "drawMission:null";
         return game.drawMission(this);
     }
 
 
-    public int chooseMissions(LinkedList<Integer> chosen) {
+    public int chooseMissions(LinkedList<Integer> chosen)
+    {
         if (this.state != State.GAMING) return -1;
         return game.chooseMissions(chosen, this);
     }
 
 
-    public int drawCardOpen(int id) {
+    public int drawCardOpen(int id)
+    {
         if (this.state != State.GAMING) return -1;
         return game.drawOpenCard(this, id);
     }
 
 
-    public int buildRailroadLine(String dest1, String dest2, String color) {
+    public int buildRailroadLine(String dest1, String dest2, String color)
+    {
         if (state != State.GAMING) return -1;
 
         RailroadLine railroadLine = game.getRailroadLineByName(dest1, dest2);
-        if (railroadLine == null || numStones < railroadLine.getDistance()) {
+        if (railroadLine == null || numStones < railroadLine.getDistance())
+        {
             if (Configuration_Constants.debug)
                 System.out.println("(DEBUG)\t Player.buildRailroadLine() Error while trying " + dest1 + " to " + dest2);
             return -1;
         }
 
         MapColor c = MapColor.getByString(color);
-        if (railroadLine instanceof DoubleRailroadLine) {
+        if (railroadLine instanceof DoubleRailroadLine)
+        {
             DoubleRailroadLine doubleRailroadLine = (DoubleRailroadLine) railroadLine;
 
-            if (doubleRailroadLine.getColor() != MapColor.GRAY && doubleRailroadLine.getColor2() != MapColor.GRAY && doubleRailroadLine.getColor() != c && doubleRailroadLine.getColor2() != c) {
+            if (doubleRailroadLine.getColor() != MapColor.GRAY && doubleRailroadLine.getColor2() != MapColor.GRAY && doubleRailroadLine.getColor() != c && doubleRailroadLine.getColor2() != c)
+            {
                 if (Configuration_Constants.debug)
                     System.out.println("(DEBUG)\t Player.buildRailroadLine() no Rail of such color! railroad from " + dest1 + " to " + dest2);
                 return -1;
             }
-        } else if (railroadLine.getColor() != MapColor.GRAY && railroadLine.getColor() != c) {
+        }
+        else if (railroadLine.getColor() != MapColor.GRAY && railroadLine.getColor() != c)
+        {
             if (Configuration_Constants.debug)
                 System.out.println("(DEBUG)\t Player.buildRailroadLine() no Rail of such color! railroad from " + dest1 + " to " + dest2);
             return -1;
         }
 
         LinkedList<TrainCard> cards = getCardsToBuildRail(TrainCard.map_mapColor_to_TrainCardType(c), railroadLine.getDistance());
-        if (cards == null) {
+        if (cards == null)
+        {
             if (Configuration_Constants.debug)
                 System.out.println("(DEBUG)\t Player.buildRailroadLine() Player " + this.name + " not enough cards of color " + c + ". Railroad from " + dest1 + " to " + dest2);
             return -1;
         }
-        if (game.setRailRoadLineOwner(this, railroadLine, c, cards) == 0) {
+        if (game.setRailRoadLineOwner(this, railroadLine, c, cards) == 0)
+        {
             this.handCards.removeAll(cards);
             this.points += getPointsForRoutes(railroadLine.getDistance());
             this.numStones -= railroadLine.getDistance();
@@ -315,17 +350,21 @@ public class Player implements Comparable {
             if (Configuration_Constants.verbose)
                 System.out.println("(DEBUG)\t Player.buildRailroadLine() Player " + this.name + " built railroad from " + dest1 + " to " + dest2);
             return 0;
-        } else return -1;
+        }
+        else return -1;
     }
 
 
-    private LinkedList<TrainCard> getCardsToBuildRail(TrainCard.Type cardType, int amount) {
+    private LinkedList<TrainCard> getCardsToBuildRail(TrainCard.Type cardType, int amount)
+    {
         LinkedList<TrainCard> cards = new LinkedList<>();
-        for (TrainCard card : this.handCards) {
+        for (TrainCard card : this.handCards)
+        {
             if (card.getType() == cardType) cards.add(card);
             if (amount <= cards.size()) return cards;
         }
-        for (TrainCard card : this.handCards) {
+        for (TrainCard card : this.handCards)
+        {
             if (card.getType() == TrainCard.Type.LOCOMOTIVE) cards.add(card);
             if (amount <= cards.size()) return cards;
         }
@@ -333,7 +372,8 @@ public class Player implements Comparable {
     }
 
 
-    public int exitGame() {
+    public int exitGame()
+    {
         if (this.state != State.GAMING) return -1;
         game.exitGame(this, handCards);
         this.state = State.LOBBY;
@@ -350,13 +390,13 @@ public class Player implements Comparable {
     //endregion
 
 
-
-
     //region ------------------------------------ ACTION HELPER METHODS ------------------------------------------------
 
 
-    private int getPointsForRoutes(int lengthOfRoute) {
-        switch (lengthOfRoute) {
+    private int getPointsForRoutes(int lengthOfRoute)
+    {
+        switch (lengthOfRoute)
+        {
             case 1:
                 return 1;
             case 2:
@@ -375,25 +415,36 @@ public class Player implements Comparable {
     }
 
 
-    private void checkIfMissionsCompleted() {
-        synchronized (missions) {
-            for (Mission mission : missions) {
-                if (!mission.isDone()) {
+    private void checkIfMissionsCompleted()
+    {
+        synchronized (missions)
+        {
+            for (Mission mission : missions)
+            {
+                if (!mission.isDone())
+                {
                     LinkedList<Destination> visited = new LinkedList<>();
                     LinkedList<Destination> toProcess = new LinkedList<>();
 
                     toProcess.add(mission.getDestination1());
-                    while (toProcess.size() > 0) {
+                    while (toProcess.size() > 0)
+                    {
                         Destination currentDest = toProcess.remove(0);
-                        for (RailroadLine line : this.ownsRailroads) {
-                            if (line.getDestination1().equals(currentDest) && !visited.contains(line.getDestination2())) {
-                                if (line.getDestination2().equals(mission.destination2)) {
+                        for (RailroadLine line : this.ownsRailroads)
+                        {
+                            if (line.getDestination1().equals(currentDest) && !visited.contains(line.getDestination2()))
+                            {
+                                if (line.getDestination2().equals(mission.destination2))
+                                {
                                     mission.setDone();
                                     return;
                                 }
                                 toProcess.add(line.getDestination2());
-                            } else if (line.getDestination2().equals(currentDest) && !visited.contains(line.getDestination1())) {
-                                if (line.getDestination1().equals(mission.destination2)) {
+                            }
+                            else if (line.getDestination2().equals(currentDest) && !visited.contains(line.getDestination1()))
+                            {
+                                if (line.getDestination1().equals(mission.destination2))
+                                {
                                     mission.setDone();
                                     return;
                                 }
@@ -412,18 +463,19 @@ public class Player implements Comparable {
     //endregion
 
 
-
-
     //region ------------------------------------- INTERFACE GAME PLAYER -----------------------------------------------
 
 
-    public void setPoints(int points) {
+    public void setPoints(int points)
+    {
         this.points = points;
     }
 
 
-    public void addHandCard(TrainCard card) {
-        if (this.state != State.GAMING) {
+    public void addHandCard(TrainCard card)
+    {
+        if (this.state != State.GAMING)
+        {
             if (Configuration_Constants.debug)
                 System.out.println("(DEBUG\tPlayer: Tried to add HandCard while player " + name + "wasn't in a game.");
             throw new IllegalStateException("Player is not in Game!");
@@ -436,9 +488,12 @@ public class Player implements Comparable {
     }
 
 
-    public void addMission(Mission mission) {
-        synchronized (mission) {
-            if (this.state != State.GAMING) {
+    public void addMission(Mission mission)
+    {
+        synchronized (mission)
+        {
+            if (this.state != State.GAMING)
+            {
                 if (Configuration_Constants.debug)
                     System.out.println("(DEBUG\tPlayer: Tried to add mission while player " + name + "wasn't in a game.");
                 throw new IllegalStateException("Player is not in Game!");
@@ -449,8 +504,10 @@ public class Player implements Comparable {
     }
 
 
-    public void setPlayerColor(Color playerColor) {
-        if (this.state == State.GAMING && this.playerColor != null) {
+    public void setPlayerColor(Color playerColor)
+    {
+        if (this.state == State.GAMING && this.playerColor != null)
+        {
             if (Configuration_Constants.debug)
                 System.out.println("(DEBUG)\tCalled Player.setPlayerColor() while Player was in Game!");
             return;
@@ -459,12 +516,14 @@ public class Player implements Comparable {
     }
 
 
-    public int getStones() {
+    public int getStones()
+    {
         return this.numStones;
     }
 
 
-    public void missionInit() {
+    public void missionInit()
+    {
         session.drawMission();
     }
 
@@ -472,16 +531,17 @@ public class Player implements Comparable {
     //endregion
 
 
-
-
     //region ------------------------------------- ENDING GAME METHODS -------------------------------------------------
 
 
-    public int calculatePointsAtGameEnd(int additionalPoints) {
+    public int calculatePointsAtGameEnd(int additionalPoints)
+    {
         //TODO call this method at the end of the game
-        synchronized (missions) {
+        synchronized (missions)
+        {
             //Punkte von Zielkarten dazuzählen und abziehen
-            for (Mission mission : this.missions) {
+            for (Mission mission : this.missions)
+            {
                 if (mission.isDone()) points = mission.getPoints();
                 else points -= mission.getPoints();
             }
@@ -494,16 +554,19 @@ public class Player implements Comparable {
     }
 
 
-    public int findLongestConnection() {
+    public int findLongestConnection()
+    {
         ArrayList<Integer> connectedRailroadLength = new ArrayList<>();
-        for (RailroadLine railroadLine : this.ownsRailroads) {
+        for (RailroadLine railroadLine : this.ownsRailroads)
+        {
             //Add length of connection from railroad
             connectedRailroadLength.add(findRailroadLine(railroadLine));
         }
 
         //Find the longest connection
         int longestConnection = 0;
-        for (Integer counter : connectedRailroadLength) {
+        for (Integer counter : connectedRailroadLength)
+        {
             if (counter > longestConnection) longestConnection = counter;
         }
 
@@ -512,11 +575,14 @@ public class Player implements Comparable {
 
 
     //Count length of connection
-    private int findRailroadLine(RailroadLine railroadLine) {
+    private int findRailroadLine(RailroadLine railroadLine)
+    {
         Destination startDestination = railroadLine.getDestination2();
         int counter = 0;
-        for (RailroadLine otherRailroadLine : this.ownsRailroads) {
-            if (startDestination == otherRailroadLine.getDestination1()) {
+        for (RailroadLine otherRailroadLine : this.ownsRailroads)
+        {
+            if (startDestination == otherRailroadLine.getDestination1())
+            {
                 counter++;
                 startDestination = otherRailroadLine.getDestination2();
             }
@@ -528,15 +594,14 @@ public class Player implements Comparable {
     //endregion
 
 
-
-
     //region --------------------------- SERVER CLIENT COMMUNICATION ---------------------------------------------------
 
 
     /**
      * prompts the client to sync
      */
-    public void sync() {
+    public void sync()
+    {
         sendCommand("sync");
     }
 
@@ -544,7 +609,8 @@ public class Player implements Comparable {
     /**
      * prompts the client, that a player has cheated
      */
-    public void cheat() {
+    public void cheat()
+    {
         sendCommand("cheat");
     }
 
@@ -552,17 +618,20 @@ public class Player implements Comparable {
     /**
      * Notifies this player that this is player [name]'s turn
      */
-    public void actionCall(String playerOnTheMove, int actionPoints) {
+    public void actionCall(String playerOnTheMove, int actionPoints)
+    {
         this.sendCommand("actionCall:" + playerOnTheMove + ":" + actionPoints);
     }
 
 
-    public void gameOver() {
+    public void gameOver()
+    {
         sendCommand("gameOver");
     }
 
 
-    private void sendCommand(String command) {
+    private void sendCommand(String command)
+    {
         session.send(command);
     }
 
@@ -570,49 +639,51 @@ public class Player implements Comparable {
     //endregion
 
 
-
-
     // region ------------------------------ SETTER GETTER TO STRING ---------------------------------------------------
 
 
-    public State getState() {
+    public State getState()
+    {
         return state;
     }
 
 
-    public int getPlayerPoints() {
+    public int getPlayerPoints()
+    {
         return points;
     }
 
 
-    public Color getPlayerColor() {
+    public Color getPlayerColor()
+    {
         return playerColor;
     }
 
 
-    public int getId() {
+    public int getId()
+    {
         return id;
     }
 
 
     //unique name check in lobby
-    public void setName(String name) {
+    public void setName(String name)
+    {
         if (name == null) throw new IllegalArgumentException("name is null");
         if (name.length() == 0) throw new IllegalArgumentException("name.length is 0");
         this.name = name;
     }
 
 
-
-
-    public String getName() {
+    public String getName()
+    {
         return name;
     }
 
 
-
     @Override
-    public String toString() {
+    public String toString()
+    {
         return "Player{" +
                 "name='" + name + '\'' +
                 ", id=" + id +
@@ -633,7 +704,8 @@ public class Player implements Comparable {
      * @return 1 if no instanceof Player, 0 if the names are equal, -1 if names differ
      */
     @Override
-    public int compareTo(Object player) {
+    public int compareTo(Object player)
+    {
         if (!(player instanceof Player)) return 1;
         if (this.name.equals(((Player) player).name)) return 0;
         else return -1;
