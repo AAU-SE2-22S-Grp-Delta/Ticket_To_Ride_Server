@@ -35,7 +35,7 @@ class LoggerTest {
     }
 
     @Test
-    public void testPrivateConstructor() throws Exception {
+    void testPrivateConstructor() throws Exception {
         Constructor<Logger> constructor = Logger.class.getDeclaredConstructor();
         assertTrue(Modifier.isPrivate(constructor.getModifiers()));
         constructor.setAccessible(true);
