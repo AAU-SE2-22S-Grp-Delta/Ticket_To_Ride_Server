@@ -1,4 +1,4 @@
-package at.aau.se2.ticketToRide_server.datastructures;
+package at.aau.se2.tickettoride_server.datastructures;
 
 import java.util.HashSet;
 import java.util.Set;

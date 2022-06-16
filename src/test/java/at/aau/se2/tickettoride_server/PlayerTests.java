@@ -1,14 +1,11 @@
-package at.aau.se2.ticketToRide_server;
+package at.aau.se2.tickettoride_server;
 
-import at.aau.se2.ticketToRide_server.datastructures.*;
-import at.aau.se2.ticketToRide_server.models.GameModel;
-import at.aau.se2.ticketToRide_server.server.Session;
-import org.junit.jupiter.api.AfterAll;
+import at.aau.se2.tickettoride_server.datastructures.*;
+import at.aau.se2.tickettoride_server.server.Session;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -94,6 +91,14 @@ class PlayerTests
 
 
     @Test
+    void testGetHandCards()
+    {
+        assertEquals("getHandCards:null", p3.getHandCards());
+        String[] s = p1.getHandCards().split(":");
+        assertEquals(1, s.length);
+    }
+
+    @Test
     void testGetOpenCards()
     {
         assertEquals("openHandCard:null", p3.getOpenCards());
@@ -155,6 +160,16 @@ class PlayerTests
             p4.addHandCard(new TrainCard(TrainCard.Type.RED));
         String[] s = p4.getHandCards().split(":");
         assertEquals(2, s.length);
+    }
+
+    @Test
+    void drawMission()
+    {
+        //?????
+        assertEquals("drawMission:null", p3.drawMission());
+        p1.drawMission();
+        p1.chooseMissions(new LinkedList<>(List.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30)));
+        System.out.println(p1.getMissions());
     }
 
     @Test

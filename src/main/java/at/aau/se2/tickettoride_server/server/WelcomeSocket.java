@@ -1,4 +1,4 @@
-package at.aau.se2.ticketToRide_server.server;
+package at.aau.se2.tickettoride_server.server;
 
 import java.net.*;
 
@@ -20,11 +20,11 @@ public class WelcomeSocket implements Runnable {
                 System.out.println("Server running on port 8001");
 
                 while (active) {
-                    if (Configuration_Constants.verbose) System.out.println("(VERBOSE)\tWelcomeSocket: waiting for connection... ");
+                    if (Configuration_Constants.VERBOSE) System.out.println("(VERBOSE)\tWelcomeSocket: waiting for connection... ");
                     Socket connection = welcomeSocket.accept();
-                    if (Configuration_Constants.verbose) System.out.println("(VERBOSE)\tWelcomeSocket: connection requested");
+                    if (Configuration_Constants.VERBOSE) System.out.println("(VERBOSE)\tWelcomeSocket: connection requested");
                     Session session = new Session(connection);
-                    if (Configuration_Constants.verbose) System.out.println("(VERBOSE)\tWelcomeSocket: launched session");
+                    if (Configuration_Constants.VERBOSE) System.out.println("(VERBOSE)\tWelcomeSocket: launched session");
                 }
             }
         } catch (Exception e) {

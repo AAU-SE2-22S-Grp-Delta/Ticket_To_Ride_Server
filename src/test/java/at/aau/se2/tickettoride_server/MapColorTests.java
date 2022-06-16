@@ -1,6 +1,6 @@
-package at.aau.se2.ticketToRide_server;
+package at.aau.se2.tickettoride_server;
 
-import at.aau.se2.ticketToRide_server.datastructures.MapColor;
+import at.aau.se2.tickettoride_server.datastructures.MapColor;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
