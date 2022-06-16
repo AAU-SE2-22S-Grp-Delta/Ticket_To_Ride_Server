@@ -27,17 +27,17 @@ public class ReceivingThread extends Thread {
                 System.out.println("ReceivingThread: lost connection");
                 //Todo close session
                 System.out.println("ReceivingThread: shutting down ...");
-                se.printStackTrace();
+                System.out.println(se.getMessage());
                 break;
             } catch (NullPointerException npe) {
                 System.out.println("ReceivingThread: lost connection");
                 //Todo close session
-                npe.printStackTrace();
+                System.out.println(npe.getMessage());
                 System.out.println("ReceivingThread: shutting down ...");
                 break;
             } catch (Exception e) {
                 System.out.println("ReceivingThread: Some error occurred ...");
-                e.printStackTrace();
+                System.out.println(e.getMessage());
             }
         }
     }

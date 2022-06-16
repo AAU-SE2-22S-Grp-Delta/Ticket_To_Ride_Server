@@ -27,7 +27,7 @@ public class SetupSessionThread extends Thread {
             System.out.println("SetupSessionThread: launched communication threads");
         } catch (Exception e) {
             System.out.println("SetupSessionThread: Failed to launch communication threads");
-            e.printStackTrace();
+            System.out.println(e.getMessage());
         }
     }
 }

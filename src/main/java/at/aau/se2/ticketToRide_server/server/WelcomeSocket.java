@@ -27,7 +27,7 @@ public class WelcomeSocket implements Runnable {
                 if (Configuration_Constants.verbose)System.out.println("(VERBOSE)\tWelcomeSocket: launched session");
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println(e.getMessage());
         }
 
     }

@@ -173,7 +173,7 @@ public class GameModel implements Runnable {
                     if (check == players.size()) checkAllChosen = true;
                 } while (!checkAllChosen);
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                System.out.println(e.getMessage());
             }
             this.notifyAll();
         }
@@ -258,7 +258,7 @@ public class GameModel implements Runnable {
                 }
             } catch (Exception e) {
                 if (Configuration_Constants.debug) System.out.println("(DEBUG)\t Error in GameModel.move");
-                e.printStackTrace();
+                System.out.println(e.getMessage());
             }
         }
     }

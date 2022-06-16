@@ -30,7 +30,7 @@ public class SendingThread extends Thread {
                 }
                 sendToClient(command);
             } catch (Exception e) {
-                e.printStackTrace();
+                System.out.println(e.getMessage());
             }
         }
     }
@@ -47,7 +47,7 @@ public class SendingThread extends Thread {
             if (Configuration_Constants.verbose) System.out.println("(VERBOSE)\tSendingThread: sending " + command);
             send.writeBytes(command + "\n");
         } catch (IOException e) {
-            e.printStackTrace();
+            System.out.println(e.getMessage());
             return -1;
         }
         return 0;
