@@ -158,7 +158,7 @@ public class GameModel implements Runnable {
     private void playersDrawingMissionsAtGameStart() {
         for (this.activePlayer = 0; activePlayer < players.size(); activePlayer++) {
             players.get(activePlayer).missionInit();
-            if (Configuration_Constants.verbose)
+            if (Configuration_Constants.VERBOSE)
                 System.out.println("(VERBOSE)\tPrompting player " + players.get(activePlayer).getName() + " to draw Mission");
         }
         activePlayer = 0;
@@ -195,13 +195,13 @@ public class GameModel implements Runnable {
         initMissionChoosers();
         playersDrawingMissionsAtGameStart();
 
-        if (Configuration_Constants.verbose) System.out.println("(VERBOSE)\tGameModel.run() Game loop up");
+        if (Configuration_Constants.VERBOSE) System.out.println("(VERBOSE)\tGameModel.run() Game loop up");
         while (!checkIfOver()) {
             move();
-            if (Configuration_Constants.verbose) System.out.println("(VERBOSE)\tGameModel.run() Next round");
+            if (Configuration_Constants.VERBOSE) System.out.println("(VERBOSE)\tGameModel.run() Next round");
             activePlayer = ++activePlayer % players.size();
         }
-        if (Configuration_Constants.verbose) System.out.println("(VERBOSE)\tGameModel.run() Game loop broke");
+        if (Configuration_Constants.VERBOSE) System.out.println("(VERBOSE)\tGameModel.run() Game loop broke");
         synchronized (this) {
             calculatePointsAndFindWinner();
             for (Player player : players) player.gameOver();
@@ -250,20 +250,20 @@ public class GameModel implements Runnable {
      * while actualisation information is locked
      */
     private void move() {
-        if (Configuration_Constants.verbose) System.out.println("(VERBOSE)\tGameModel.move() move start");
+        if (Configuration_Constants.VERBOSE) System.out.println("(VERBOSE)\tGameModel.move() move start");
         this.actionsLeft = 2;
         while (actionsLeft > 0) {
             try {
                 synchronized (this) {
                     actionCall();
                     stateChanged = false;
-                    if (Configuration_Constants.verbose)
+                    if (Configuration_Constants.VERBOSE)
                         System.out.println("(VERBOSE)\tGameModel.move() called and waiting for action");
                     this.wait(); //Waits until a action is done
                     sync();      //then the sync broadcast
                 }
             } catch (Exception e) {
-                if (Configuration_Constants.debug) System.out.println("(DEBUG)\t Error in GameModel.move");
+                if (Configuration_Constants.DEBUG) System.out.println("(DEBUG)\t Error in GameModel.move");
                 System.out.println(e.getMessage());
             }
         }
@@ -274,7 +274,7 @@ public class GameModel implements Runnable {
      * Broadcasts to all players that this is player [name]'s turn
      */
     private void actionCall() {
-        if (Configuration_Constants.verbose) System.out.println("(VERBOSE)\tGameModel.actionCall() calling players...");
+        if (Configuration_Constants.VERBOSE) System.out.println("(VERBOSE)\tGameModel.actionCall() calling players...");
         String playerOnTheMove = players.get(this.activePlayer).getName();
         for (Player p : this.players) {
             p.actionCall(playerOnTheMove, actionsLeft);
@@ -491,7 +491,7 @@ public class GameModel implements Runnable {
      * @return 0 on success, -1 on fail
      */
     public int startGame(Player whoIsPerformingThisAction) {
-        if (Configuration_Constants.verbose)
+        if (Configuration_Constants.VERBOSE)
             System.out.println(("(VERBOSE)\t GameModel.startGame() starting game " + this.name + "..."));
         if (!whoIsPerformingThisAction.equals(owner)) {
             System.out.println("(DEBUG)\tGameModel.startGame() called from player who is not owner");
@@ -515,10 +515,10 @@ public class GameModel implements Runnable {
         int retVal = -1;
         synchronized (this) {
             if (!players.get(activePlayer).equals(player)) {
-                if (Configuration_Constants.verbose)
+                if (Configuration_Constants.VERBOSE)
                     System.out.println("(VERBOSE)\t Player" + player.getName() + " was blocked trying pick open card while players " + players.get(activePlayer) + "turn.");
             } else if (openCardId < 0 || openCardId > 4) {
-                if (Configuration_Constants.verbose)
+                if (Configuration_Constants.VERBOSE)
                     System.out.println("(VERBOSE)\t Player" + player.getName() + " tried to pick card out of range: openCardId=" + openCardId);
             } else {
                 boolean locomotive = openCards[openCardId].getType() == TrainCard.Type.LOCOMOTIVE;
@@ -529,7 +529,7 @@ public class GameModel implements Runnable {
                     retVal = 0;
                     actionsLeft = 0;
                 } else if (actionsLeft == 1 && locomotive) {
-                    if (Configuration_Constants.debug)
+                    if (Configuration_Constants.DEBUG)
                         System.out.println("(DEBUG)\tGameModel.drawOpenCard() Player " + player.getName() + " tried to pick locomotive when actionsLeft=1");
                 } else {
                     player.addHandCard(openCards[openCardId]);
@@ -549,7 +549,7 @@ public class GameModel implements Runnable {
         String response = "cardStack:null";
         synchronized (this) {
             if (!players.get(activePlayer).equals(player)) {
-                if (Configuration_Constants.verbose)
+                if (Configuration_Constants.VERBOSE)
                     System.out.println("(VERBOSE)\tGameModel.drawCardFromStack() Player" + player.getName() + " was blocked trying pick card from stack while players " + players.get(activePlayer) + "turn.");
             } else {
                 TrainCard card = drawCardFromStack();
@@ -569,7 +569,7 @@ public class GameModel implements Runnable {
     private TrainCard drawCardFromStack() {
         TrainCard card = null;
         synchronized (this) {
-            if (Configuration_Constants.verbose)
+            if (Configuration_Constants.VERBOSE)
                 System.out.println("(VERBOSE)\tGameModel.drawCardFromStack() drawing card...");
 
             boolean abort = false;
@@ -595,7 +595,7 @@ public class GameModel implements Runnable {
         int retVal = -1;
         synchronized (this) {
             if (!players.get(activePlayer).equals(player)) {
-                if (Configuration_Constants.debug)
+                if (Configuration_Constants.DEBUG)
                     System.out.println("(DEBUG)\tPlayer" + player.getName() + " was blocked trying to build road while players " + players.get(activePlayer) + "turn.");
             }
 
@@ -614,7 +614,7 @@ public class GameModel implements Runnable {
                 returnCardsToDiscordPile(cardsToBuildRail);
                 stateChanged = true;
                 retVal = 0;
-                if (Configuration_Constants.verbose)
+                if (Configuration_Constants.VERBOSE)
                     System.out.println("(VERBOSE)\nGameModel.setRailRoadLineOwner() RailOwner=" + player.getName());
             }
             this.notifyAll();
@@ -634,7 +634,7 @@ public class GameModel implements Runnable {
         String response = "drawMission:null";
         synchronized (this) {
             if (!players.get(activePlayer).equals(player)) {
-                if (Configuration_Constants.debug)
+                if (Configuration_Constants.DEBUG)
                     System.out.println("(DEBUG)\tPlayer" + player.getName() + " was blocked trying to draw mission while players " + players.get(activePlayer) + "turn.");
             } else {
                 if (missions.isEmpty()) response = "drawMission:empty";
@@ -650,7 +650,7 @@ public class GameModel implements Runnable {
                     }
                     waitForCoice[activePlayer] = true;
                 } else {
-                    if (Configuration_Constants.debug)
+                    if (Configuration_Constants.DEBUG)
                         System.out.println("(DEBUG)\tGameModel.drawMission() called when player has to coose mission");
                 }
             }
@@ -677,7 +677,7 @@ public class GameModel implements Runnable {
                     }
                 }
                 if (counter > 0) {
-                    if (Configuration_Constants.debug)
+                    if (Configuration_Constants.DEBUG)
                         System.out.println("(DEBUG)\tGameModel.chooseMissions() illegal choice when called");
                 } else {
                     for (Mission mission : toAdd) player.addMission(mission);
@@ -687,7 +687,7 @@ public class GameModel implements Runnable {
                 }
                 dropMissions(toDrop);
             } else {
-                if (Configuration_Constants.debug)
+                if (Configuration_Constants.DEBUG)
                     System.out.println("(DEBUG)\tGameModel.chooseMissions() called when not waiting on Player " + player.getName());
             }
             this.notifyAll();
@@ -733,7 +733,7 @@ public class GameModel implements Runnable {
             }
 
             players.remove(playerPosition);
-            if (Configuration_Constants.verbose)
+            if (Configuration_Constants.VERBOSE)
                 System.out.println("(VERBOSE)\t GameModel.exitGame() removed Player " + player.getName() + "from game " + name);
 
             if (this.players.size() == 0) Lobby.getInstance().removeGame(this);
@@ -937,7 +937,7 @@ public class GameModel implements Runnable {
         map.addRailroadLine(new DoubleRailroadLine(kansascity, denver, MapColor.BLACK, 4, MapColor.ORANGE));
         map.addRailroadLine(new RailroadLine(denver, phoenix, MapColor.WHITE, 5));
 
-        if (!Configuration_Constants.doubleRails) {
+        if (!Configuration_Constants.DOUBLE_RAILS) {
             Player dummy = Player.getDummy();
             for (RailroadLine rail : map.getRailroadLines()) {
                 if (rail instanceof DoubleRailroadLine) {

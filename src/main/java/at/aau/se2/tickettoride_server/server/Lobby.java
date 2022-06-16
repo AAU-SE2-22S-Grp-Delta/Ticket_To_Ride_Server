@@ -105,7 +105,7 @@ public class Lobby {
             boolean found = false;
             for (Player p : players) {
                 if (p.getName().equals(name)) {//if name is already in use
-                    if (Configuration_Constants.debug) System.out.println("(DEBUG)\t Lobby.enterLobby() Name " + name + "already in use");
+                    if (Configuration_Constants.DEBUG) System.out.println("(DEBUG)\t Lobby.enterLobby() Name " + name + "already in use");
                     found = false;
                     break;
                 }
@@ -128,7 +128,7 @@ public class Lobby {
      */
     public GameModel createGame(String gameName, Player owner) {
         if (gameName == null || gameName.length() == 0) {
-            if (Configuration_Constants.debug)
+            if (Configuration_Constants.DEBUG)
                 System.out.println("(DEBUG)\t Lobby.createGame() Illegal game format: " + gameName);
             return null;
         }
@@ -136,13 +136,13 @@ public class Lobby {
         GameModel game = null;
         synchronized (games) {
             if (getGameByName(gameName) != null) {
-                if (Configuration_Constants.debug)
+                if (Configuration_Constants.DEBUG)
                     System.out.println("(DEBUG)\t Lobby.createGame() game of gameName " + gameName + " already exists");
             }
             else {
                 game = new GameModel(gameName, owner);
                 this.games.add(game);
-                if (Configuration_Constants.verbose)
+                if (Configuration_Constants.VERBOSE)
                     System.out.println("(VERBOSE)\t Lobby.createGame() game of gameName " + gameName + " created");
             }
             games.notifyAll();
@@ -161,11 +161,11 @@ public class Lobby {
                 }
             }
             if (game == null) {
-                if (Configuration_Constants.debug) System.out.println("(DEBUG)\tLobby.joinGame() No game of name " + gameName);
+                if (Configuration_Constants.DEBUG) System.out.println("(DEBUG)\tLobby.joinGame() No game of name " + gameName);
             }
             else {
                 if (game.addPlayer(player) < 0) {
-                    if (Configuration_Constants.debug) System.out.println("(DEBUG)\t Game is full");
+                    if (Configuration_Constants.DEBUG) System.out.println("(DEBUG)\t Game is full");
                     game = null;
                 }
             }

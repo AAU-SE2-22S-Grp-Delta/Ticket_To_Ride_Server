@@ -16,15 +16,15 @@ public class SendingThread extends Thread {
 
     @Override
     public void run() {
-        if (Configuration_Constants.verbose) System.out.println("(VERBOSE)\tSendingThread: has been started ...");
+        if (Configuration_Constants.VERBOSE) System.out.println("(VERBOSE)\tSendingThread: has been started ...");
         String command;
         while (true) {
             try {
                 synchronized (lock) {
                     if (outputBuffer.isEmpty()) {
-                        if (Configuration_Constants.verbose) System.out.println("(VERBOSE)\tSendingThread: Pause sending thread");
+                        if (Configuration_Constants.VERBOSE) System.out.println("(VERBOSE)\tSendingThread: Pause sending thread");
                         lock.wait();
-                        if (Configuration_Constants.verbose) System.out.println("(VERBOSE)\tSendingThread: Continue sending thread");
+                        if (Configuration_Constants.VERBOSE) System.out.println("(VERBOSE)\tSendingThread: Continue sending thread");
                     }
                     command = outputBuffer.remove();
                 }
@@ -45,7 +45,7 @@ public class SendingThread extends Thread {
 
     private int sendToClient(String command) {
         try {
-            if (Configuration_Constants.verbose) System.out.println("(VERBOSE)\tSendingThread: sending " + command);
+            if (Configuration_Constants.VERBOSE) System.out.println("(VERBOSE)\tSendingThread: sending " + command);
             send.writeBytes(command + "\n");
         } catch (IOException e) {
             System.out.println(e.getMessage());

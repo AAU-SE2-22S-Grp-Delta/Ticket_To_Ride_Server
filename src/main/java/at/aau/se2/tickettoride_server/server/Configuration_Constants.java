@@ -1,8 +1,8 @@
 package at.aau.se2.tickettoride_server.server;
 
 public class Configuration_Constants {
-    public static final boolean verbose = true;
-    public static final boolean debug = true;
-    public static final boolean echo = true;
-    public static final boolean doubleRails = false;
+    public static final boolean VERBOSE = true;
+    public static final boolean DEBUG = true;
+    public static final boolean ECHO = true;
+    public static final boolean DOUBLE_RAILS = false;
 }

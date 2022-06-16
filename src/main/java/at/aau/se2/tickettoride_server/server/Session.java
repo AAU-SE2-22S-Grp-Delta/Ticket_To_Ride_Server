@@ -73,8 +73,8 @@ public class Session {
 
 
     void parseCommand(String received) {
-        if (Configuration_Constants.verbose) System.out.println("(VERBOSE)\tSession received: " + received);
-        if (Configuration_Constants.echo) send("echo:" + received);
+        if (Configuration_Constants.VERBOSE) System.out.println("(VERBOSE)\tSession received: " + received);
+        if (Configuration_Constants.ECHO) send("echo:" + received);
 
         String[] commands = received.split(";");
 
@@ -88,7 +88,7 @@ public class Session {
             //----------- when adding commands which don't necessarily need a session owner, put them above the following check ---------
             if (this.player == null) {
                 sendingThread.sendCommand("ERROR: Not in Lobby");
-                if (Configuration_Constants.debug) {
+                if (Configuration_Constants.DEBUG) {
                     System.out.printf("(DEBUG)\t Session %d received command '%s' while sessionOwner=null\n", this.id, command);
                     send(command + ":null");
                 }
@@ -167,17 +167,17 @@ public class Session {
 
 
     private void enterLobby(String command) {
-        if (Configuration_Constants.verbose) System.out.println("(VERBOSE)\tSession.enterLobby() called");
+        if (Configuration_Constants.VERBOSE) System.out.println("(VERBOSE)\tSession.enterLobby() called");
         if (this.player != null) {
             this.send("enterLobby:null");
-            if (Configuration_Constants.debug)
+            if (Configuration_Constants.DEBUG)
                 System.out.println("(DEBUG)\tSession.enterLobby() failed: session already belongs to player " + player.getName());
             return;
         }
 
         String[] words = command.split(":");
         this.player = Player.enterLobby(words[1], this);
-        if (Configuration_Constants.verbose) System.out.println("(VERBOSE)\tCreated Player " + words[1]);
+        if (Configuration_Constants.VERBOSE) System.out.println("(VERBOSE)\tCreated Player " + words[1]);
     }
 
 
@@ -185,11 +185,11 @@ public class Session {
         String[] words = command.split(":");
 
         if (player.createGame(words[1]) < 0) {
-            if (Configuration_Constants.debug) System.out.println("(DEBUG)\tCreating game " + words[1] + " failed");
+            if (Configuration_Constants.DEBUG) System.out.println("(DEBUG)\tCreating game " + words[1] + " failed");
             send("createGame:null");
             return;
         }
-        if (Configuration_Constants.verbose) System.out.println("(VERBOSE)\tCreated game " + words[1]);
+        if (Configuration_Constants.VERBOSE) System.out.println("(VERBOSE)\tCreated game " + words[1]);
     }
 
 

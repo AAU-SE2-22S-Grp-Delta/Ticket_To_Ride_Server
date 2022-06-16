@@ -114,7 +114,7 @@ public class Player implements Comparable {
      */
     public int joinGame(String gameName) {
         if (state.equals(State.GAMING)) {
-            if (Configuration_Constants.debug)
+            if (Configuration_Constants.DEBUG)
                 System.out.println("(DEBUG)\t Player.joinGame() called while Player " + name + " was in game " + this.game.getName());
             return -1;
         }
@@ -129,7 +129,7 @@ public class Player implements Comparable {
         this.handCards = new ArrayList<>();
         this.missions = new ArrayList<>();
         this.game = game;
-        if (Configuration_Constants.verbose) System.out.println("(VERBOSE)\tPlayer joint game " + this.game.getName());
+        if (Configuration_Constants.VERBOSE) System.out.println("(VERBOSE)\tPlayer joint game " + this.game.getName());
         return 0;
     }
 
@@ -242,7 +242,7 @@ public class Player implements Comparable {
      */
     public int startGame() {
         if (state != State.GAMING) {
-            if (Configuration_Constants.debug)
+            if (Configuration_Constants.DEBUG)
                 System.out.println("(DEBUG)\t Player.startGame() called while not in game");
             return -1;
         }
@@ -280,7 +280,7 @@ public class Player implements Comparable {
 
         RailroadLine railroadLine = game.getRailroadLineByName(dest1, dest2);
         if (railroadLine == null || numStones < railroadLine.getDistance()) {
-            if (Configuration_Constants.debug)
+            if (Configuration_Constants.DEBUG)
                 System.out.println("(DEBUG)\t Player.buildRailroadLine() Error while trying " + dest1 + " to " + dest2);
             return -1;
         }
@@ -290,19 +290,19 @@ public class Player implements Comparable {
             DoubleRailroadLine doubleRailroadLine = (DoubleRailroadLine) railroadLine;
 
             if (doubleRailroadLine.getColor() != MapColor.GRAY && doubleRailroadLine.getColor2() != MapColor.GRAY && doubleRailroadLine.getColor() != c && doubleRailroadLine.getColor2() != c) {
-                if (Configuration_Constants.debug)
+                if (Configuration_Constants.DEBUG)
                     System.out.println("(DEBUG)\t Player.buildRailroadLine() no Rail of such color! railroad from " + dest1 + " to " + dest2);
                 return -1;
             }
         } else if (railroadLine.getColor() != MapColor.GRAY && railroadLine.getColor() != c) {
-            if (Configuration_Constants.debug)
+            if (Configuration_Constants.DEBUG)
                 System.out.println("(DEBUG)\t Player.buildRailroadLine() no Rail of such color! railroad from " + dest1 + " to " + dest2);
             return -1;
         }
 
         LinkedList<TrainCard> cards = getCardsToBuildRail(TrainCard.map_mapColor_to_TrainCardType(c), railroadLine.getDistance());
         if (cards == null) {
-            if (Configuration_Constants.debug)
+            if (Configuration_Constants.DEBUG)
                 System.out.println("(DEBUG)\t Player.buildRailroadLine() Player " + this.name + " not enough cards of color " + c + ". Railroad from " + dest1 + " to " + dest2);
             return -1;
         }
@@ -312,7 +312,7 @@ public class Player implements Comparable {
             this.numStones -= railroadLine.getDistance();
             this.ownsRailroads.add(railroadLine);
             checkIfMissionsCompleted();
-            if (Configuration_Constants.verbose)
+            if (Configuration_Constants.VERBOSE)
                 System.out.println("(DEBUG)\t Player.buildRailroadLine() Player " + this.name + " built railroad from " + dest1 + " to " + dest2);
             return 0;
         } else return -1;
@@ -424,11 +424,11 @@ public class Player implements Comparable {
 
     public void addHandCard(TrainCard card) {
         if (this.state != State.GAMING) {
-            if (Configuration_Constants.debug)
+            if (Configuration_Constants.DEBUG)
                 System.out.println("(DEBUG\tPlayer: Tried to add HandCard while player " + name + "wasn't in a game.");
             throw new IllegalStateException("Player is not in Game!");
         }
-        if (Configuration_Constants.verbose)
+        if (Configuration_Constants.VERBOSE)
             System.out.println("(VERBOSE)\tPlayer.addHandCard() Card=" + card.getType().toString());
         if (card == null) throw new IllegalArgumentException("card is Null!");
         this.handCards.add(card);
@@ -439,7 +439,7 @@ public class Player implements Comparable {
     public void addMission(Mission mission) {
         synchronized (mission) {
             if (this.state != State.GAMING) {
-                if (Configuration_Constants.debug)
+                if (Configuration_Constants.DEBUG)
                     System.out.println("(DEBUG\tPlayer: Tried to add mission while player " + name + "wasn't in a game.");
                 throw new IllegalStateException("Player is not in Game!");
             }
@@ -451,7 +451,7 @@ public class Player implements Comparable {
 
     public void setPlayerColor(Color playerColor) {
         if (this.state == State.GAMING && this.playerColor != null) {
-            if (Configuration_Constants.debug)
+            if (Configuration_Constants.DEBUG)
                 System.out.println("(DEBUG)\tCalled Player.setPlayerColor() while Player was in Game!");
             return;
         }
