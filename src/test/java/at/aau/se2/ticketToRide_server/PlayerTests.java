@@ -6,21 +6,17 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
 
-
-public class PlayerTests
+class PlayerTests
 {
     static Session mockedSession = Mockito.mock(Session.class);
     static Player p1 = new Player("testPlayer", mockedSession);
     static Player p2 = new Player("testPlayer2", mockedSession);
     static Player p3 = new Player("testPlayer3", mockedSession);
-    static Player p4 = new Player("testPlayer3", mockedSession);
 
     @BeforeAll
     static void init()
@@ -98,7 +94,6 @@ public class PlayerTests
         assertEquals("getHandCards:", p1.getHandCards());
     }
 
-
     @Test
     void testGetOpenCards()
     {
@@ -134,7 +129,6 @@ public class PlayerTests
         assertEquals("getMissions:null", p3.getMissions());
         assertEquals("getMissions", p1.getMissions());
     }
-
 
     @Test
     void testGetNumStones()
@@ -175,7 +169,4 @@ public class PlayerTests
 //        assertEquals(-1, p3.drawCardOpen(2));
 //        assertEquals(0, p2.drawCardOpen(3));
 //    }
-
-
-
 }
