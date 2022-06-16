@@ -1,6 +1,6 @@
 package at.aau.se2.ticketToRide_server.server;
 
-import at.aau.se2.ticketToRide_server.data_structures.Player;
+import at.aau.se2.ticketToRide_server.datastructures.Player;
 import at.aau.se2.ticketToRide_server.models.GameModel;
 
 import java.util.ArrayList;
