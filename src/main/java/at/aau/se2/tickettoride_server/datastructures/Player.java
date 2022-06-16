@@ -423,13 +423,13 @@ public class Player implements Comparable<Object> {
 
 
     public void addMission(Mission mission) {
-        synchronized (mission) {
+        synchronized (missions) {
             if (this.state != State.GAMING) {
                 Logger.debug("Player: Tried to add mission while player " + name + "wasn't in a game.");
                 throw new IllegalStateException("Player is not in Game!");
             }
             this.missions.add(mission);
-            mission.notifyAll();
+            missions.notifyAll();
         }
     }
 
@@ -472,7 +472,7 @@ public class Player implements Comparable<Object> {
 
             //Zusatzpunkte für längste Strecke
             points += additionalPoints;
-            notifyAll();
+            missions.notifyAll();
         }
         return points;
     }
