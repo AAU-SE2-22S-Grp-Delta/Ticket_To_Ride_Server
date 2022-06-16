@@ -29,8 +29,9 @@ public class SendingThread extends Thread {
                     command = outputBuffer.remove();
                 }
                 sendToClient(command);
-            } catch (Exception e) {
+            } catch (InterruptedException e) {
                 System.out.println(e.getMessage());
+                Thread.currentThread().interrupt();
             }
         }
     }
