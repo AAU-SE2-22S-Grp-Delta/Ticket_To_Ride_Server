@@ -2,10 +2,12 @@ package at.aau.se2.tickettoride_server;
 
 import at.aau.se2.tickettoride_server.datastructures.*;
 import at.aau.se2.tickettoride_server.server.Session;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
