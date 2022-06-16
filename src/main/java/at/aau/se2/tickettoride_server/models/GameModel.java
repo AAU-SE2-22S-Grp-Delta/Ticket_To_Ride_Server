@@ -13,7 +13,8 @@ enum State {
 }
 
 public class GameModel implements Runnable {
-    private static int idCounter = 0;
+    private static final String PLAYER = "Player";
+    private static final String TURN = "turn";
 
     //meta
     private final String name;
@@ -25,7 +26,6 @@ public class GameModel implements Runnable {
     private boolean[] waitForCoice;                                     //when player has to choose missions, the game will remember to wait for the coice
     boolean stateChanged = false;
     private Player winner;
-    private int[] pointsAtEnd;
 
 
     //invisible
@@ -39,7 +39,7 @@ public class GameModel implements Runnable {
 
     //visible to all
     private final Map map = getMapInstance();
-    private TrainCard[] openCards = new TrainCard[5];
+    private final TrainCard[] openCards = new TrainCard[5];
 
     public boolean isActive(Player player)
     {
@@ -146,7 +146,9 @@ public class GameModel implements Runnable {
 
 
     private void initMissionChoosers() {
-        this.set3s = new LinkedList[players.size()];
+        @SuppressWarnings("unchecked")
+        LinkedList<Mission>[] missions = new LinkedList[players.size()];
+        this.set3s = missions;
         this.waitForCoice = new boolean[players.size()];
         for (int i = 0; i < players.size(); i++) {
             set3s[i] = new LinkedList<>();
@@ -324,7 +326,7 @@ public class GameModel implements Runnable {
     private void calculatePointsAndFindWinner() {
         Player longest = findPlayerWithLongestConnection();
         int counter = 0;
-        this.pointsAtEnd = new int[players.size()];
+        int[] pointsAtEnd = new int[players.size()];
         for (Player player : this.players) {
             int additionalPoints = 0;
             if (longest != null && player.getName().equals(longest.getName())) additionalPoints = 10;
@@ -514,9 +516,9 @@ public class GameModel implements Runnable {
         int retVal = -1;
         synchronized (this) {
             if (!players.get(activePlayer).equals(player)) {
-                Logger.verbose("Player" + player.getName() + " was blocked trying pick open card while players " + players.get(activePlayer) + "turn.");
+                Logger.verbose(PLAYER + player.getName() + " was blocked trying pick open card while players " + players.get(activePlayer) + TURN);
             } else if (openCardId < 0 || openCardId > 4) {
-                Logger.verbose("Player" + player.getName() + " tried to pick card out of range: openCardId=" + openCardId);
+                Logger.verbose(PLAYER + player.getName() + " tried to pick card out of range: openCardId=" + openCardId);
             } else {
                 boolean locomotive = openCards[openCardId].getType() == TrainCard.Type.LOCOMOTIVE;
                 if (actionsLeft == 2 && locomotive) {
@@ -545,7 +547,7 @@ public class GameModel implements Runnable {
         String response = "cardStack:null";
         synchronized (this) {
             if (!players.get(activePlayer).equals(player)) {
-                Logger.verbose("GameModel.drawCardFromStack() Player" + player.getName() + " was blocked trying pick card from stack while players " + players.get(activePlayer) + "turn.");
+                Logger.verbose("GameModel.drawCardFromStack() Player" + player.getName() + " was blocked trying pick card from stack while players " + players.get(activePlayer) + TURN);
             } else {
                 TrainCard card = drawCardFromStack();
                 if (card != null) {
@@ -589,7 +591,7 @@ public class GameModel implements Runnable {
         int retVal = -1;
         synchronized (this) {
             if (!players.get(activePlayer).equals(player)) {
-                Logger.debug("Player" + player.getName() + " was blocked trying to build road while players " + players.get(activePlayer) + "turn.");
+                Logger.debug(PLAYER + player.getName() + " was blocked trying to build road while players " + players.get(activePlayer) + TURN);
             }
 
             if ((railroadLine.getColor() == MapColor.GRAY || railroadLine.getColor() == color) && railroadLine.getOwner() == null) {
@@ -606,7 +608,6 @@ public class GameModel implements Runnable {
                 this.actionsLeft = 0;
                 returnCardsToDiscordPile(cardsToBuildRail);
                 stateChanged = true;
-                retVal = 0;
                 Logger.verbose("GameModel.setRailRoadLineOwner() RailOwner=" + player.getName());
             }
             this.notifyAll();
@@ -616,28 +617,26 @@ public class GameModel implements Runnable {
 
 
     private void returnCardsToDiscordPile(LinkedList<TrainCard> cards) {
-        for (TrainCard card : cards) {
-            discardPile.add(card);
-        }
+        discardPile.addAll(cards);
     }
 
 
     public String drawMission(Player player) {
-        String response = "drawMission:null";
+        StringBuilder response = new StringBuilder("drawMission:null");
         synchronized (this) {
             if (!players.get(activePlayer).equals(player)) {
-                Logger.debug("Player" + player.getName() + " was blocked trying to draw mission while players " + players.get(activePlayer) + "turn.");
+                Logger.debug(PLAYER + player.getName() + " was blocked trying to draw mission while players " + players.get(activePlayer) + TURN);
             } else {
-                if (missions.isEmpty()) response = "drawMission:empty";
+                if (missions.isEmpty()) response = new StringBuilder("drawMission:empty");
                 else if (!waitForCoice[activePlayer]) {
                     set3s[activePlayer] = new LinkedList<>();
                     for (int i = 0; !missions.isEmpty() && i < 3; i++) {
                         set3s[activePlayer].add(missions.remove(0));
                     }
 
-                    response = "drawMission";
+                    response = new StringBuilder("drawMission");
                     for (Mission mission : set3s[activePlayer]) {
-                        response += ":" + mission.getId();
+                        response.append(":").append(mission.getId());
                     }
                     waitForCoice[activePlayer] = true;
                 } else {
@@ -646,7 +645,7 @@ public class GameModel implements Runnable {
             }
             this.notifyAll();
         }
-        return response;
+        return response.toString();
     }
 
 
@@ -701,6 +700,7 @@ public class GameModel implements Runnable {
                 actionsLeft = 0;
             }
 
+            @SuppressWarnings("unchecked")
             LinkedList<Mission>[] newSet3s = new LinkedList[players.size() - 1];
             boolean[] newWaitForCoice = new boolean[players.size() - 1];
 
@@ -753,12 +753,12 @@ public class GameModel implements Runnable {
 
     @Override
     public String toString() {
-        String toString = "name='" + name +
+        StringBuilder toString = new StringBuilder("name='" + name +
                 ", state=" + state
                 + ", owner=" + owner.getName() + "\n"
-                + "\tPlayers:";
-        for (Player player : players) toString += "\t" + player.toString() + "\n";
-        return toString;
+                + "\tPlayers:");
+        for (Player player : players) toString.append("\t").append(player.toString()).append("\n");
+        return toString.toString();
     }
 
 
