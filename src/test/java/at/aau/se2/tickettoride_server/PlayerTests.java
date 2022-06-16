@@ -281,11 +281,11 @@ class PlayerTests
         assertEquals("getMissions", p1.getMissions());
     }
 
-    @Test
-    @Order(999)
-    void endGame()
-    {
-        p4.exitGame();
-        p1.exitGame();
-    }
+//    @Test
+//    @Order(999)
+//    void endGame()
+//    {
+//        p4.exitGame();
+//        p1.exitGame();
+//    }
 }
