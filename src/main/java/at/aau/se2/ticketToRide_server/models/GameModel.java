@@ -215,6 +215,10 @@ public class GameModel implements Runnable {
      * @return true on over
      */
     private boolean checkIfOver() {
+        if(players.size() == 0 ){
+            state = State.OVER;
+            return true;
+        }
         if (countdown != -1) {
             countdown--;
         }
