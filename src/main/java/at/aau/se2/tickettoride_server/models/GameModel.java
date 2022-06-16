@@ -176,6 +176,7 @@ public class GameModel implements Runnable {
                 } while (!checkAllChosen);
             } catch (InterruptedException e) {
                 Logger.exception(e.getMessage());
+                Thread.currentThread().interrupt();
             }
             this.notifyAll();
         }
@@ -261,9 +262,10 @@ public class GameModel implements Runnable {
                     this.wait(); //Waits until a action is done
                     sync();      //then the sync broadcast
                 }
-            } catch (Exception e) {
+            } catch (InterruptedException e) {
                 Logger.debug("Error in GameModel.move");
                 Logger.exception(e.getMessage());
+                Thread.currentThread().interrupt();
             }
         }
     }
