@@ -2,7 +2,8 @@ package at.aau.se2.tickettoride_server.datastructures;
 
 public class Mission {
 
-    Destination destination1, destination2;
+    Destination destination1;
+    Destination destination2;
     private int id;
     private int points;
     private boolean done;
