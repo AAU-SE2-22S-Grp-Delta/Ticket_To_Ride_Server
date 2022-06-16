@@ -3,7 +3,7 @@ package at.aau.se2.tickettoride_server.models;
 import at.aau.se2.tickettoride_server.Logger;
 import at.aau.se2.tickettoride_server.datastructures.*;
 import at.aau.se2.tickettoride_server.datastructures.Map;
-import at.aau.se2.tickettoride_server.server.Configuration_Constants;
+import at.aau.se2.tickettoride_server.server.ConfigurationConstants;
 import at.aau.se2.tickettoride_server.server.Lobby;
 
 import java.util.*;
@@ -924,7 +924,7 @@ public class GameModel implements Runnable {
         map.addRailroadLine(new DoubleRailroadLine(kansascity, denver, MapColor.BLACK, 4, MapColor.ORANGE));
         map.addRailroadLine(new RailroadLine(denver, phoenix, MapColor.WHITE, 5));
 
-        if (!Configuration_Constants.DOUBLE_RAILS) {
+        if (!ConfigurationConstants.DOUBLE_RAILS) {
             Player dummy = Player.getDummy();
             for (RailroadLine rail : map.getRailroadLines()) {
                 if (rail instanceof DoubleRailroadLine) {

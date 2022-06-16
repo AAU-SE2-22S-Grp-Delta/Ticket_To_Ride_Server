@@ -1,13 +1,13 @@
 package at.aau.se2.tickettoride_server;
 
-import at.aau.se2.tickettoride_server.server.Configuration_Constants;
+import at.aau.se2.tickettoride_server.server.ConfigurationConstants;
 
 public class Logger {
     private Logger() {
     }
 
     public static void debug(String msg) {
-        if (Configuration_Constants.DEBUG) {
+        if (ConfigurationConstants.DEBUG) {
             log("(DEBUG)\t" + msg);
         }
     }
@@ -25,7 +25,7 @@ public class Logger {
     }
 
     public static void verbose(String msg) {
-        if (Configuration_Constants.VERBOSE) {
+        if (ConfigurationConstants.VERBOSE) {
             log("(VERBOSE)\t" + msg);
         }
     }

@@ -75,7 +75,7 @@ public class Session {
 
     void parseCommand(String received) {
         Logger.verbose("Session received: " + received);
-        if (Configuration_Constants.ECHO) send("echo:" + received);
+        if (ConfigurationConstants.ECHO) send("echo:" + received);
 
         String[] commands = received.split(";");
 
@@ -89,8 +89,8 @@ public class Session {
             //----------- when adding commands which don't necessarily need a session owner, put them above the following check ---------
             if (this.player == null) {
                 sendingThread.sendCommand("ERROR: Not in Lobby");
-                if (Configuration_Constants.DEBUG) {
-                    System.out.printf("(DEBUG)\t Session %d received command '%s' while sessionOwner=null\n", this.id, command);
+                Logger.debug(String.format("Session %d received command '%s' while sessionOwner=null", this.id, command));
+                if (ConfigurationConstants.DEBUG) {
                     send(command + ":null");
                 }
                 return;
