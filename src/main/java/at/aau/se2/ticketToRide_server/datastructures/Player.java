@@ -342,6 +342,11 @@ public class Player implements Comparable {
     }
 
 
+    public boolean isActive()
+    {
+        return game.isActive(this);
+    }
+
     //endregion
 
 

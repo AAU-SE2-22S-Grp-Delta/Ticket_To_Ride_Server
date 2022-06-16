@@ -40,8 +40,10 @@ public class GameModel implements Runnable {
     private final Map map = getMapInstance();
     private TrainCard[] openCards = new TrainCard[5];
 
-
-
+    public boolean isActive(Player player)
+    {
+        return players.get(activePlayer).equals(player);
+    }
 
     public GameModel(String name, Player owner) {
         this.name = name;
