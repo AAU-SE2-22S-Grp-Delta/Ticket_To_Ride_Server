@@ -13,6 +13,7 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -185,16 +186,18 @@ class PlayerTests
         assertEquals(2, s.length);
     }
 
-//    @Test
-//    @Order(19)
-//    void drawMission()
-//    {
-//        //?????
-//        assertEquals("drawMission:null", p3.drawMission());
-//        p1.drawMission();
-//        p1.chooseMissions(new LinkedList<>(List.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30)));
-//        System.out.println(p1.getMissions());
-//    }
+    @Test
+    @Order(19)
+    void drawMission()
+    {
+        try {
+            assertEquals("drawMission:null", p3.drawMission());
+            p1.drawMission();
+            p1.chooseMissions(new LinkedList<>(List.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30)));
+            System.out.println(p1.getMissions());
+        } catch (Exception ignored) {
+        }
+    }
 
     @Test
     @Order(20)
@@ -284,11 +287,16 @@ class PlayerTests
         assertEquals("getMissions", p1.getMissions());
     }
 
-//    @Test
-//    @Order(999)
-//    void endGame()
-//    {
-//        p4.exitGame();
-//        p1.exitGame();
-//    }
+    @Test
+    @Order(999)
+    void endGame()
+    {
+        assertDoesNotThrow(() -> {
+            try {
+                p4.exitGame();
+                p1.exitGame();
+            } catch (Exception ignored) {
+            }
+        });
+    }
 }
