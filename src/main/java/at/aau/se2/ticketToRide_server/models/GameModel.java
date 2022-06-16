@@ -110,7 +110,7 @@ public class GameModel implements Runnable {
             for (Player player : this.players) {
                 builder.append(player.getName()).append(".");
             }
-            this.notify();
+            this.notifyAll();
         }
         return builder.toString();
     }
@@ -120,7 +120,7 @@ public class GameModel implements Runnable {
         String state;
         synchronized (this) {
             state = this.state.toString();
-            this.notify();
+            this.notifyAll();
         }
         return state;
     }
@@ -175,7 +175,7 @@ public class GameModel implements Runnable {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            this.notify();
+            this.notifyAll();
         }
     }
 
@@ -204,7 +204,7 @@ public class GameModel implements Runnable {
             calculatePointsAndFindWinner();
             for (Player player : players) player.gameOver();
             this.state = State.OVER;
-            this.notify();
+            this.notifyAll();
         }
     }
 
@@ -364,7 +364,7 @@ public class GameModel implements Runnable {
             for (TrainCard card : this.openCards) {
                 builder.append(card).append(".");
             }
-            this.notify();
+            this.notifyAll();
         }
         return builder.toString();
     }
@@ -384,7 +384,7 @@ public class GameModel implements Runnable {
                 builder.append(".");
             }
 
-            this.notify();
+            this.notifyAll();
         }
         return builder.toString();
     }
@@ -415,7 +415,7 @@ public class GameModel implements Runnable {
             for (Player player : this.players) {
                 builder.append(player.getName()).append(player.getPlayerPoints()).append(".");
             }
-            this.notify();
+            this.notifyAll();
         }
         return builder.toString();
     }
@@ -437,7 +437,7 @@ public class GameModel implements Runnable {
                     }
                 }
             }
-            this.notify();
+            this.notifyAll();
 //            0. befehlsformat und was kommt zurück
 //            Befehl vom Client 		cheatMission
 //            Server schickt zurück		cheatMission:[playerName1],[mission1], .... , [missionN]:....:[playerNameN],[mission1], .... , [missionN]
@@ -533,7 +533,7 @@ public class GameModel implements Runnable {
                     actionsLeft--;
                 }
             }
-            this.notify();
+            this.notifyAll();
         }
         return retVal;
     }
@@ -554,7 +554,7 @@ public class GameModel implements Runnable {
                     actionsLeft--;
                 }
             }
-            this.notify();
+            this.notifyAll();
         }
         return response;
     }
@@ -579,7 +579,7 @@ public class GameModel implements Runnable {
             if (!trainCardsStack.isEmpty() && !abort) {
                 card = trainCardsStack.remove(0);
             }
-            this.notify();
+            this.notifyAll();
         }
         return card;
     }
@@ -611,7 +611,7 @@ public class GameModel implements Runnable {
                 if (Configuration_Constants.verbose)
                     System.out.println("(VERBOSE)\nGameModel.setRailRoadLineOwner() RailOwner=" + player.getName());
             }
-            this.notify();
+            this.notifyAll();
         }
         return retVal;
     }
@@ -648,7 +648,7 @@ public class GameModel implements Runnable {
                         System.out.println("(DEBUG)\tGameModel.drawMission() called when player has to coose mission");
                 }
             }
-            this.notify();
+            this.notifyAll();
         }
         return response;
     }
@@ -684,7 +684,7 @@ public class GameModel implements Runnable {
                 if (Configuration_Constants.debug)
                     System.out.println("(DEBUG)\tGameModel.chooseMissions() called when not waiting on Player " + player.getName());
             }
-            this.notify();
+            this.notifyAll();
         }
         return retVal;
     }
@@ -735,7 +735,7 @@ public class GameModel implements Runnable {
                 this.owner = players.get(0);
             }
 
-            this.notify();
+            this.notifyAll();
         }
     }
 
