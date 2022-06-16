@@ -1,4 +1,4 @@
-package at.aau.se2.ticketToRide_server.datastructures;
+package at.aau.se2.tickettoride_server.datastructures;
 
 public enum MapColor {
     BLUE("blue"), GREEN("green"), YELLOW("yellow"), RED("red"), WHITE("white"), ORANGE("orange"), GRAY("gray"), BLACK("black"), PINK("pink");

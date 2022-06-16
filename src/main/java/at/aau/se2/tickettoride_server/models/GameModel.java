@@ -1,9 +1,9 @@
-package at.aau.se2.ticketToRide_server.models;
+package at.aau.se2.tickettoride_server.models;
 
-import at.aau.se2.ticketToRide_server.datastructures.*;
-import at.aau.se2.ticketToRide_server.datastructures.Map;
-import at.aau.se2.ticketToRide_server.server.Configuration_Constants;
-import at.aau.se2.ticketToRide_server.server.Lobby;
+import at.aau.se2.tickettoride_server.datastructures.*;
+import at.aau.se2.tickettoride_server.datastructures.Map;
+import at.aau.se2.tickettoride_server.server.Configuration_Constants;
+import at.aau.se2.tickettoride_server.server.Lobby;
 
 import java.util.*;
 

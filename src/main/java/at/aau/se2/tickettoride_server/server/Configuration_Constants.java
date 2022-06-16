@@ -1,4 +1,4 @@
-package at.aau.se2.ticketToRide_server.server;
+package at.aau.se2.tickettoride_server.server;
 
 public class Configuration_Constants {
     public static final boolean verbose = true;

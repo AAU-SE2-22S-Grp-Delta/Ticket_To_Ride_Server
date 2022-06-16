@@ -1,6 +1,6 @@
-package at.aau.se2.ticketToRide_server;
+package at.aau.se2.tickettoride_server;
 
-import at.aau.se2.ticketToRide_server.server.WelcomeSocket;
+import at.aau.se2.tickettoride_server.server.WelcomeSocket;
 
 public class Main {
     public static void main(String[] args) {
