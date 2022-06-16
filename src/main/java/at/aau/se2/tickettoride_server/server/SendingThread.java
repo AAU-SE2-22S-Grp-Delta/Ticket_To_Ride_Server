@@ -1,5 +1,7 @@
 package at.aau.se2.tickettoride_server.server;
 
+import at.aau.se2.tickettoride_server.Logger;
+
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
@@ -16,21 +18,21 @@ public class SendingThread extends Thread {
 
     @Override
     public void run() {
-        if (Configuration_Constants.VERBOSE) System.out.println("(VERBOSE)\tSendingThread: has been started ...");
+        Logger.verbose("SendingThread: has been started ...");
         String command;
         while (true) {
             try {
                 synchronized (lock) {
                     if (outputBuffer.isEmpty()) {
-                        if (Configuration_Constants.VERBOSE) System.out.println("(VERBOSE)\tSendingThread: Pause sending thread");
+                        Logger.verbose("SendingThread: Pause sending thread");
                         lock.wait();
-                        if (Configuration_Constants.VERBOSE) System.out.println("(VERBOSE)\tSendingThread: Continue sending thread");
+                        Logger.verbose("SendingThread: Continue sending thread");
                     }
                     command = outputBuffer.remove();
                 }
                 sendToClient(command);
             } catch (InterruptedException e) {
-                System.out.println(e.getMessage());
+                Logger.exception(e.getMessage());
                 Thread.currentThread().interrupt();
             }
         }
@@ -45,10 +47,10 @@ public class SendingThread extends Thread {
 
     private int sendToClient(String command) {
         try {
-            if (Configuration_Constants.VERBOSE) System.out.println("(VERBOSE)\tSendingThread: sending " + command);
+            Logger.verbose("SendingThread: sending " + command);
             send.writeBytes(command + "\n");
         } catch (IOException e) {
-            System.out.println(e.getMessage());
+            Logger.exception(e.getMessage());
             return -1;
         }
         return 0;

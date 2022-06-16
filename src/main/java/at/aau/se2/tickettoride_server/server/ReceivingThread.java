@@ -1,5 +1,7 @@
 package at.aau.se2.tickettoride_server.server;
 
+import at.aau.se2.tickettoride_server.Logger;
+
 import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.InputStreamReader;
@@ -17,27 +19,27 @@ public class ReceivingThread extends Thread {
 
     @Override
     public void run() {
-        System.out.println("ReceivingThread: has been started and is listening ...");
+        Logger.log("ReceivingThread: has been started and is listening ...");
         while (true) {
             try {
                 String line = receive.readLine();
-                System.out.println("ReceivingThread: received " + line);
+                Logger.verbose("ReceivingThread: received " + line);
                 session.parseCommand(line);
             } catch (SocketException se) {
-                System.out.println("ReceivingThread: lost connection");
+                Logger.debug("ReceivingThread: lost connection");
                 //Todo close session
-                System.out.println("ReceivingThread: shutting down ...");
-                System.out.println(se.getMessage());
+                Logger.debug("ReceivingThread: shutting down ...");
+                Logger.exception(se.getMessage());
                 break;
             } catch (NullPointerException npe) {
-                System.out.println("ReceivingThread: lost connection");
+                Logger.debug("ReceivingThread: lost connection");
                 //Todo close session
-                System.out.println(npe.getMessage());
-                System.out.println("ReceivingThread: shutting down ...");
+                Logger.exception(npe.getMessage());
+                Logger.debug("ReceivingThread: shutting down ...");
                 break;
             } catch (Exception e) {
-                System.out.println("ReceivingThread: Some error occurred ...");
-                System.out.println(e.getMessage());
+                Logger.debug("ReceivingThread: Some error occurred ...");
+                Logger.exception(e.getMessage());
             }
         }
     }

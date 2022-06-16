@@ -1,5 +1,7 @@
 package at.aau.se2.tickettoride_server.server;
 
+import at.aau.se2.tickettoride_server.Logger;
+
 import java.net.*;
 
 public class WelcomeSocket implements Runnable {
@@ -17,18 +19,18 @@ public class WelcomeSocket implements Runnable {
     private void launchWelcomeSocket() {
         try {
             try (ServerSocket welcomeSocket = new ServerSocket(8001)) {
-                System.out.println("Server running on port 8001");
+                Logger.log("Server running on port 8001");
 
                 while (active) {
-                    if (Configuration_Constants.VERBOSE) System.out.println("(VERBOSE)\tWelcomeSocket: waiting for connection... ");
+                    Logger.verbose("WelcomeSocket: waiting for connection... ");
                     Socket connection = welcomeSocket.accept();
-                    if (Configuration_Constants.VERBOSE) System.out.println("(VERBOSE)\tWelcomeSocket: connection requested");
+                    Logger.verbose("WelcomeSocket: connection requested");
                     Session session = new Session(connection);
-                    if (Configuration_Constants.VERBOSE) System.out.println("(VERBOSE)\tWelcomeSocket: launched session");
+                    Logger.verbose("WelcomeSocket: launched session");
                 }
             }
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            Logger.exception(e.getMessage());
         }
 
     }

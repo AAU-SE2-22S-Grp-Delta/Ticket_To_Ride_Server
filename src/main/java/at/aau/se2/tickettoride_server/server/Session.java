@@ -1,5 +1,6 @@
 package at.aau.se2.tickettoride_server.server;
 
+import at.aau.se2.tickettoride_server.Logger;
 import at.aau.se2.tickettoride_server.datastructures.Player;
 
 import java.io.BufferedReader;
@@ -73,7 +74,7 @@ public class Session {
 
 
     void parseCommand(String received) {
-        if (Configuration_Constants.VERBOSE) System.out.println("(VERBOSE)\tSession received: " + received);
+        Logger.verbose("Session received: " + received);
         if (Configuration_Constants.ECHO) send("echo:" + received);
 
         String[] commands = received.split(";");
@@ -167,17 +168,16 @@ public class Session {
 
 
     private void enterLobby(String command) {
-        if (Configuration_Constants.VERBOSE) System.out.println("(VERBOSE)\tSession.enterLobby() called");
+        Logger.verbose("Session.enterLobby() called");
         if (this.player != null) {
             this.send("enterLobby:null");
-            if (Configuration_Constants.DEBUG)
-                System.out.println("(DEBUG)\tSession.enterLobby() failed: session already belongs to player " + player.getName());
+            Logger.debug("Session.enterLobby() failed: session already belongs to player " + player.getName());
             return;
         }
 
         String[] words = command.split(":");
         this.player = Player.enterLobby(words[1], this);
-        if (Configuration_Constants.VERBOSE) System.out.println("(VERBOSE)\tCreated Player " + words[1]);
+        Logger.verbose("Created Player " + words[1]);
     }
 
 
@@ -185,11 +185,11 @@ public class Session {
         String[] words = command.split(":");
 
         if (player.createGame(words[1]) < 0) {
-            if (Configuration_Constants.DEBUG) System.out.println("(DEBUG)\tCreating game " + words[1] + " failed");
+            Logger.debug("Creating game " + words[1] + " failed");
             send("createGame:null");
             return;
         }
-        if (Configuration_Constants.VERBOSE) System.out.println("(VERBOSE)\tCreated game " + words[1]);
+        Logger.verbose("Created game " + words[1]);
     }
 
 

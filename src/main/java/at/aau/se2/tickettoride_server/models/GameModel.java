@@ -1,5 +1,6 @@
 package at.aau.se2.tickettoride_server.models;
 
+import at.aau.se2.tickettoride_server.Logger;
 import at.aau.se2.tickettoride_server.datastructures.*;
 import at.aau.se2.tickettoride_server.datastructures.Map;
 import at.aau.se2.tickettoride_server.server.Configuration_Constants;
@@ -67,12 +68,12 @@ public class GameModel implements Runnable {
             if (players.size() > 4) throw new IllegalStateException("Board is full!");
             if (this.state != State.WAITING_FOR_PLAYERS) throw new IllegalStateException("Game has already started!");
         } catch (IllegalArgumentException e) {
-            System.out.println(e);
+            Logger.exception(e.getMessage());
             return -1;
         }
         players.add(player);
         if (colorCounter > 4) {
-            System.out.println("(FATAL) GameModel: colorCounter raised over 5, max value when executing addPlayer at this point should be 5. Execution crashed.");
+            Logger.fatal("GameModel: colorCounter raised over 5, max value when executing addPlayer at this point should be 5. Execution crashed.");
         }
         switch (colorCounter++) {
             case 0:
@@ -158,8 +159,7 @@ public class GameModel implements Runnable {
     private void playersDrawingMissionsAtGameStart() {
         for (this.activePlayer = 0; activePlayer < players.size(); activePlayer++) {
             players.get(activePlayer).missionInit();
-            if (Configuration_Constants.VERBOSE)
-                System.out.println("(VERBOSE)\tPrompting player " + players.get(activePlayer).getName() + " to draw Mission");
+            Logger.verbose("Prompting player " + players.get(activePlayer).getName() + " to draw Mission");
         }
         activePlayer = 0;
         synchronized (this) {
@@ -175,7 +175,7 @@ public class GameModel implements Runnable {
                     if (check == players.size()) checkAllChosen = true;
                 } while (!checkAllChosen);
             } catch (InterruptedException e) {
-                System.out.println(e.getMessage());
+                Logger.exception(e.getMessage());
             }
             this.notifyAll();
         }
@@ -195,13 +195,13 @@ public class GameModel implements Runnable {
         initMissionChoosers();
         playersDrawingMissionsAtGameStart();
 
-        if (Configuration_Constants.VERBOSE) System.out.println("(VERBOSE)\tGameModel.run() Game loop up");
+        Logger.verbose("GameModel.run() Game loop up");
         while (!checkIfOver()) {
             move();
-            if (Configuration_Constants.VERBOSE) System.out.println("(VERBOSE)\tGameModel.run() Next round");
+            Logger.verbose("GameModel.run() Next round");
             activePlayer = ++activePlayer % players.size();
         }
-        if (Configuration_Constants.VERBOSE) System.out.println("(VERBOSE)\tGameModel.run() Game loop broke");
+        Logger.verbose("GameModel.run() Game loop broke");
         synchronized (this) {
             calculatePointsAndFindWinner();
             for (Player player : players) player.gameOver();
@@ -250,21 +250,20 @@ public class GameModel implements Runnable {
      * while actualisation information is locked
      */
     private void move() {
-        if (Configuration_Constants.VERBOSE) System.out.println("(VERBOSE)\tGameModel.move() move start");
+        Logger.verbose("GameModel.move() move start");
         this.actionsLeft = 2;
         while (actionsLeft > 0) {
             try {
                 synchronized (this) {
                     actionCall();
                     stateChanged = false;
-                    if (Configuration_Constants.VERBOSE)
-                        System.out.println("(VERBOSE)\tGameModel.move() called and waiting for action");
+                    Logger.verbose("GameModel.move() called and waiting for action");
                     this.wait(); //Waits until a action is done
                     sync();      //then the sync broadcast
                 }
             } catch (Exception e) {
-                if (Configuration_Constants.DEBUG) System.out.println("(DEBUG)\t Error in GameModel.move");
-                System.out.println(e.getMessage());
+                Logger.debug("Error in GameModel.move");
+                Logger.exception(e.getMessage());
             }
         }
     }
@@ -274,7 +273,7 @@ public class GameModel implements Runnable {
      * Broadcasts to all players that this is player [name]'s turn
      */
     private void actionCall() {
-        if (Configuration_Constants.VERBOSE) System.out.println("(VERBOSE)\tGameModel.actionCall() calling players...");
+        Logger.verbose("GameModel.actionCall() calling players...");
         String playerOnTheMove = players.get(this.activePlayer).getName();
         for (Player p : this.players) {
             p.actionCall(playerOnTheMove, actionsLeft);
@@ -490,15 +489,14 @@ public class GameModel implements Runnable {
      * @return 0 on success, -1 on fail
      */
     public int startGame(Player whoIsPerformingThisAction) {
-        if (Configuration_Constants.VERBOSE)
-            System.out.println(("(VERBOSE)\t GameModel.startGame() starting game " + this.name + "..."));
+        Logger.verbose(("GameModel.startGame() starting game " + this.name + "..."));
         if (!whoIsPerformingThisAction.equals(owner)) {
-            System.out.println("(DEBUG)\tGameModel.startGame() called from player who is not owner");
+            Logger.debug("GameModel.startGame() called from player who is not owner");
             return -1;
         }
 
         if (this.state != State.WAITING_FOR_PLAYERS) {
-            System.out.println("(DEBUG)\tGameModel.startGame() Game is not in state WAITING_FOR_PLAYERS!");
+            Logger.debug("GameModel.startGame() Game is not in state WAITING_FOR_PLAYERS!");
             return -1;
         }
 
@@ -514,11 +512,9 @@ public class GameModel implements Runnable {
         int retVal = -1;
         synchronized (this) {
             if (!players.get(activePlayer).equals(player)) {
-                if (Configuration_Constants.VERBOSE)
-                    System.out.println("(VERBOSE)\t Player" + player.getName() + " was blocked trying pick open card while players " + players.get(activePlayer) + "turn.");
+                Logger.verbose("Player" + player.getName() + " was blocked trying pick open card while players " + players.get(activePlayer) + "turn.");
             } else if (openCardId < 0 || openCardId > 4) {
-                if (Configuration_Constants.VERBOSE)
-                    System.out.println("(VERBOSE)\t Player" + player.getName() + " tried to pick card out of range: openCardId=" + openCardId);
+                Logger.verbose("Player" + player.getName() + " tried to pick card out of range: openCardId=" + openCardId);
             } else {
                 boolean locomotive = openCards[openCardId].getType() == TrainCard.Type.LOCOMOTIVE;
                 if (actionsLeft == 2 && locomotive) {
@@ -528,8 +524,7 @@ public class GameModel implements Runnable {
                     retVal = 0;
                     actionsLeft = 0;
                 } else if (actionsLeft == 1 && locomotive) {
-                    if (Configuration_Constants.DEBUG)
-                        System.out.println("(DEBUG)\tGameModel.drawOpenCard() Player " + player.getName() + " tried to pick locomotive when actionsLeft=1");
+                    Logger.debug("GameModel.drawOpenCard() Player " + player.getName() + " tried to pick locomotive when actionsLeft=1");
                 } else {
                     player.addHandCard(openCards[openCardId]);
                     openCards[openCardId] = drawCardFromStack();
@@ -548,8 +543,7 @@ public class GameModel implements Runnable {
         String response = "cardStack:null";
         synchronized (this) {
             if (!players.get(activePlayer).equals(player)) {
-                if (Configuration_Constants.VERBOSE)
-                    System.out.println("(VERBOSE)\tGameModel.drawCardFromStack() Player" + player.getName() + " was blocked trying pick card from stack while players " + players.get(activePlayer) + "turn.");
+                Logger.verbose("GameModel.drawCardFromStack() Player" + player.getName() + " was blocked trying pick card from stack while players " + players.get(activePlayer) + "turn.");
             } else {
                 TrainCard card = drawCardFromStack();
                 if (card != null) {
@@ -568,8 +562,7 @@ public class GameModel implements Runnable {
     private TrainCard drawCardFromStack() {
         TrainCard card = null;
         synchronized (this) {
-            if (Configuration_Constants.VERBOSE)
-                System.out.println("(VERBOSE)\tGameModel.drawCardFromStack() drawing card...");
+            Logger.verbose("GameModel.drawCardFromStack() drawing card...");
 
             boolean abort = false;
             if (trainCardsStack.isEmpty()) {
@@ -594,8 +587,7 @@ public class GameModel implements Runnable {
         int retVal = -1;
         synchronized (this) {
             if (!players.get(activePlayer).equals(player)) {
-                if (Configuration_Constants.DEBUG)
-                    System.out.println("(DEBUG)\tPlayer" + player.getName() + " was blocked trying to build road while players " + players.get(activePlayer) + "turn.");
+                Logger.debug("Player" + player.getName() + " was blocked trying to build road while players " + players.get(activePlayer) + "turn.");
             }
 
             if ((railroadLine.getColor() == MapColor.GRAY || railroadLine.getColor() == color) && railroadLine.getOwner() == null) {
@@ -613,8 +605,7 @@ public class GameModel implements Runnable {
                 returnCardsToDiscordPile(cardsToBuildRail);
                 stateChanged = true;
                 retVal = 0;
-                if (Configuration_Constants.VERBOSE)
-                    System.out.println("(VERBOSE)\nGameModel.setRailRoadLineOwner() RailOwner=" + player.getName());
+                Logger.verbose("GameModel.setRailRoadLineOwner() RailOwner=" + player.getName());
             }
             this.notifyAll();
         }
@@ -633,8 +624,7 @@ public class GameModel implements Runnable {
         String response = "drawMission:null";
         synchronized (this) {
             if (!players.get(activePlayer).equals(player)) {
-                if (Configuration_Constants.DEBUG)
-                    System.out.println("(DEBUG)\tPlayer" + player.getName() + " was blocked trying to draw mission while players " + players.get(activePlayer) + "turn.");
+                Logger.debug("Player" + player.getName() + " was blocked trying to draw mission while players " + players.get(activePlayer) + "turn.");
             } else {
                 if (missions.isEmpty()) response = "drawMission:empty";
                 else if (!waitForCoice[activePlayer]) {
@@ -649,8 +639,7 @@ public class GameModel implements Runnable {
                     }
                     waitForCoice[activePlayer] = true;
                 } else {
-                    if (Configuration_Constants.DEBUG)
-                        System.out.println("(DEBUG)\tGameModel.drawMission() called when player has to coose mission");
+                    Logger.debug("GameModel.drawMission() called when player has to coose mission");
                 }
             }
             this.notifyAll();
@@ -676,8 +665,7 @@ public class GameModel implements Runnable {
                     }
                 }
                 if (counter > 0) {
-                    if (Configuration_Constants.DEBUG)
-                        System.out.println("(DEBUG)\tGameModel.chooseMissions() illegal choice when called");
+                    Logger.debug("GameModel.chooseMissions() illegal choice when called");
                 } else {
                     for (Mission mission : toAdd) player.addMission(mission);
                     retVal = 0;
@@ -686,8 +674,7 @@ public class GameModel implements Runnable {
                 }
                 dropMissions(toDrop);
             } else {
-                if (Configuration_Constants.DEBUG)
-                    System.out.println("(DEBUG)\tGameModel.chooseMissions() called when not waiting on Player " + player.getName());
+                Logger.debug("GameModel.chooseMissions() called when not waiting on Player " + player.getName());
             }
             this.notifyAll();
         }
@@ -732,8 +719,7 @@ public class GameModel implements Runnable {
             }
 
             players.remove(playerPosition);
-            if (Configuration_Constants.VERBOSE)
-                System.out.println("(VERBOSE)\t GameModel.exitGame() removed Player " + player.getName() + "from game " + name);
+            Logger.verbose("GameModel.exitGame() removed Player " + player.getName() + "from game " + name);
 
             if (this.players.size() == 0) Lobby.getInstance().removeGame(this);
             if (player == this.owner &&players.size()>0) {
