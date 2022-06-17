@@ -49,7 +49,7 @@ public class SendingThread extends Thread {
         try {
             Logger.verbose("SendingThread: sending " + command);
             send.writeBytes(command + "\n");
-        } catch (IOException e) {
+        } catch (IOException | NullPointerException e) {
             Logger.exception(e.getMessage());
             return -1;
         }
