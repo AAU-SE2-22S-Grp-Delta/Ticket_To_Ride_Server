@@ -9,8 +9,6 @@ import java.util.ArrayList;
 
 public class Lobby {
     private static Lobby lobby;
-    private static String DEFAULT_GAME_NAME = "game ";
-    private static int gameCounter = 0;
 
     private final ArrayList<Player> players;
     private final ArrayList<GameModel> games;
@@ -107,7 +105,7 @@ public class Lobby {
             for (Player p : players) {
                 if (p.getName().equals(name)) {//if name is already in use
                     Logger.debug("Lobby.enterLobby() Name " + name + "already in use");
-                    found = false;
+                    found = true;
                     break;
                 }
             }
