@@ -296,19 +296,6 @@ class SessionTests {
 
     @Test
     @Order(21)
-    void testExitGame() {
-        assertDoesNotThrow(() -> {
-            try {
-                Method method = Session.class.getDeclaredMethod("exitGame", (Class<?>[]) null);
-                method.setAccessible(true);
-                method.invoke(session);
-            } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException | NullPointerException ignored) {
-            }
-        });
-    }
-
-    @Test
-    @Order(22)
     void testPrepareSend() {
         String command = "command";
         String toClient = "test";
@@ -320,5 +307,76 @@ class SessionTests {
             assertEquals(command + ":" + toClient, result);
         } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException | NullPointerException ignored) {
         }
+    }
+
+    @Test
+    @Order(22)
+    void testParseCommandExtended() {
+        assertDoesNotThrow(() -> {
+            try {
+                Method method = Session.class.getDeclaredMethod("parseCommand", String.class);
+                method.setAccessible(true);
+                method.invoke(session, "enterLobby:Player");
+                method.invoke(session, "listPlayersLobby");
+                method.invoke(session, "createGame:Game1");
+                method.invoke(session, "listGames");
+                method.invoke(session, "listPlayersGame:Game1");
+                method.invoke(session, "getGameState:Game1");
+                method.invoke(session, "joinGame:Game1");
+                method.invoke(session, "getHandCards");
+                method.invoke(session, "getOpenCards");
+                method.invoke(session, "getMap");
+                method.invoke(session, "getPoints");
+                method.invoke(session, "getColor");
+                method.invoke(session, "getWinner");
+                method.invoke(session, "exitGame");
+                method.invoke(session, "leave");
+            } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException | NullPointerException ignored) {
+            }
+        });
+    }
+
+    @Test
+    @Order(23)
+    void testBuildRailroad() {
+        assertDoesNotThrow(() -> {
+            try {
+                Method method = Session.class.getDeclaredMethod("buildRailroad", String.class);
+                method.setAccessible(true);
+                method.invoke(session, "Dest1:Dest2:null");
+            } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException | NullPointerException ignored) {
+            }
+        });
+    }
+
+    @Test
+    @Order(24)
+    void testChooseMission() {
+        assertDoesNotThrow(() -> {
+            try {
+                Method method = Session.class.getDeclaredMethod("chooseMission", String.class);
+                method.setAccessible(true);
+                method.invoke(session, "1:2");
+            } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException | NullPointerException ignored) {
+            }
+        });
+    }
+
+
+
+
+
+
+    @Test
+    @Order(999)
+    void testExitGame() {
+        assertDoesNotThrow(() -> {
+            try {
+                Method method = Session.class.getDeclaredMethod("exitGame", (Class<?>[]) null);
+                method.setAccessible(true);
+                method.invoke(session);
+            } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException | NullPointerException ignored) {
+            }
+        });
     }
 }
