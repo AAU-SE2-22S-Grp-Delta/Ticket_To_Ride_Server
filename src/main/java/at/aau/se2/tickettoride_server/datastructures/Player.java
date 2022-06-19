@@ -207,6 +207,14 @@ public class Player implements Comparable<Object> {
         return game.cheatMission();
     }
 
+    public String cheatTrainCard() {
+        if (state != State.GAMING) {
+            return "cheatTrainCard:null";
+        }
+        game.cheat();
+        return game.drawCardFromStack(this);
+    }
+
 
     public String getWinner() {
         if (state != State.GAMING) return "getWinner:null";

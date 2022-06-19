@@ -458,7 +458,7 @@ public class GameModel implements Runnable {
     /**
      * Notifies all players, that a player has cheated
      */
-    private void cheat() {
+    public void cheat() {
         for (Player p : this.players) {
             p.cheat();
         }
@@ -683,7 +683,7 @@ public class GameModel implements Runnable {
     }
 
 
-    private void dropMissions(LinkedList<Mission> backToStack) {
+    public void dropMissions(LinkedList<Mission> backToStack) {
         missions.addAll(backToStack);
         Collections.shuffle(missions);
     }

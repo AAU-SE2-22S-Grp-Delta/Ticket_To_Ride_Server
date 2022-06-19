@@ -68,6 +68,8 @@ public class Session {
     private static final String COMMAND_DRAW_MISSION = "drawMission";
     private static final String COMMAND_CHOOSE_MISSION = "chooseMission:?(\\d\\d?)?(:\\d\\d?){0,2}";
     private static final String COMMAND_CHEAT_MISSION = "cheatMission";
+    private static final String COMMAND_CHEAT_TRAIN_CARD = "cheatTrainCard";
+
     //----------------------------------------------
 
 
@@ -118,6 +120,7 @@ public class Session {
             else if (command.matches(REQUEST_GET_MISSIONS)) this.getMissions();
             else if (command.matches(COMMAND_CHEAT_MISSION)) this.cheatMission();
             else if (command.matches(REQUEST_GET_WINNER)) this.getWinner();
+            else if (command.matches(COMMAND_CHEAT_TRAIN_CARD)) this.cheatTrainCard();
 
                 //----- IN GAME COMMANDS --------------------------------------------------------
             else if (command.matches(COMMAND_DRAW_CARD_STACK)) this.drawCardStack();
@@ -245,6 +248,9 @@ public class Session {
     private void cheatMission() {
         send(player.cheatMission());
     }
+
+
+    private void cheatTrainCard() { send(player.cheatTrainCard());}
 
 
     private void getWinner() {
