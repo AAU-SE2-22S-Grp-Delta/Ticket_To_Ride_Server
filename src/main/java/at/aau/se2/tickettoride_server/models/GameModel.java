@@ -797,7 +797,7 @@ public class GameModel implements Runnable {
         Destination saltlakecity = new Destination("Salt Lake City");
         Destination sanfrancisco = new Destination("San Francisco");
         Destination santafe = new Destination("Santa Fe");
-        Destination saultstmarie = new Destination("Sault St. Marie");
+        Destination saultstmarie = new Destination("Sault St Marie");
         Destination seattle = new Destination("Seattle");
         Destination toronto = new Destination("Toronto");
         Destination vancouver = new Destination("Vancouver");
@@ -961,8 +961,8 @@ public class GameModel implements Runnable {
         missions.add(new Mission(map.getDestinationByName("Portland"), map.getDestinationByName("Nashville"), 17, 19));
         missions.add(new Mission(map.getDestinationByName("Portland"), map.getDestinationByName("Phoenix"), 11, 20));
         missions.add(new Mission(map.getDestinationByName("San Francisco"), map.getDestinationByName("Atlanta"), 17, 21));
-        missions.add(new Mission(map.getDestinationByName("Sault St. Marie"), map.getDestinationByName("Nashville"), 8, 22));
-        missions.add(new Mission(map.getDestinationByName("Sault St. Marie"), map.getDestinationByName("Oklahoma City"), 9, 23));
+        missions.add(new Mission(map.getDestinationByName("Sault St Marie"), map.getDestinationByName("Nashville"), 8, 22));
+        missions.add(new Mission(map.getDestinationByName("Sault St Marie"), map.getDestinationByName("Oklahoma City"), 9, 23));
         missions.add(new Mission(map.getDestinationByName("Seattle"), map.getDestinationByName("Los Angeles"), 9, 24));
         missions.add(new Mission(map.getDestinationByName("Seattle"), map.getDestinationByName("New York"), 22, 25));
         missions.add(new Mission(map.getDestinationByName("Toronto"), map.getDestinationByName("Miami"), 10, 26));
