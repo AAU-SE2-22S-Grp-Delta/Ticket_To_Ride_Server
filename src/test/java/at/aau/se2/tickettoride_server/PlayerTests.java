@@ -9,6 +9,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.mockito.Mockito;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -285,6 +287,78 @@ class PlayerTests
         }
 
         assertEquals("getMissions", p1.getMissions());
+    }
+
+    @Test
+    @Order(26)
+    void testGetPointsForRoutes1()
+    {
+        try {
+            Method method = Player.class.getDeclaredMethod("getPointsForRoutes", int.class);
+            method.setAccessible(true);
+            assertEquals(1, method.invoke(p1, 1));
+        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException | NullPointerException ignored) {
+        }
+    }
+
+    @Test
+    @Order(27)
+    void testGetPointsForRoutes2()
+    {
+        try {
+            Method method = Player.class.getDeclaredMethod("getPointsForRoutes", int.class);
+            method.setAccessible(true);
+            assertEquals(2, method.invoke(p1, 2));
+        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException | NullPointerException ignored) {
+        }
+    }
+
+    @Test
+    @Order(28)
+    void testGetPointsForRoutes3()
+    {
+        try {
+            Method method = Player.class.getDeclaredMethod("getPointsForRoutes", int.class);
+            method.setAccessible(true);
+            assertEquals(4, method.invoke(p1, 3));
+        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException | NullPointerException ignored) {
+        }
+    }
+
+    @Test
+    @Order(29)
+    void testGetPointsForRoutes4()
+    {
+        try {
+            Method method = Player.class.getDeclaredMethod("getPointsForRoutes", int.class);
+            method.setAccessible(true);
+            assertEquals(7, method.invoke(p1, 4));
+        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException | NullPointerException ignored) {
+        }
+    }
+
+    @Test
+    @Order(30)
+    void testGetPointsForRoutes5()
+    {
+        try {
+            Method method = Player.class.getDeclaredMethod("getPointsForRoutes", int.class);
+            method.setAccessible(true);
+            assertEquals(10, method.invoke(p1, 5));
+        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException | NullPointerException ignored) {
+        }
+    }
+
+    @Test
+    @Order(31)
+    void testGetPointsForRoutes6()
+    {
+        try {
+            Method method = Player.class.getDeclaredMethod("getPointsForRoutes", int.class);
+            method.setAccessible(true);
+            assertEquals(15, method.invoke(p1, 6));
+        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException | NullPointerException ignored) {
+        }
     }
 
     @Test
