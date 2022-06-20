@@ -36,7 +36,6 @@ public class Player implements Comparable<Object> {
     private ArrayList<TrainCard> handCards;
     private ArrayList<Mission> missions;
     private final ArrayList<RailroadLine> ownsRailroads = new ArrayList<>();
-    //todo completed missions
     int points = 0;
 
 
@@ -95,8 +94,8 @@ public class Player implements Comparable<Object> {
 
 
     public int createGame(String gameName) {
-        GameModel game = Lobby.getInstance().createGame(gameName, this);
-        if (game == null) return -1;
+        GameModel gm = Lobby.getInstance().createGame(gameName, this);
+        if (gm == null) return -1;
         return this.joinGame(gameName);
     }
 
@@ -113,8 +112,8 @@ public class Player implements Comparable<Object> {
             return -1;
         }
 
-        GameModel game = Lobby.getInstance().joinGame(gameName, this);
-        if (game == null) {
+        GameModel gm = Lobby.getInstance().joinGame(gameName, this);
+        if (gm == null) {
             return -1;
         }
 
@@ -122,14 +121,14 @@ public class Player implements Comparable<Object> {
         this.numStones = 45;
         this.handCards = new ArrayList<>();
         this.missions = new ArrayList<>();
-        this.game = game;
+        this.game = gm;
         Logger.verbose("Player joint game " + this.game.getName());
         return 0;
     }
 
 
     public int leave() {
-        //TODO impl
+        // impl
         return -1;
     }
 
@@ -146,11 +145,11 @@ public class Player implements Comparable<Object> {
         if (this.state != State.GAMING) {
             return "getHandCards:null";
         }
-        StringBuilder handCards = new StringBuilder("getHandCards:");
+        StringBuilder builder = new StringBuilder("getHandCards:");
         for (TrainCard card : this.handCards) {
-            handCards.append(card.getType().toString()).append(".");
+            builder.append(card.getType().toString()).append(".");
         }
-        return handCards.toString();
+        return builder.toString();
     }
 
 
@@ -379,7 +378,7 @@ public class Player implements Comparable<Object> {
                     LinkedList<Destination> toProcess = new LinkedList<>();
 
                     toProcess.add(mission.getDestination1());
-                    while (toProcess.size() > 0) {
+                    while (!toProcess.isEmpty()) {
                         Destination currentDest = toProcess.remove(0);
                         for (RailroadLine line : this.ownsRailroads) {
                             if (line.getDestination1().equals(currentDest) && !visited.contains(line.getDestination2())) {
@@ -470,7 +469,7 @@ public class Player implements Comparable<Object> {
 
 
     public int calculatePointsAtGameEnd(int additionalPoints) {
-        //TODO call this method at the end of the game
+        // Call this method at the end of the game
         synchronized (missions) {
             //Punkte von Zielkarten dazuzählen und abziehen
             for (Mission mission : this.missions) {
