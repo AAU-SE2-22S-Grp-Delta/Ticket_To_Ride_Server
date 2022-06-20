@@ -15,6 +15,42 @@ enum State {
 public class GameModel implements Runnable {
     private static final String PLAYER = "Player";
     private static final String TURN = "turn";
+    private static final String ATLANTA = "Atlanta";
+    private static final String BOSTON = "Boston";
+    private static final String CALGARY = "Calgary";
+    private static final String CHICAGO = "Chicago";
+    private static final String DALLAS = "Dallas";
+    private static final String DENVER = "Denver";
+    private static final String DULUTH = "Duluth";
+    private static final String EL_PASO = "El Paso";
+    private static final String HELENA = "Helena";
+    private static final String HOUSTON = "Houston";
+    private static final String KANSAS_CITY = "Kansas City";
+    private static final String LITTLE_ROCK = "Little Rock";
+    private static final String LOS_ANGELES = "Los Angeles";
+    private static final String MIAMI = "Miami";
+    private static final String MONTREAL = "Montreal";
+    private static final String NASHVILLE = "Nashville";
+    private static final String NEW_ORLEANS = "New Orleans";
+    private static final String NEW_YORK = "New York";
+    private static final String OKLAHOMA_CITY = "Oklahoma City";
+    private static final String PHOENIX = "Phoenix";
+    private static final String PITTSBURGH = "Pittsburgh";
+    private static final String PORTLAND = "Portland";
+    private static final String SALT_LAKE_CITY = "Salt Lake City";
+    private static final String SAN_FRANCISCO = "San Francisco";
+    private static final String SANTA_FE = "Santa Fe";
+    private static final String SAULT_ST_MARIE = "Sault St Marie";
+    private static final String SEATTLE = "Seattle";
+    private static final String TORONTO = "Toronto";
+    private static final String VANCOUVER = "Vancouver";
+    private static final String WINNIPEG = "Winnipeg";
+    private static final String OMAHA = "Omaha";
+    private static final String WASHINGTON = "Washington";
+    private static final String LAS_VEGAS = "Las Vegas";
+    private static final String CHARLESTON = "Charleston";
+    private static final String SAINT_LOUIS = "Saint Louis";
+    private static final String RALEIGH = "Raleigh";
 
     //meta
     private final String name;
@@ -91,6 +127,8 @@ public class GameModel implements Runnable {
             case 4:
                 player.setPlayerColor(Player.Color.BLACK);
                 break;
+            default:
+                break;
         }
 
         return 0;
@@ -120,12 +158,12 @@ public class GameModel implements Runnable {
 
 
     public String getState() {
-        String state;
+        String s;
         synchronized (this) {
-            state = this.state.toString();
+            s = this.state.toString();
             this.notifyAll();
         }
-        return state;
+        return s;
     }
 
 
@@ -137,7 +175,7 @@ public class GameModel implements Runnable {
     //region -------------------- GAME INITIALIZATION ------------------------------
 
 
-    //TODO init visible cards
+    // init visible cards
     private void initOpenCards() {
         for (int i = 0; i < 5; i++) {
             this.openCards[i] = this.trainCardsStack.remove(0);
@@ -147,8 +185,8 @@ public class GameModel implements Runnable {
 
     private void initMissionChoosers() {
         @SuppressWarnings("unchecked")
-        LinkedList<Mission>[] missions = new LinkedList[players.size()];
-        this.set3s = missions;
+        LinkedList<Mission>[] m = new LinkedList[players.size()];
+        this.set3s = m;
         this.waitForCoice = new boolean[players.size()];
         for (int i = 0; i < players.size(); i++) {
             set3s[i] = new LinkedList<>();
@@ -383,8 +421,8 @@ public class GameModel implements Runnable {
         StringBuilder builder = new StringBuilder("getMap:");
         synchronized (this) {
             for (RailroadLine line : map.getRailroadLines()) {
-                Player owner = line.getOwner();
-                builder.append(line.getDestination1().getName()).append(",").append(line.getDestination2().getName()).append(",").append(owner == null ? "null" : owner.getName());
+                Player owner1 = line.getOwner();
+                builder.append(line.getDestination1().getName()).append(",").append(line.getDestination2().getName()).append(",").append(owner1 == null ? "null" : owner1.getName());
                 if (line instanceof DoubleRailroadLine) {
                     Player owner2 = ((DoubleRailroadLine) line).getOwner2();
                     builder.append(",").append(owner2 == null ? "null" : owner2.getName());
@@ -433,8 +471,8 @@ public class GameModel implements Runnable {
         StringBuilder builder = new StringBuilder("cheatMission");
         synchronized (this) {
             for (Player player : this.players) {
-                String missions = player.getMissions();
-                String[] splitMissions = missions.split(":");
+                String m = player.getMissions();
+                String[] splitMissions = m.split(":");
                 builder.append(":").append(player.getName()).append(",");
 
                 for (int i = 1; i < splitMissions.length; i++) {
@@ -656,7 +694,8 @@ public class GameModel implements Runnable {
             while (players.get(playerPosition).compareTo(player) != 0) playerPosition++; //find position in list
             if (waitForCoice[playerPosition]) {
                 int counter = chosen.size(); //to check if all missions was dealt by the game
-                LinkedList<Mission> toAdd = new LinkedList<>(), toDrop = new LinkedList<>();
+                LinkedList<Mission> toAdd = new LinkedList<>();
+                LinkedList<Mission> toDrop = new LinkedList<>();
                 for (int choice : chosen) {
                     for (Mission mission : set3s[playerPosition]) {
                         if (mission.getId() == choice) {
@@ -706,7 +745,8 @@ public class GameModel implements Runnable {
 
             //this is cause game could wait for player to choose missions
             if (state == State.RUNNING) {
-                int counterNew = 0, counterOld = 0;
+                int counterNew = 0;
+                int counterOld = 0;
                 for (Player p : this.players) {
                     if (!p.equals(player)) {
                         newSet3s[counterNew] = set3s[counterOld];
@@ -723,8 +763,8 @@ public class GameModel implements Runnable {
             players.remove(playerPosition);
             Logger.verbose("GameModel.exitGame() removed Player " + player.getName() + "from game " + name);
 
-            if (this.players.size() == 0) Lobby.getInstance().removeGame(this);
-            if (player == this.owner &&players.size()>0) {
+            if (this.players.isEmpty()) Lobby.getInstance().removeGame(this);
+            if (player == this.owner && !players.isEmpty()) {
                 this.owner = players.get(0);
             }
 
@@ -772,42 +812,42 @@ public class GameModel implements Runnable {
 
     private static Map getMapInstance() {
         Map map = new Map();
-        Destination atlanta = new Destination("Atlanta");
-        Destination boston = new Destination("Boston");
-        Destination calgary = new Destination("Calgary");
-        Destination chicago = new Destination("Chicago");
-        Destination dallas = new Destination("Dallas");
-        Destination denver = new Destination("Denver");
-        Destination duluth = new Destination("Duluth");
-        Destination elpaso = new Destination("El Paso");
-        Destination helena = new Destination("Helena");
-        Destination houston = new Destination("Houston");
-        Destination kansascity = new Destination("Kansas City");
-        Destination littlerock = new Destination("Little Rock");
-        Destination losangeles = new Destination("Los Angeles");
-        Destination miami = new Destination("Miami");
-        Destination montreal = new Destination("Montreal");
-        Destination nashville = new Destination("Nashville");
-        Destination neworleans = new Destination("New Orleans");
-        Destination newyork = new Destination("New York");
-        Destination oklahomacity = new Destination("Oklahoma City");
-        Destination phoenix = new Destination("Phoenix");
-        Destination pittsburgh = new Destination("Pittsburgh");
-        Destination portland = new Destination("Portland");
-        Destination saltlakecity = new Destination("Salt Lake City");
-        Destination sanfrancisco = new Destination("San Francisco");
-        Destination santafe = new Destination("Santa Fe");
-        Destination saultstmarie = new Destination("Sault St Marie");
-        Destination seattle = new Destination("Seattle");
-        Destination toronto = new Destination("Toronto");
-        Destination vancouver = new Destination("Vancouver");
-        Destination winnipeg = new Destination("Winnipeg");
-        Destination omaha = new Destination("Omaha");
-        Destination washington = new Destination("Washington");
-        Destination lasvegas = new Destination("Las Vegas");
-        Destination charleston = new Destination("Charleston");
-        Destination saintlouis = new Destination("Saint Louis");
-        Destination raleigh = new Destination("Raleigh");
+        Destination atlanta = new Destination(ATLANTA);
+        Destination boston = new Destination(BOSTON);
+        Destination calgary = new Destination(CALGARY);
+        Destination chicago = new Destination(CHICAGO);
+        Destination dallas = new Destination(DALLAS);
+        Destination denver = new Destination(DENVER);
+        Destination duluth = new Destination(DULUTH);
+        Destination elpaso = new Destination(EL_PASO);
+        Destination helena = new Destination(HELENA);
+        Destination houston = new Destination(HOUSTON);
+        Destination kansascity = new Destination(KANSAS_CITY);
+        Destination littlerock = new Destination(LITTLE_ROCK);
+        Destination losangeles = new Destination(LOS_ANGELES);
+        Destination miami = new Destination(MIAMI);
+        Destination montreal = new Destination(MONTREAL);
+        Destination nashville = new Destination(NASHVILLE);
+        Destination neworleans = new Destination(NEW_ORLEANS);
+        Destination newyork = new Destination(NEW_YORK);
+        Destination oklahomacity = new Destination(OKLAHOMA_CITY);
+        Destination phoenix = new Destination(PHOENIX);
+        Destination pittsburgh = new Destination(PITTSBURGH);
+        Destination portland = new Destination(PORTLAND);
+        Destination saltlakecity = new Destination(SALT_LAKE_CITY);
+        Destination sanfrancisco = new Destination(SAN_FRANCISCO);
+        Destination santafe = new Destination(SANTA_FE);
+        Destination saultstmarie = new Destination(SAULT_ST_MARIE);
+        Destination seattle = new Destination(SEATTLE);
+        Destination toronto = new Destination(TORONTO);
+        Destination vancouver = new Destination(VANCOUVER);
+        Destination winnipeg = new Destination(WINNIPEG);
+        Destination omaha = new Destination(OMAHA);
+        Destination washington = new Destination(WASHINGTON);
+        Destination lasvegas = new Destination(LAS_VEGAS);
+        Destination charleston = new Destination(CHARLESTON);
+        Destination saintlouis = new Destination(SAINT_LOUIS);
+        Destination raleigh = new Destination(RALEIGH);
         map.addDestination(raleigh);
         map.addDestination(charleston);
         map.addDestination(saintlouis);
@@ -940,36 +980,36 @@ public class GameModel implements Runnable {
     private ArrayList<Mission> getMissions() {
         ArrayList<Mission> missions = new ArrayList<>();
 
-        missions.add(new Mission(map.getDestinationByName("Boston"), map.getDestinationByName("Miami"), 12, 1));
-        missions.add(new Mission(map.getDestinationByName("Calgary"), map.getDestinationByName("Phoenix"), 13, 2));
-        missions.add(new Mission(map.getDestinationByName("Calgary"), map.getDestinationByName("Salt Lake City"), 7, 3));
-        missions.add(new Mission(map.getDestinationByName("Chicago"), map.getDestinationByName("New Orleans"), 7, 4));
-        missions.add(new Mission(map.getDestinationByName("Chicago"), map.getDestinationByName("Santa Fe"), 9, 5));
-        missions.add(new Mission(map.getDestinationByName("Dallas"), map.getDestinationByName("New York"), 11, 6));
-        missions.add(new Mission(map.getDestinationByName("Denver"), map.getDestinationByName("El Paso"), 4, 7));
-        missions.add(new Mission(map.getDestinationByName("Denver"), map.getDestinationByName("Pittsburgh"), 11, 8));
-        missions.add(new Mission(map.getDestinationByName("Duluth"), map.getDestinationByName("El Paso"), 10, 9));
-        missions.add(new Mission(map.getDestinationByName("Duluth"), map.getDestinationByName("Houston"), 8, 10));
-        missions.add(new Mission(map.getDestinationByName("Helena"), map.getDestinationByName("Los Angeles"), 8, 11));
-        missions.add(new Mission(map.getDestinationByName("Kansas City"), map.getDestinationByName("Houston"), 5, 12));
-        missions.add(new Mission(map.getDestinationByName("Los Angeles"), map.getDestinationByName("Chicago"), 16, 13));
-        missions.add(new Mission(map.getDestinationByName("Los Angeles"), map.getDestinationByName("Miami"), 20, 14));
-        missions.add(new Mission(map.getDestinationByName("Los Angeles"), map.getDestinationByName("New York"), 21, 15));
-        missions.add(new Mission(map.getDestinationByName("Montreal"), map.getDestinationByName("Atlanta"), 9, 16));
-        missions.add(new Mission(map.getDestinationByName("Montreal"), map.getDestinationByName("New Orleans"), 13, 17));
-        missions.add(new Mission(map.getDestinationByName("New York"), map.getDestinationByName("Atlanta"), 6, 18));
-        missions.add(new Mission(map.getDestinationByName("Portland"), map.getDestinationByName("Nashville"), 17, 19));
-        missions.add(new Mission(map.getDestinationByName("Portland"), map.getDestinationByName("Phoenix"), 11, 20));
-        missions.add(new Mission(map.getDestinationByName("San Francisco"), map.getDestinationByName("Atlanta"), 17, 21));
-        missions.add(new Mission(map.getDestinationByName("Sault St Marie"), map.getDestinationByName("Nashville"), 8, 22));
-        missions.add(new Mission(map.getDestinationByName("Sault St Marie"), map.getDestinationByName("Oklahoma City"), 9, 23));
-        missions.add(new Mission(map.getDestinationByName("Seattle"), map.getDestinationByName("Los Angeles"), 9, 24));
-        missions.add(new Mission(map.getDestinationByName("Seattle"), map.getDestinationByName("New York"), 22, 25));
-        missions.add(new Mission(map.getDestinationByName("Toronto"), map.getDestinationByName("Miami"), 10, 26));
-        missions.add(new Mission(map.getDestinationByName("Vancouver"), map.getDestinationByName("Montreal"), 20, 27));
-        missions.add(new Mission(map.getDestinationByName("Vancouver"), map.getDestinationByName("Santa Fe"), 13, 28));
-        missions.add(new Mission(map.getDestinationByName("Winnipeg"), map.getDestinationByName("Houston"), 12, 29));
-        missions.add(new Mission(map.getDestinationByName("Winnipeg"), map.getDestinationByName("Little Rock"), 11, 30));
+        missions.add(new Mission(map.getDestinationByName(BOSTON), map.getDestinationByName(MIAMI), 12, 1));
+        missions.add(new Mission(map.getDestinationByName(CALGARY), map.getDestinationByName(PHOENIX), 13, 2));
+        missions.add(new Mission(map.getDestinationByName(CALGARY), map.getDestinationByName(SALT_LAKE_CITY), 7, 3));
+        missions.add(new Mission(map.getDestinationByName(CHICAGO), map.getDestinationByName(NEW_ORLEANS), 7, 4));
+        missions.add(new Mission(map.getDestinationByName(CHICAGO), map.getDestinationByName(SANTA_FE), 9, 5));
+        missions.add(new Mission(map.getDestinationByName(DALLAS), map.getDestinationByName(NEW_YORK), 11, 6));
+        missions.add(new Mission(map.getDestinationByName(DENVER), map.getDestinationByName(EL_PASO), 4, 7));
+        missions.add(new Mission(map.getDestinationByName(DENVER), map.getDestinationByName(PITTSBURGH), 11, 8));
+        missions.add(new Mission(map.getDestinationByName(DULUTH), map.getDestinationByName(EL_PASO), 10, 9));
+        missions.add(new Mission(map.getDestinationByName(DULUTH), map.getDestinationByName(HOUSTON), 8, 10));
+        missions.add(new Mission(map.getDestinationByName(HELENA), map.getDestinationByName(LOS_ANGELES), 8, 11));
+        missions.add(new Mission(map.getDestinationByName(KANSAS_CITY), map.getDestinationByName(HOUSTON), 5, 12));
+        missions.add(new Mission(map.getDestinationByName(LOS_ANGELES), map.getDestinationByName(CHICAGO), 16, 13));
+        missions.add(new Mission(map.getDestinationByName(LOS_ANGELES), map.getDestinationByName(MIAMI), 20, 14));
+        missions.add(new Mission(map.getDestinationByName(LOS_ANGELES), map.getDestinationByName(NEW_YORK), 21, 15));
+        missions.add(new Mission(map.getDestinationByName(MONTREAL), map.getDestinationByName(ATLANTA), 9, 16));
+        missions.add(new Mission(map.getDestinationByName(MONTREAL), map.getDestinationByName(NEW_ORLEANS), 13, 17));
+        missions.add(new Mission(map.getDestinationByName(NEW_YORK), map.getDestinationByName(ATLANTA), 6, 18));
+        missions.add(new Mission(map.getDestinationByName(PORTLAND), map.getDestinationByName(NASHVILLE), 17, 19));
+        missions.add(new Mission(map.getDestinationByName(PORTLAND), map.getDestinationByName(PHOENIX), 11, 20));
+        missions.add(new Mission(map.getDestinationByName(SAN_FRANCISCO), map.getDestinationByName(ATLANTA), 17, 21));
+        missions.add(new Mission(map.getDestinationByName(SAULT_ST_MARIE), map.getDestinationByName(NASHVILLE), 8, 22));
+        missions.add(new Mission(map.getDestinationByName(SAULT_ST_MARIE), map.getDestinationByName(OKLAHOMA_CITY), 9, 23));
+        missions.add(new Mission(map.getDestinationByName(SEATTLE), map.getDestinationByName(LOS_ANGELES), 9, 24));
+        missions.add(new Mission(map.getDestinationByName(SEATTLE), map.getDestinationByName(NEW_YORK), 22, 25));
+        missions.add(new Mission(map.getDestinationByName(TORONTO), map.getDestinationByName(MIAMI), 10, 26));
+        missions.add(new Mission(map.getDestinationByName(VANCOUVER), map.getDestinationByName(MONTREAL), 20, 27));
+        missions.add(new Mission(map.getDestinationByName(VANCOUVER), map.getDestinationByName(SANTA_FE), 13, 28));
+        missions.add(new Mission(map.getDestinationByName(WINNIPEG), map.getDestinationByName(HOUSTON), 12, 29));
+        missions.add(new Mission(map.getDestinationByName(WINNIPEG), map.getDestinationByName(LITTLE_ROCK), 11, 30));
 
         Collections.shuffle(missions);
         return missions;
