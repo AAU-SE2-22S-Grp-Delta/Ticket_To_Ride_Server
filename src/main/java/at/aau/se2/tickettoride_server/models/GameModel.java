@@ -272,7 +272,7 @@ public class GameModel implements Runnable {
         } else {
             for (Player player : players) {
                 if (player.getStones() <= 2) {
-                    if (countdown != -1) {
+                    if (countdown == -1) {
                         countdown = players.size();
                     }
                 }
